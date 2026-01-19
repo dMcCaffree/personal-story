@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStory } from "@/contexts/StoryContext";
 import { useAudio } from "@/contexts/AudioContext";
@@ -83,90 +83,19 @@ function ToolbarButton({
 	return buttonContent;
 }
 
-export function Toolbar() {
-	const { currentSceneIndex } = useStory();
-	const {
-		isPlaying,
-		currentTime,
-		duration,
-		volume,
-		isMuted,
-		setVolume,
-		setMuted,
-		togglePlayPause,
-	} = useAudio();
-
-	const [isHovered, setIsHovered] = useState(false);
-	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-	const [captionsEnabled, setCaptionsEnabled] = useState(false);
-	const [isDragging, setIsDragging] = useState(false);
-	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
-	const [sceneSelectorOpen, setSceneSelectorOpen] = useState(false);
-	const [polaroidHovered, setPolaroidHovered] = useState(false);
-	const titleRef = useRef<HTMLDivElement>(null);
-	const containerRef = useRef<HTMLDivElement>(null);
-
-	// Get current scene name
-	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
-	const sceneName = currentScene?.title || `Scene ${currentSceneIndex}`;
-
-	// Calculate scroll distance for long titles
-	useLayoutEffect(() => {
-		const calculateScroll = () => {
-			if (titleRef.current && containerRef.current) {
-				const titleWidth = titleRef.current.scrollWidth;
-				const containerWidth = containerRef.current.clientWidth;
-				const scrollNeeded = titleWidth - containerWidth + 24; // 24px for padding/margins
-				setTitleScrollDistance(scrollNeeded > 0 ? scrollNeeded : 0);
-			}
-		};
-
-		// Small delay to ensure DOM has updated
-		const timer = setTimeout(calculateScroll, 0);
-
-		// Recalculate on window resize
-		window.addEventListener("resize", calculateScroll);
-		return () => {
-			clearTimeout(timer);
-			window.removeEventListener("resize", calculateScroll);
-		};
-	}, []);
-
-	const handleMuteToggle = () => {
-		setMuted(!isMuted);
-	};
-
-	const handleVolumeChange = (newVolume: number) => {
-		setVolume(newVolume);
-		if (newVolume === 0) {
-			setMuted(true);
-		} else if (isMuted) {
-			setMuted(false);
-		}
-	};
-
-	const handlePlayPause = () => {
-		togglePlayPause();
-	};
-
-	const handleCaptionsToggle = () => {
-		setCaptionsEnabled(!captionsEnabled);
-		// TODO: Implement captions toggle
-	};
-
-	const handleHintToggle = () => {
-		// TODO: Implement hint/aside highlighting
-		console.log("Show hints for clickable asides");
-	};
-
-	const formatTime = (seconds: number) => {
-		const mins = Math.floor(seconds / 60);
-		const secs = Math.floor(seconds % 60);
-		return `${mins}:${secs.toString().padStart(2, "0")}`;
-	};
-
-	// Polaroid Stack Button Component
-	const PolaroidStackButton = () => {
+// Polaroid Stack Button - Memoized to prevent re-renders
+const PolaroidStackButton = memo(
+	({
+		currentSceneIndex,
+		polaroidHovered,
+		setPolaroidHovered,
+		onClick,
+	}: {
+		currentSceneIndex: number;
+		polaroidHovered: boolean;
+		setPolaroidHovered: (hovered: boolean) => void;
+		onClick: () => void;
+	}) => {
 		const prevIndex = Math.max(1, currentSceneIndex - 1);
 		const nextIndex = Math.min(scenes.length, currentSceneIndex + 1);
 		const [showTooltip, setShowTooltip] = useState(false);
@@ -175,7 +104,7 @@ export function Toolbar() {
 			<motion.button
 				type="button"
 				className="relative flex h-9 w-12 items-center justify-center"
-				onClick={() => setSceneSelectorOpen(true)}
+				onClick={onClick}
 				onMouseEnter={() => {
 					setPolaroidHovered(true);
 					setShowTooltip(true);
@@ -277,6 +206,91 @@ export function Toolbar() {
 				</AnimatePresence>
 			</motion.button>
 		);
+	},
+);
+
+PolaroidStackButton.displayName = "PolaroidStackButton";
+
+export function Toolbar() {
+	const { currentSceneIndex } = useStory();
+	const {
+		isPlaying,
+		currentTime,
+		duration,
+		volume,
+		isMuted,
+		setVolume,
+		setMuted,
+		togglePlayPause,
+	} = useAudio();
+
+	const [isHovered, setIsHovered] = useState(false);
+	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+	const [captionsEnabled, setCaptionsEnabled] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
+	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
+	const [sceneSelectorOpen, setSceneSelectorOpen] = useState(false);
+	const [polaroidHovered, setPolaroidHovered] = useState(false);
+	const titleRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	// Get current scene name
+	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
+	const sceneName = currentScene?.title || `Scene ${currentSceneIndex}`;
+
+	// Calculate scroll distance for long titles
+	useLayoutEffect(() => {
+		const calculateScroll = () => {
+			if (titleRef.current && containerRef.current) {
+				const titleWidth = titleRef.current.scrollWidth;
+				const containerWidth = containerRef.current.clientWidth;
+				const scrollNeeded = titleWidth - containerWidth + 24; // 24px for padding/margins
+				setTitleScrollDistance(scrollNeeded > 0 ? scrollNeeded : 0);
+			}
+		};
+
+		// Small delay to ensure DOM has updated
+		const timer = setTimeout(calculateScroll, 0);
+
+		// Recalculate on window resize
+		window.addEventListener("resize", calculateScroll);
+		return () => {
+			clearTimeout(timer);
+			window.removeEventListener("resize", calculateScroll);
+		};
+	}, []);
+
+	const handleMuteToggle = () => {
+		setMuted(!isMuted);
+	};
+
+	const handleVolumeChange = (newVolume: number) => {
+		setVolume(newVolume);
+		if (newVolume === 0) {
+			setMuted(true);
+		} else if (isMuted) {
+			setMuted(false);
+		}
+	};
+
+	const handlePlayPause = () => {
+		togglePlayPause();
+	};
+
+	const handleCaptionsToggle = () => {
+		setCaptionsEnabled(!captionsEnabled);
+		// TODO: Implement captions toggle
+	};
+
+	const handleHintToggle = () => {
+		// TODO: Implement hint/aside highlighting
+		console.log("Show hints for clickable asides");
+	};
+
+	const formatTime = (seconds: number) => {
+		const mins = Math.floor(seconds / 60);
+		const secs = Math.floor(seconds % 60);
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	};
 
 	// Utility buttons that pop out on hover
@@ -385,7 +399,7 @@ export function Toolbar() {
 				>
 					{/* Top section - Scene info and narration controls */}
 					<motion.div
-						className="flex flex-col gap-1 pt-1!"
+						className="flex flex-col gap-1"
 						animate={{
 							paddingBottom: isHovered ? "0.5rem" : "0rem",
 						}}
@@ -603,7 +617,12 @@ export function Toolbar() {
 											delay: 0,
 										}}
 									>
-										<PolaroidStackButton />
+										<PolaroidStackButton
+											currentSceneIndex={currentSceneIndex}
+											polaroidHovered={polaroidHovered}
+											setPolaroidHovered={setPolaroidHovered}
+											onClick={() => setSceneSelectorOpen(true)}
+										/>
 									</motion.div>
 
 									{/* Divider */}

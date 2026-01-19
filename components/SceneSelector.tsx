@@ -2,15 +2,104 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { scenes } from "@/data/scenes";
-import { getKeyframeUrl } from "@/lib/story-config";
+import { getKeyframeUrl, getTransitionUrl } from "@/lib/story-config";
 import { useStory } from "@/contexts/StoryContext";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface SceneSelectorProps {
 	isOpen: boolean;
 	onClose: () => void;
 	currentSceneIndex: number;
+}
+
+// Scene card component to prevent re-renders
+function SceneCard({
+	scene,
+	index,
+	currentSceneIndex,
+	onClick,
+}: {
+	scene: { index: number; title: string };
+	index: number;
+	currentSceneIndex: number;
+	onClick: () => void;
+}) {
+	const [isHovered, setIsHovered] = useState(false);
+	const videoRef = useRef<HTMLVideoElement>(null);
+
+	useEffect(() => {
+		const video = videoRef.current;
+		if (!video) return;
+
+		if (isHovered && scene.index !== currentSceneIndex) {
+			video.play().catch(() => {
+				// Ignore play errors
+			});
+		} else {
+			video.pause();
+			video.currentTime = 0;
+		}
+	}, [isHovered, scene.index, currentSceneIndex]);
+
+	const isCurrent = scene.index === currentSceneIndex;
+
+	return (
+		<motion.button
+			type="button"
+			initial={{ opacity: 0, scale: 0.8 }}
+			animate={{ opacity: 1, scale: 1 }}
+			transition={{
+				delay: index * 0.015,
+				duration: 0.3,
+				ease: [0.34, 1.56, 0.64, 1],
+			}}
+			onClick={onClick}
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
+			disabled={isCurrent}
+			className={`group relative overflow-hidden rounded-md border ${
+				isCurrent
+					? "border-white ring-2 ring-white/50"
+					: "border-white/25 hover:border-white/60"
+			} transition-all duration-200 ${
+				isCurrent ? "cursor-default" : "cursor-pointer"
+			}`}
+			whileHover={!isCurrent ? { scale: 1.05 } : {}}
+			whileTap={!isCurrent ? { scale: 0.95 } : {}}
+			style={{
+				boxShadow: isCurrent
+					? "0 4px 16px rgba(255,255,255,0.3), inset 0 0 0 1px rgba(255,255,255,0.5)"
+					: "0 2px 6px rgba(0,0,0,0.3)",
+			}}
+		>
+			<div className="relative aspect-square w-full overflow-hidden">
+				{/* Keyframe image */}
+				<Image
+					src={getKeyframeUrl(scene.index)}
+					alt={scene.title}
+					fill
+					className="object-cover"
+					unoptimized
+				/>
+
+				{/* Transition video on hover */}
+				{!isCurrent && scene.index < scenes.length && (
+					<video
+						ref={videoRef}
+						src={getTransitionUrl(scene.index, scene.index + 1)}
+						loop
+						muted
+						playsInline
+						className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+					/>
+				)}
+
+				{/* Subtle gradient overlay */}
+				<div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
+			</div>
+		</motion.button>
+	);
 }
 
 export function SceneSelector({
@@ -19,7 +108,6 @@ export function SceneSelector({
 	currentSceneIndex,
 }: SceneSelectorProps) {
 	const { goToNextScene, goToPreviousScene } = useStory();
-	const [hoveredScene, setHoveredScene] = useState<number | null>(null);
 
 	const handleSceneClick = (targetIndex: number) => {
 		// Calculate how many scenes to navigate
@@ -80,76 +168,13 @@ export function SceneSelector({
 						<div className="overflow-y-auto px-6 py-6 scrollbar-hide max-h-[370px]">
 							<div className="grid grid-cols-5 gap-2.5">
 								{scenes.map((scene, index) => (
-									<motion.button
+									<SceneCard
 										key={scene.index}
-										type="button"
-										initial={{ opacity: 0, scale: 0.8 }}
-										animate={{ opacity: 1, scale: 1 }}
-										transition={{
-											delay: index * 0.015,
-											duration: 0.3,
-											ease: [0.34, 1.56, 0.64, 1],
-										}}
+										scene={scene}
+										index={index}
+										currentSceneIndex={currentSceneIndex}
 										onClick={() => handleSceneClick(scene.index)}
-										onMouseEnter={() => setHoveredScene(scene.index)}
-										onMouseLeave={() => setHoveredScene(null)}
-										disabled={scene.index === currentSceneIndex}
-										className={`group relative overflow-hidden rounded-md border ${
-											scene.index === currentSceneIndex
-												? "border-white ring-2 ring-white/50"
-												: "border-white/25 hover:border-white/60"
-										} transition-all duration-200 ${
-											scene.index === currentSceneIndex
-												? "cursor-default"
-												: "cursor-pointer"
-										}`}
-										whileHover={
-											scene.index !== currentSceneIndex ? { scale: 1.08 } : {}
-										}
-										whileTap={
-											scene.index !== currentSceneIndex ? { scale: 0.95 } : {}
-										}
-										style={{
-											boxShadow:
-												scene.index === currentSceneIndex
-													? "0 4px 16px rgba(255,255,255,0.3), inset 0 0 0 1px rgba(255,255,255,0.5)"
-													: "0 2px 6px rgba(0,0,0,0.3)",
-										}}
-									>
-										{/* Image */}
-										<div className="relative aspect-square w-full overflow-hidden">
-											<Image
-												src={getKeyframeUrl(scene.index)}
-												alt={scene.title}
-												fill
-												className="object-cover transition-transform duration-300 group-hover:scale-110"
-												unoptimized
-											/>
-											{/* Subtle gradient overlay */}
-											<div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-											{/* Hover title */}
-											<AnimatePresence>
-												{hoveredScene === scene.index &&
-													scene.index !== currentSceneIndex && (
-														<motion.div
-															initial={{ opacity: 0, y: 5 }}
-															animate={{ opacity: 1, y: 0 }}
-															exit={{ opacity: 0, y: 5 }}
-															transition={{ duration: 0.15 }}
-															className="absolute bottom-0 left-0 right-0 px-1.5 py-1 bg-black/90 backdrop-blur-sm"
-														>
-															<div className="text-[8px] text-white/70 font-semibold uppercase tracking-wider">
-																Chapter {scene.index}
-															</div>
-															<div className="text-[9px] text-white font-bold line-clamp-1 leading-tight">
-																{scene.title}
-															</div>
-														</motion.div>
-													)}
-											</AnimatePresence>
-										</div>
-									</motion.button>
+									/>
 								))}
 							</div>
 						</div>
