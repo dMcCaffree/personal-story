@@ -12,7 +12,11 @@ export const scenes: Scene[] = [
 	{ index: 5, title: "No Soliciting", hasAsides: false },
 	{ index: 6, title: "Take A Chance On Me", hasAsides: false },
 	{ index: 7, title: "Icarus Has Takeoff", hasAsides: false },
-	{ index: 8, title: "Brothers Near The Sun", hasAsides: false },
+	{
+		index: 8,
+		title: "Never regret thy fall, O Icarus of the fearless flight",
+		hasAsides: false,
+	},
 	{ index: 9, title: "It Burns Us", hasAsides: false },
 	{ index: 10, title: "When It Rains, It's Just Rain", hasAsides: false },
 	{ index: 11, title: "4 Years @ Copy.ai", hasAsides: false },

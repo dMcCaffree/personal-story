@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStory } from "@/contexts/StoryContext";
 import { scenes } from "@/data/scenes";
 
 const LINKEDIN_URL = "https://linkedin.com/in/dMcCaffree";
 const RESUME_URL = "#"; // Placeholder for now
+const MAX_TITLE_LENGTH_BEFORE_ANIMATING = 20;
 
 interface ToolbarButtonProps {
 	icon: React.ReactNode;
@@ -89,6 +90,35 @@ export function Toolbar() {
 	const [isNarrationPlaying, setIsNarrationPlaying] = useState(false);
 	const [currentTime] = useState(0);
 	const [duration] = useState(180); // TODO: Get actual duration from audio
+	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
+	const titleRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	// Get current scene name
+	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
+	const sceneName = currentScene?.title || `Scene ${currentSceneIndex}`;
+
+	// Calculate scroll distance for long titles
+	useLayoutEffect(() => {
+		const calculateScroll = () => {
+			if (titleRef.current && containerRef.current) {
+				const titleWidth = titleRef.current.scrollWidth;
+				const containerWidth = containerRef.current.clientWidth;
+				const scrollNeeded = titleWidth - containerWidth + 24; // 24px for padding/margins
+				setTitleScrollDistance(scrollNeeded > 0 ? scrollNeeded : 0);
+			}
+		};
+
+		// Small delay to ensure DOM has updated
+		const timer = setTimeout(calculateScroll, 0);
+
+		// Recalculate on window resize
+		window.addEventListener("resize", calculateScroll);
+		return () => {
+			clearTimeout(timer);
+			window.removeEventListener("resize", calculateScroll);
+		};
+	}, [sceneName]);
 
 	const handleMuteToggle = () => {
 		setIsMuted(!isMuted);
@@ -124,11 +154,6 @@ export function Toolbar() {
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
 		return `${mins}:${secs.toString().padStart(2, "0")}`;
-	};
-
-	const getSceneName = (index: number) => {
-		const scene = scenes.find((s) => s.index === index);
-		return scene?.title || `Scene ${index}`;
 	};
 
 	// Utility buttons that pop out on hover
@@ -236,7 +261,7 @@ export function Toolbar() {
 			>
 				{/* Top section - Scene info and narration controls */}
 				<motion.div
-					className="flex flex-col gap-1.5"
+					className="flex flex-col gap-1 pt-1!"
 					animate={{
 						paddingBottom: isHovered ? "0.5rem" : "0rem",
 					}}
@@ -245,18 +270,51 @@ export function Toolbar() {
 						ease: "easeInOut",
 					}}
 				>
-					{/* Scene name */}
-					<div className="px-1 text-center text-xs font-medium text-white/90">
-						{getSceneName(currentSceneIndex)}
+					{/* Scene name with scrolling for long titles */}
+					<div
+						ref={containerRef}
+						className="relative px-1 text-center text-xs font-medium text-white/90 overflow-hidden max-w-[280px] mx-auto"
+					>
+						{sceneName.length > MAX_TITLE_LENGTH_BEFORE_ANIMATING ? (
+							<div className="flex items-center justify-center w-full">
+								<motion.div
+									ref={titleRef}
+									key={`scroll-${currentSceneIndex}`}
+									animate={{
+										x: [
+											0,
+											0,
+											-titleScrollDistance,
+											-titleScrollDistance,
+											-titleScrollDistance,
+										],
+									}}
+									transition={{
+										duration: 12,
+										times: [0, 0.25, 0.5, 0.75, 1],
+										ease: "linear",
+										repeat: Infinity,
+									}}
+									className="whitespace-nowrap will-change-transform"
+									style={{ paddingLeft: "2rem" }}
+								>
+									{sceneName}
+								</motion.div>
+							</div>
+						) : (
+							<div ref={titleRef} className="whitespace-nowrap">
+								{sceneName}
+							</div>
+						)}
 					</div>
 
 					{/* Narration controls */}
-					<div className="flex items-center justify-between gap-3 px-1">
+					<div className="flex items-center justify-between gap-3">
 						{/* Play/Pause */}
 						<button
 							type="button"
 							onClick={handlePlayPause}
-							className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+							className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-2"
 						>
 							{isNarrationPlaying ? (
 								<svg
@@ -293,7 +351,7 @@ export function Toolbar() {
 						</div>
 
 						{/* Volume control */}
-						<div className="relative flex items-center">
+						<div className="relative flex items-center mr-2">
 							<button
 								type="button"
 								onClick={handleMuteToggle}
