@@ -7,6 +7,7 @@ import { useAudio } from "@/contexts/AudioContext";
 import { scenes } from "@/data/scenes";
 import { getKeyframeUrl } from "@/lib/story-config";
 import { SceneSelector } from "@/components/SceneSelector";
+import { Tooltip } from "@/components/Tooltip";
 import Image from "next/image";
 
 const LINKEDIN_URL = "https://linkedin.com/in/dMcCaffree";
@@ -30,10 +31,9 @@ function ToolbarButton({
 	disabled = false,
 	isActive = false,
 }: ToolbarButtonProps) {
-	const [showTooltip, setShowTooltip] = useState(false);
-
 	const buttonContent = (
 		<motion.button
+			type="button"
 			className={`relative flex h-9 w-9 items-center justify-center rounded-full transition-all ${
 				disabled
 					? "cursor-not-allowed opacity-40"
@@ -41,46 +41,29 @@ function ToolbarButton({
 			} ${isActive ? "bg-white/20" : ""}`}
 			disabled={disabled}
 			onClick={onClick}
-			onMouseEnter={() => setShowTooltip(true)}
-			onMouseLeave={() => setShowTooltip(false)}
 			whileHover={{ scale: disabled ? 1 : 1.1 }}
 			whileTap={{ scale: disabled ? 1 : 0.9 }}
 			transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.5 }}
 		>
 			{icon}
-
-			{/* Tooltip */}
-			<AnimatePresence>
-				{showTooltip && (
-					<motion.div
-						initial={{ opacity: 0, y: 10 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: 10 }}
-						transition={{
-							type: "spring",
-							stiffness: 500,
-							damping: 30,
-							mass: 0.5,
-						}}
-						className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-xs text-white backdrop-blur-xl"
-					>
-						{label}
-						<div className="absolute -bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rotate-45 bg-black/90" />
-					</motion.div>
-				)}
-			</AnimatePresence>
 		</motion.button>
+	);
+
+	const wrappedButton = (
+		<Tooltip label={label} delay={300}>
+			{buttonContent}
+		</Tooltip>
 	);
 
 	if (href) {
 		return (
 			<a href={href} target="_blank" rel="noopener noreferrer">
-				{buttonContent}
+				{wrappedButton}
 			</a>
 		);
 	}
 
-	return buttonContent;
+	return wrappedButton;
 }
 
 // Polaroid Stack Button - Memoized to prevent re-renders
@@ -98,113 +81,92 @@ const PolaroidStackButton = memo(
 	}) => {
 		const prevIndex = Math.max(1, currentSceneIndex - 1);
 		const nextIndex = Math.min(scenes.length, currentSceneIndex + 1);
-		const [showTooltip, setShowTooltip] = useState(false);
 
 		return (
-			<motion.button
-				type="button"
-				className="relative flex h-9 w-12 items-center justify-center"
-				onClick={onClick}
-				onMouseEnter={() => {
-					setPolaroidHovered(true);
-					setShowTooltip(true);
-				}}
-				onMouseLeave={() => {
-					setPolaroidHovered(false);
-					setShowTooltip(false);
-				}}
-				whileHover={{ scale: 1.1 }}
-				whileTap={{ scale: 0.9 }}
-				transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.5 }}
-			>
-				{/* Stack of polaroids */}
-				<div className="relative h-7 w-10">
-					{/* Previous scene - bottom left */}
-					<motion.div
-						className="absolute left-0 top-0 h-6 w-8 rounded-sm border border-white/40 bg-white shadow-lg overflow-hidden"
-						animate={{
-							rotate: polaroidHovered ? -15 : -5,
-							x: polaroidHovered ? -4 : 0,
-							y: polaroidHovered ? 2 : 0,
-						}}
-						transition={{ type: "spring", stiffness: 400, damping: 25 }}
-						style={{ zIndex: 1 }}
-					>
-						<div className="relative h-full w-full p-0.5">
-							<Image
-								src={getKeyframeUrl(prevIndex)}
-								alt=""
-								fill
-								className="object-cover"
-								unoptimized
-							/>
-						</div>
-					</motion.div>
-
-					{/* Next scene - bottom right */}
-					<motion.div
-						className="absolute right-0 top-0 h-6 w-8 rounded-sm border border-white/40 bg-white shadow-lg overflow-hidden"
-						animate={{
-							rotate: polaroidHovered ? 15 : 5,
-							x: polaroidHovered ? 4 : 0,
-							y: polaroidHovered ? 2 : 0,
-						}}
-						transition={{ type: "spring", stiffness: 400, damping: 25 }}
-						style={{ zIndex: 2 }}
-					>
-						<div className="relative h-full w-full p-0.5">
-							<Image
-								src={getKeyframeUrl(nextIndex)}
-								alt=""
-								fill
-								className="object-cover"
-								unoptimized
-							/>
-						</div>
-					</motion.div>
-
-					{/* Current scene - on top center */}
-					<motion.div
-						className="absolute left-1/2 top-0 -translate-x-1/2 h-6 w-8 rounded-sm border-2 border-white bg-white shadow-xl overflow-hidden"
-						animate={{
-							y: polaroidHovered ? -4 : 0,
-						}}
-						transition={{ type: "spring", stiffness: 400, damping: 25 }}
-						style={{ zIndex: 3 }}
-					>
-						<div className="relative h-full w-full p-0.5">
-							<Image
-								src={getKeyframeUrl(currentSceneIndex)}
-								alt=""
-								fill
-								className="object-cover"
-								unoptimized
-							/>
-						</div>
-					</motion.div>
-				</div>
-
-				{/* Tooltip */}
-				<AnimatePresence>
-					{showTooltip && (
+			<Tooltip label="Scene Selector" delay={300}>
+				<motion.button
+					type="button"
+					className="relative flex h-9 w-16 items-center justify-center"
+					onClick={onClick}
+					onMouseEnter={() => setPolaroidHovered(true)}
+					onMouseLeave={() => setPolaroidHovered(false)}
+					whileHover={{ scale: 1.05 }}
+					whileTap={{ scale: 0.95 }}
+					transition={{
+						type: "spring",
+						stiffness: 500,
+						damping: 30,
+						mass: 0.5,
+					}}
+				>
+					{/* Stack of polaroids */}
+					<div className="relative h-7 w-10">
+						{/* Previous scene - bottom left */}
 						<motion.div
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 10 }}
-							transition={{
-								type: "spring",
-								stiffness: 500,
-								damping: 30,
-								mass: 0.5,
+							className="absolute left-0 top-0 h-6 w-8 rounded-sm border border-white/40 bg-white shadow-lg overflow-hidden"
+							animate={{
+								rotate: polaroidHovered ? -12 : -5,
+								x: polaroidHovered ? -2 : 0,
+								y: polaroidHovered ? 1 : 0,
 							}}
-							className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-xs text-white backdrop-blur-xl"
+							transition={{ type: "spring", stiffness: 400, damping: 25 }}
+							style={{ zIndex: 1 }}
 						>
-							Scene Selector
-							<div className="absolute -bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rotate-45 bg-black/90" />
+							<div className="relative h-full w-full p-0.5">
+								<Image
+									src={getKeyframeUrl(prevIndex)}
+									alt=""
+									fill
+									className="object-cover"
+									unoptimized
+								/>
+							</div>
 						</motion.div>
-					)}
-				</AnimatePresence>
-			</motion.button>
+
+						{/* Next scene - bottom right */}
+						<motion.div
+							className="absolute right-0 top-0 h-6 w-8 rounded-sm border border-white/40 bg-white shadow-lg overflow-hidden"
+							animate={{
+								rotate: polaroidHovered ? 12 : 5,
+								x: polaroidHovered ? 2 : 0,
+								y: polaroidHovered ? 1 : 0,
+							}}
+							transition={{ type: "spring", stiffness: 400, damping: 25 }}
+							style={{ zIndex: 2 }}
+						>
+							<div className="relative h-full w-full p-0.5">
+								<Image
+									src={getKeyframeUrl(nextIndex)}
+									alt=""
+									fill
+									className="object-cover"
+									unoptimized
+								/>
+							</div>
+						</motion.div>
+
+						{/* Current scene - on top center */}
+						<motion.div
+							className="absolute left-1/2 top-0 -translate-x-1/2 h-6 w-8 rounded-sm border-2 border-white bg-white shadow-xl overflow-hidden"
+							animate={{
+								y: polaroidHovered ? -3 : 0,
+							}}
+							transition={{ type: "spring", stiffness: 400, damping: 25 }}
+							style={{ zIndex: 3 }}
+						>
+							<div className="relative h-full w-full p-0.5">
+								<Image
+									src={getKeyframeUrl(currentSceneIndex)}
+									alt=""
+									fill
+									className="object-cover"
+									unoptimized
+								/>
+							</div>
+						</motion.div>
+					</div>
+				</motion.button>
+			</Tooltip>
 		);
 	},
 );
