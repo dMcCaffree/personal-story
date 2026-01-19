@@ -580,71 +580,73 @@ export function Toolbar() {
 									height: { duration: 0.2, ease: "easeInOut" },
 									opacity: { duration: 0.15 },
 								}}
-								className="overflow-hidden pb-2"
+								className="overflow-hidden"
 							>
-								{/* Separator */}
-								<motion.div
-									initial={{ opacity: 0, scaleX: 0 }}
-									animate={{ opacity: 1, scaleX: 1 }}
-									exit={{ opacity: 0, scaleX: 0 }}
-									transition={{
-										duration: 0.15,
-										ease: "easeOut",
-									}}
-									className="h-px w-full bg-white/10 mb-2"
-								/>
-
-								{/* Buttons container */}
-								<motion.div
-									className="flex items-center justify-center gap-2"
-									initial={{ width: 0 }}
-									animate={{ width: "auto" }}
-									exit={{ width: 0 }}
-									transition={{
-										duration: 0.2,
-										ease: "easeInOut",
-									}}
-									style={{ overflow: "visible" }}
-								>
-									{/* Polaroid Stack Button */}
+								<div className="pt-2 pb-2">
+									{/* Separator */}
 									<motion.div
-										initial={{ opacity: 0, y: 10, scale: 0.8 }}
-										animate={{ opacity: 1, y: 0, scale: 1 }}
-										exit={{ opacity: 0, y: 10, scale: 0.8 }}
+										initial={{ opacity: 0, scaleX: 0 }}
+										animate={{ opacity: 1, scaleX: 1 }}
+										exit={{ opacity: 0, scaleX: 0 }}
+										transition={{
+											duration: 0.15,
+											ease: "easeOut",
+										}}
+										className="h-px w-full bg-white/10 mb-2"
+									/>
+
+									{/* Buttons container */}
+									<motion.div
+										className="flex items-center justify-center gap-2"
+										initial={{ width: 0 }}
+										animate={{ width: "auto" }}
+										exit={{ width: 0 }}
 										transition={{
 											duration: 0.2,
-											ease: [0.34, 1.56, 0.64, 1],
-											delay: 0,
+											ease: "easeInOut",
 										}}
+										style={{ overflow: "visible" }}
 									>
-										<PolaroidStackButton
-											currentSceneIndex={currentSceneIndex}
-											polaroidHovered={polaroidHovered}
-											setPolaroidHovered={setPolaroidHovered}
-											onClick={() => setSceneSelectorOpen(true)}
-										/>
-									</motion.div>
-
-									{/* Divider */}
-									<div className="h-6 w-px bg-white/20" />
-
-									{/* Other utility buttons */}
-									{utilityButtons.map((button, index) => (
+										{/* Polaroid Stack Button */}
 										<motion.div
-											key={`utility-${button.label}-${index}`}
 											initial={{ opacity: 0, y: 10, scale: 0.8 }}
 											animate={{ opacity: 1, y: 0, scale: 1 }}
 											exit={{ opacity: 0, y: 10, scale: 0.8 }}
 											transition={{
 												duration: 0.2,
 												ease: [0.34, 1.56, 0.64, 1],
-												delay: (index + 1) * 0.05,
+												delay: 0,
 											}}
 										>
-											<ToolbarButton {...button} />
+											<PolaroidStackButton
+												currentSceneIndex={currentSceneIndex}
+												polaroidHovered={polaroidHovered}
+												setPolaroidHovered={setPolaroidHovered}
+												onClick={() => setSceneSelectorOpen(true)}
+											/>
 										</motion.div>
-									))}
-								</motion.div>
+
+										{/* Divider */}
+										<div className="h-6 w-px bg-white/20" />
+
+										{/* Other utility buttons */}
+										{utilityButtons.map((button, index) => (
+											<motion.div
+												key={`utility-${button.label}-${index}`}
+												initial={{ opacity: 0, y: 10, scale: 0.8 }}
+												animate={{ opacity: 1, y: 0, scale: 1 }}
+												exit={{ opacity: 0, y: 10, scale: 0.8 }}
+												transition={{
+													duration: 0.2,
+													ease: [0.34, 1.56, 0.64, 1],
+													delay: (index + 1) * 0.05,
+												}}
+											>
+												<ToolbarButton {...button} />
+											</motion.div>
+										))}
+									</motion.div>
+								</div>
 							</motion.div>
 						)}
 					</AnimatePresence>
