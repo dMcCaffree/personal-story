@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { useStory } from "@/contexts/StoryContext";
 import { useAudio } from "@/contexts/AudioContext";
 import { scenes } from "@/data/scenes";
+import { getKeyframeUrl } from "@/lib/story-config";
+import { SceneSelector } from "@/components/SceneSelector";
+import Image from "next/image";
 
 const LINKEDIN_URL = "https://linkedin.com/in/dMcCaffree";
 const RESUME_URL = "#"; // Placeholder for now
@@ -98,6 +101,8 @@ export function Toolbar() {
 	const [captionsEnabled, setCaptionsEnabled] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
 	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
+	const [sceneSelectorOpen, setSceneSelectorOpen] = useState(false);
+	const [polaroidHovered, setPolaroidHovered] = useState(false);
 	const titleRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +130,7 @@ export function Toolbar() {
 			clearTimeout(timer);
 			window.removeEventListener("resize", calculateScroll);
 		};
-	}, [sceneName]);
+	}, []);
 
 	const handleMuteToggle = () => {
 		setMuted(!isMuted);
@@ -158,6 +163,120 @@ export function Toolbar() {
 		const mins = Math.floor(seconds / 60);
 		const secs = Math.floor(seconds % 60);
 		return `${mins}:${secs.toString().padStart(2, "0")}`;
+	};
+
+	// Polaroid Stack Button Component
+	const PolaroidStackButton = () => {
+		const prevIndex = Math.max(1, currentSceneIndex - 1);
+		const nextIndex = Math.min(scenes.length, currentSceneIndex + 1);
+		const [showTooltip, setShowTooltip] = useState(false);
+
+		return (
+			<motion.button
+				type="button"
+				className="relative flex h-9 w-12 items-center justify-center"
+				onClick={() => setSceneSelectorOpen(true)}
+				onMouseEnter={() => {
+					setPolaroidHovered(true);
+					setShowTooltip(true);
+				}}
+				onMouseLeave={() => {
+					setPolaroidHovered(false);
+					setShowTooltip(false);
+				}}
+				whileHover={{ scale: 1.1 }}
+				whileTap={{ scale: 0.9 }}
+				transition={{ type: "spring", stiffness: 500, damping: 30, mass: 0.5 }}
+			>
+				{/* Stack of polaroids */}
+				<div className="relative h-7 w-10">
+					{/* Previous scene - bottom left */}
+					<motion.div
+						className="absolute left-0 top-0 h-6 w-8 rounded-sm border border-white/40 bg-white shadow-lg overflow-hidden"
+						animate={{
+							rotate: polaroidHovered ? -15 : -5,
+							x: polaroidHovered ? -4 : 0,
+							y: polaroidHovered ? 2 : 0,
+						}}
+						transition={{ type: "spring", stiffness: 400, damping: 25 }}
+						style={{ zIndex: 1 }}
+					>
+						<div className="relative h-full w-full p-0.5">
+							<Image
+								src={getKeyframeUrl(prevIndex)}
+								alt=""
+								fill
+								className="object-cover"
+								unoptimized
+							/>
+						</div>
+					</motion.div>
+
+					{/* Next scene - bottom right */}
+					<motion.div
+						className="absolute right-0 top-0 h-6 w-8 rounded-sm border border-white/40 bg-white shadow-lg overflow-hidden"
+						animate={{
+							rotate: polaroidHovered ? 15 : 5,
+							x: polaroidHovered ? 4 : 0,
+							y: polaroidHovered ? 2 : 0,
+						}}
+						transition={{ type: "spring", stiffness: 400, damping: 25 }}
+						style={{ zIndex: 2 }}
+					>
+						<div className="relative h-full w-full p-0.5">
+							<Image
+								src={getKeyframeUrl(nextIndex)}
+								alt=""
+								fill
+								className="object-cover"
+								unoptimized
+							/>
+						</div>
+					</motion.div>
+
+					{/* Current scene - on top center */}
+					<motion.div
+						className="absolute left-1/2 top-0 -translate-x-1/2 h-6 w-8 rounded-sm border-2 border-white bg-white shadow-xl overflow-hidden"
+						animate={{
+							y: polaroidHovered ? -4 : 0,
+						}}
+						transition={{ type: "spring", stiffness: 400, damping: 25 }}
+						style={{ zIndex: 3 }}
+					>
+						<div className="relative h-full w-full p-0.5">
+							<Image
+								src={getKeyframeUrl(currentSceneIndex)}
+								alt=""
+								fill
+								className="object-cover"
+								unoptimized
+							/>
+						</div>
+					</motion.div>
+				</div>
+
+				{/* Tooltip */}
+				<AnimatePresence>
+					{showTooltip && (
+						<motion.div
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 10 }}
+							transition={{
+								type: "spring",
+								stiffness: 500,
+								damping: 30,
+								mass: 0.5,
+							}}
+							className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-xs text-white backdrop-blur-xl"
+						>
+							Scene Selector
+							<div className="absolute -bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rotate-45 bg-black/90" />
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</motion.button>
+		);
 	};
 
 	// Utility buttons that pop out on hover
@@ -242,253 +361,283 @@ export function Toolbar() {
 	];
 
 	return (
-		<motion.div
-			drag
-			dragMomentum={false}
-			dragElastic={0.1}
-			onDragStart={() => setIsDragging(true)}
-			onDragEnd={() => setIsDragging(false)}
-			className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 cursor-grab active:cursor-grabbing"
-			whileDrag={{ scale: 1.05, cursor: "grabbing" }}
-		>
+		<>
 			<motion.div
-				className="relative flex flex-col rounded-2xl border border-white/20 bg-black/40 px-3 py-2 backdrop-blur-2xl"
-				onMouseEnter={() => !isDragging && setIsHovered(true)}
-				onMouseLeave={() => {
-					if (!isDragging) {
-						setIsHovered(false);
-					}
-				}}
-				style={{
-					boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
-				}}
+				drag
+				dragMomentum={false}
+				dragElastic={0.1}
+				onDragStart={() => setIsDragging(true)}
+				onDragEnd={() => setIsDragging(false)}
+				className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 cursor-grab active:cursor-grabbing"
+				whileDrag={{ scale: 1.05, cursor: "grabbing" }}
 			>
-				{/* Top section - Scene info and narration controls */}
 				<motion.div
-					className="flex flex-col gap-1 pt-1!"
-					animate={{
-						paddingBottom: isHovered ? "0.5rem" : "0rem",
+					className="relative flex flex-col rounded-2xl border border-white/20 bg-black/40 px-3 py-2 backdrop-blur-2xl"
+					onMouseEnter={() => !isDragging && setIsHovered(true)}
+					onMouseLeave={() => {
+						if (!isDragging) {
+							setIsHovered(false);
+						}
 					}}
-					transition={{
-						duration: 0.2,
-						ease: "easeInOut",
+					style={{
+						boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
 					}}
 				>
-					{/* Scene name with scrolling for long titles */}
-					<div
-						ref={containerRef}
-						className="relative px-1 text-center text-xs font-medium text-white/90 overflow-hidden max-w-[280px] mx-auto"
+					{/* Top section - Scene info and narration controls */}
+					<motion.div
+						className="flex flex-col gap-1 pt-1!"
+						animate={{
+							paddingBottom: isHovered ? "0.5rem" : "0rem",
+						}}
+						transition={{
+							duration: 0.2,
+							ease: "easeInOut",
+						}}
 					>
-						{sceneName.length > MAX_TITLE_LENGTH_BEFORE_ANIMATING ? (
-							<div className="flex items-center justify-center w-full">
-								<motion.div
-									ref={titleRef}
-									key={`scroll-${currentSceneIndex}`}
-									animate={{
-										x: [
-											0,
-											0,
-											-titleScrollDistance,
-											-titleScrollDistance,
-											-titleScrollDistance,
-										],
-									}}
-									transition={{
-										duration: 12,
-										times: [0, 0.25, 0.5, 0.75, 1],
-										ease: "linear",
-										repeat: Infinity,
-									}}
-									className="whitespace-nowrap will-change-transform"
-									style={{ paddingLeft: "2rem" }}
-								>
-									{sceneName}
-								</motion.div>
-							</div>
-						) : (
-							<div ref={titleRef} className="whitespace-nowrap">
-								{sceneName}
-							</div>
-						)}
-					</div>
-
-					{/* Narration controls */}
-					<div className="flex items-center justify-between gap-3">
-						{/* Play/Pause */}
-						<button
-							type="button"
-							onClick={handlePlayPause}
-							className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-2"
+						{/* Scene name with scrolling for long titles */}
+						<div
+							ref={containerRef}
+							className="relative px-1 text-center text-xs font-medium text-white/90 overflow-hidden max-w-[280px] mx-auto"
 						>
-							{isPlaying ? (
-								<svg
-									className="h-3 w-3 text-white"
-									fill="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-								</svg>
+							{sceneName.length > MAX_TITLE_LENGTH_BEFORE_ANIMATING ? (
+								<div className="flex items-center justify-center w-full">
+									<motion.div
+										ref={titleRef}
+										key={`scroll-${currentSceneIndex}`}
+										animate={{
+											x: [
+												0,
+												0,
+												-titleScrollDistance,
+												-titleScrollDistance,
+												-titleScrollDistance,
+											],
+										}}
+										transition={{
+											duration: 12,
+											times: [0, 0.25, 0.5, 0.75, 1],
+											ease: "linear",
+											repeat: Infinity,
+										}}
+										className="whitespace-nowrap will-change-transform"
+										style={{ paddingLeft: "2rem" }}
+									>
+										{sceneName}
+									</motion.div>
+								</div>
 							) : (
-								<svg
-									className="h-3 w-3 text-white"
-									fill="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path d="M8 5v14l11-7z" />
-								</svg>
+								<div ref={titleRef} className="whitespace-nowrap">
+									{sceneName}
+								</div>
 							)}
-						</button>
-
-						{/* Time display */}
-						<div className="flex-1 text-center">
-							<div className="text-[10px] text-white/70 font-mono">
-								{formatTime(currentTime)} / {formatTime(duration)}
-							</div>
-							{/* Progress bar */}
-							<div className="mt-0.5 h-0.5 w-full rounded-full bg-white/20">
-								<motion.div
-									className="h-full rounded-full bg-white/70"
-									style={{ width: `${(currentTime / duration) * 100}%` }}
-									transition={{ duration: 0.2, ease: "linear" }}
-								/>
-							</div>
 						</div>
 
-						{/* Volume control */}
-						<div className="relative flex items-center mr-2">
+						{/* Narration controls */}
+						<div className="flex items-center justify-between gap-3">
+							{/* Play/Pause */}
 							<button
 								type="button"
-								onClick={handleMuteToggle}
-								onMouseEnter={() => setShowVolumeSlider(true)}
-								onMouseLeave={() => setShowVolumeSlider(false)}
-								className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+								onClick={handlePlayPause}
+								className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-2"
 							>
-								{isMuted || volume === 0 ? (
+								{isPlaying ? (
 									<svg
 										className="h-3 w-3 text-white"
-										fill="none"
+										fill="currentColor"
 										viewBox="0 0 24 24"
-										stroke="currentColor"
 									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-										/>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
-										/>
+										<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
 									</svg>
 								) : (
 									<svg
 										className="h-3 w-3 text-white"
-										fill="none"
+										fill="currentColor"
 										viewBox="0 0 24 24"
-										stroke="currentColor"
 									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
-										/>
+										<path d="M8 5v14l11-7z" />
 									</svg>
 								)}
 							</button>
 
-							{/* Volume slider */}
-							<AnimatePresence>
-								{showVolumeSlider && (
+							{/* Time display */}
+							<div className="flex-1 text-center">
+								<div className="text-[10px] text-white/70 font-mono">
+									{formatTime(currentTime)} / {formatTime(duration)}
+								</div>
+								{/* Progress bar */}
+								<div className="mt-0.5 h-0.5 w-full rounded-full bg-white/20">
 									<motion.div
-										initial={{ opacity: 0, x: -10, scale: 0.9 }}
-										animate={{ opacity: 1, x: 0, scale: 1 }}
-										exit={{ opacity: 0, x: -10, scale: 0.9 }}
-										transition={{ duration: 0.15, ease: [0.34, 1.56, 0.64, 1] }}
-										onMouseEnter={() => setShowVolumeSlider(true)}
-										onMouseLeave={() => setShowVolumeSlider(false)}
-										className="absolute right-full mr-2 flex items-center gap-2 rounded-lg border border-white/20 bg-black/90 px-3 py-1.5 backdrop-blur-xl"
-									>
-										<input
-											type="range"
-											min="0"
-											max="100"
-											value={volume}
-											onChange={(e) =>
-												handleVolumeChange(Number(e.target.value))
-											}
-											className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/20 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
-										/>
-										<span className="text-[10px] font-mono text-white/70">
-											{volume}
-										</span>
-									</motion.div>
-								)}
-							</AnimatePresence>
+										className="h-full rounded-full bg-white/70"
+										style={{ width: `${(currentTime / duration) * 100}%` }}
+										transition={{ duration: 0.2, ease: "linear" }}
+									/>
+								</div>
+							</div>
+
+							{/* Volume control */}
+							<div className="relative flex items-center mr-2">
+								<button
+									type="button"
+									onClick={handleMuteToggle}
+									onMouseEnter={() => setShowVolumeSlider(true)}
+									onMouseLeave={() => setShowVolumeSlider(false)}
+									className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+								>
+									{isMuted || volume === 0 ? (
+										<svg
+											className="h-3 w-3 text-white"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+											/>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"
+											/>
+										</svg>
+									) : (
+										<svg
+											className="h-3 w-3 text-white"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+											/>
+										</svg>
+									)}
+								</button>
+
+								{/* Volume slider */}
+								<AnimatePresence>
+									{showVolumeSlider && (
+										<motion.div
+											initial={{ opacity: 0, x: -10, scale: 0.9 }}
+											animate={{ opacity: 1, x: 0, scale: 1 }}
+											exit={{ opacity: 0, x: -10, scale: 0.9 }}
+											transition={{
+												duration: 0.15,
+												ease: [0.34, 1.56, 0.64, 1],
+											}}
+											onMouseEnter={() => setShowVolumeSlider(true)}
+											onMouseLeave={() => setShowVolumeSlider(false)}
+											className="absolute right-full mr-2 flex items-center gap-2 rounded-lg border border-white/20 bg-black/90 px-3 py-1.5 backdrop-blur-xl"
+										>
+											<input
+												type="range"
+												min="0"
+												max="100"
+												value={volume}
+												onChange={(e) =>
+													handleVolumeChange(Number(e.target.value))
+												}
+												className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/20 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
+											/>
+											<span className="text-[10px] font-mono text-white/70">
+												{volume}
+											</span>
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</div>
 						</div>
-					</div>
-				</motion.div>
+					</motion.div>
 
-				{/* Utility buttons - pop out on hover */}
-				<AnimatePresence initial={false}>
-					{isHovered && (
-						<motion.div
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{
-								height: { duration: 0.2, ease: "easeInOut" },
-								opacity: { duration: 0.15 },
-							}}
-							className="overflow-hidden"
-						>
-							{/* Separator */}
+					{/* Utility buttons - pop out on hover */}
+					<AnimatePresence initial={false}>
+						{isHovered && (
 							<motion.div
-								initial={{ opacity: 0, scaleX: 0 }}
-								animate={{ opacity: 1, scaleX: 1 }}
-								exit={{ opacity: 0, scaleX: 0 }}
+								initial={{ height: 0, opacity: 0 }}
+								animate={{ height: "auto", opacity: 1 }}
+								exit={{ height: 0, opacity: 0 }}
 								transition={{
-									duration: 0.15,
-									ease: "easeOut",
+									height: { duration: 0.2, ease: "easeInOut" },
+									opacity: { duration: 0.15 },
 								}}
-								className="h-px w-full bg-white/10 mb-2"
-							/>
-
-							{/* Buttons container */}
-							<motion.div
-								className="flex items-center justify-center gap-2"
-								initial={{ width: 0 }}
-								animate={{ width: "auto" }}
-								exit={{ width: 0 }}
-								transition={{
-									duration: 0.2,
-									ease: "easeInOut",
-								}}
-								style={{ overflow: "hidden" }}
+								className="overflow-hidden pb-2"
 							>
-								{utilityButtons.map((button, index) => (
+								{/* Separator */}
+								<motion.div
+									initial={{ opacity: 0, scaleX: 0 }}
+									animate={{ opacity: 1, scaleX: 1 }}
+									exit={{ opacity: 0, scaleX: 0 }}
+									transition={{
+										duration: 0.15,
+										ease: "easeOut",
+									}}
+									className="h-px w-full bg-white/10 mb-2"
+								/>
+
+								{/* Buttons container */}
+								<motion.div
+									className="flex items-center justify-center gap-2"
+									initial={{ width: 0 }}
+									animate={{ width: "auto" }}
+									exit={{ width: 0 }}
+									transition={{
+										duration: 0.2,
+										ease: "easeInOut",
+									}}
+									style={{ overflow: "visible" }}
+								>
+									{/* Polaroid Stack Button */}
 									<motion.div
-										key={`utility-${button.label}-${index}`}
 										initial={{ opacity: 0, y: 10, scale: 0.8 }}
 										animate={{ opacity: 1, y: 0, scale: 1 }}
 										exit={{ opacity: 0, y: 10, scale: 0.8 }}
 										transition={{
 											duration: 0.2,
 											ease: [0.34, 1.56, 0.64, 1],
-											delay: index * 0.05,
+											delay: 0,
 										}}
 									>
-										<ToolbarButton {...button} />
+										<PolaroidStackButton />
 									</motion.div>
-								))}
+
+									{/* Divider */}
+									<div className="h-6 w-px bg-white/20" />
+
+									{/* Other utility buttons */}
+									{utilityButtons.map((button, index) => (
+										<motion.div
+											key={`utility-${button.label}-${index}`}
+											initial={{ opacity: 0, y: 10, scale: 0.8 }}
+											animate={{ opacity: 1, y: 0, scale: 1 }}
+											exit={{ opacity: 0, y: 10, scale: 0.8 }}
+											transition={{
+												duration: 0.2,
+												ease: [0.34, 1.56, 0.64, 1],
+												delay: (index + 1) * 0.05,
+											}}
+										>
+											<ToolbarButton {...button} />
+										</motion.div>
+									))}
+								</motion.div>
 							</motion.div>
-						</motion.div>
-					)}
-				</AnimatePresence>
+						)}
+					</AnimatePresence>
+				</motion.div>
 			</motion.div>
-		</motion.div>
+
+			{/* Scene Selector Modal - Outside toolbar container */}
+			<SceneSelector
+				isOpen={sceneSelectorOpen}
+				onClose={() => setSceneSelectorOpen(false)}
+				currentSceneIndex={currentSceneIndex}
+			/>
+		</>
 	);
 }
