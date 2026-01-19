@@ -2,17 +2,15 @@
 
 import { StoryProvider } from "@/contexts/StoryContext";
 import { StoryScene } from "@/components/StoryScene";
-import { NavigationControls } from "@/components/NavigationControls";
-import { UtilityButtons } from "@/components/UtilityButtons";
+import { Toolbar } from "@/components/Toolbar";
 
 export default function Home() {
-  return (
-    <StoryProvider>
-      <main className="fixed inset-0 overflow-hidden bg-black">
-        <StoryScene />
-        <NavigationControls />
-        <UtilityButtons />
-      </main>
-    </StoryProvider>
-  );
+	return (
+		<StoryProvider>
+			<main className="fixed inset-0 overflow-hidden bg-black">
+				<StoryScene />
+				<Toolbar />
+			</main>
+		</StoryProvider>
+	);
 }
