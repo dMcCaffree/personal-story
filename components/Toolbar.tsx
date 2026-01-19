@@ -80,7 +80,7 @@ function ToolbarButton({
 
 export function Toolbar() {
 	const { currentSceneIndex } = useStory();
-	const [isMenuExpanded, setIsMenuExpanded] = useState(false);
+	const [isHovered, setIsHovered] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
 	const [volume, setVolume] = useState(100);
 	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
@@ -131,10 +131,8 @@ export function Toolbar() {
 		return scene?.title || `Scene ${index}`;
 	};
 
-	// No navigation buttons in toolbar anymore - moved to edges
-
-	// Hover-revealed buttons - smaller icons
-	const expandedButtons = [
+	// Utility buttons that pop out on hover
+	const utilityButtons = [
 		{
 			icon: (
 				<svg
@@ -219,26 +217,34 @@ export function Toolbar() {
 			drag
 			dragMomentum={false}
 			dragElastic={0.1}
-			dragConstraints={{
-				top: -window.innerHeight / 2 + 100,
-				bottom: window.innerHeight / 2 - 100,
-				left: -window.innerWidth / 2 + 200,
-				right: window.innerWidth / 2 - 200,
-			}}
 			onDragStart={() => setIsDragging(true)}
 			onDragEnd={() => setIsDragging(false)}
 			className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 cursor-grab active:cursor-grabbing"
 			whileDrag={{ scale: 1.05, cursor: "grabbing" }}
 		>
 			<motion.div
-				className="relative flex flex-col gap-2 rounded-2xl border border-white/20 bg-black/40 px-3 py-2 backdrop-blur-2xl"
-				onMouseLeave={() => !isDragging && setIsMenuExpanded(false)}
+				className="relative flex flex-col rounded-2xl border border-white/20 bg-black/40 px-3 py-2 backdrop-blur-2xl"
+				onMouseEnter={() => !isDragging && setIsHovered(true)}
+				onMouseLeave={() => {
+					if (!isDragging) {
+						setIsHovered(false);
+					}
+				}}
 				style={{
 					boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
 				}}
 			>
 				{/* Top section - Scene info and narration controls */}
-				<div className="flex flex-col gap-1.5">
+				<motion.div
+					className="flex flex-col gap-1.5"
+					animate={{
+						paddingBottom: isHovered ? "0.5rem" : "0rem",
+					}}
+					transition={{
+						duration: 0.2,
+						ease: "easeInOut",
+					}}
+				>
 					{/* Scene name */}
 					<div className="px-1 text-center text-xs font-medium text-white/90">
 						{getSceneName(currentSceneIndex)}
@@ -362,79 +368,64 @@ export function Toolbar() {
 							</AnimatePresence>
 						</div>
 					</div>
-				</div>
+				</motion.div>
 
-				{/* Separator */}
-				<div className="h-px w-full bg-white/10" />
-
-				{/* Bottom section - Utility controls */}
-				<div className="flex items-center justify-center gap-2">
-					{/* Separator - shows when menu is expanded */}
-					<AnimatePresence>
-						{isMenuExpanded && (
+				{/* Utility buttons - pop out on hover */}
+				<AnimatePresence initial={false}>
+					{isHovered && (
+						<motion.div
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: "auto", opacity: 1 }}
+							exit={{ height: 0, opacity: 0 }}
+							transition={{
+								height: { duration: 0.2, ease: "easeInOut" },
+								opacity: { duration: 0.15 },
+							}}
+							className="overflow-hidden"
+						>
+							{/* Separator */}
 							<motion.div
-								initial={{ opacity: 0, scaleY: 0 }}
-								animate={{ opacity: 1, scaleY: 1 }}
-								exit={{ opacity: 0, scaleY: 0 }}
+								initial={{ opacity: 0, scaleX: 0 }}
+								animate={{ opacity: 1, scaleX: 1 }}
+								exit={{ opacity: 0, scaleX: 0 }}
 								transition={{
 									duration: 0.15,
 									ease: "easeOut",
 								}}
-								className="h-5 w-px bg-white/20"
+								className="h-px w-full bg-white/10 mb-2"
 							/>
-						)}
-					</AnimatePresence>
 
-					{/* Expanded buttons - morph from menu button */}
-					<AnimatePresence mode="wait">
-						{isMenuExpanded ? (
-							expandedButtons.map((button, index) => (
-								<motion.div
-									key={`expanded-${button.label}-${index}`}
-									initial={{ opacity: 0, scale: 0, width: 0 }}
-									animate={{ opacity: 1, scale: 1, width: "auto" }}
-									exit={{ opacity: 0, scale: 0, width: 0 }}
-									transition={{
-										duration: 0.15,
-										ease: [0.34, 1.56, 0.64, 1], // Custom ease for snappy spring effect
-										delay: index * 0.02,
-									}}
-								>
-									<ToolbarButton {...button} />
-								</motion.div>
-							))
-						) : (
-							<motion.button
-								key="menu-button"
-								className="relative flex h-9 w-9 items-center justify-center rounded-full transition-all hover:bg-white/20 active:scale-95"
-								onMouseEnter={() => !isDragging && setIsMenuExpanded(true)}
-								initial={{ opacity: 0, scale: 0 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0 }}
-								whileHover={{ scale: 1.1 }}
-								whileTap={{ scale: 0.9 }}
+							{/* Buttons container */}
+							<motion.div
+								className="flex items-center justify-center gap-2"
+								initial={{ width: 0 }}
+								animate={{ width: "auto" }}
+								exit={{ width: 0 }}
 								transition={{
-									duration: 0.15,
-									ease: [0.34, 1.56, 0.64, 1],
+									duration: 0.2,
+									ease: "easeInOut",
 								}}
+								style={{ overflow: "hidden" }}
 							>
-								<svg
-									className="h-4 w-4 text-white"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-									/>
-								</svg>
-							</motion.button>
-						)}
-					</AnimatePresence>
-				</div>
+								{utilityButtons.map((button, index) => (
+									<motion.div
+										key={`utility-${button.label}-${index}`}
+										initial={{ opacity: 0, y: 10, scale: 0.8 }}
+										animate={{ opacity: 1, y: 0, scale: 1 }}
+										exit={{ opacity: 0, y: 10, scale: 0.8 }}
+										transition={{
+											duration: 0.2,
+											ease: [0.34, 1.56, 0.64, 1],
+											delay: index * 0.05,
+										}}
+									>
+										<ToolbarButton {...button} />
+									</motion.div>
+								))}
+							</motion.div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</motion.div>
 		</motion.div>
 	);
