@@ -3,6 +3,7 @@
 import { useState, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStory } from "@/contexts/StoryContext";
+import { useAudio } from "@/contexts/AudioContext";
 import { scenes } from "@/data/scenes";
 
 const LINKEDIN_URL = "https://linkedin.com/in/dMcCaffree";
@@ -81,15 +82,21 @@ function ToolbarButton({
 
 export function Toolbar() {
 	const { currentSceneIndex } = useStory();
+	const {
+		isPlaying,
+		currentTime,
+		duration,
+		volume,
+		isMuted,
+		setVolume,
+		setMuted,
+		togglePlayPause,
+	} = useAudio();
+
 	const [isHovered, setIsHovered] = useState(false);
-	const [isMuted, setIsMuted] = useState(false);
-	const [volume, setVolume] = useState(100);
 	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 	const [captionsEnabled, setCaptionsEnabled] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
-	const [isNarrationPlaying, setIsNarrationPlaying] = useState(false);
-	const [currentTime] = useState(0);
-	const [duration] = useState(180); // TODO: Get actual duration from audio
 	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
 	const titleRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -121,23 +128,20 @@ export function Toolbar() {
 	}, [sceneName]);
 
 	const handleMuteToggle = () => {
-		setIsMuted(!isMuted);
-		// TODO: Implement actual mute functionality
+		setMuted(!isMuted);
 	};
 
 	const handleVolumeChange = (newVolume: number) => {
 		setVolume(newVolume);
 		if (newVolume === 0) {
-			setIsMuted(true);
+			setMuted(true);
 		} else if (isMuted) {
-			setIsMuted(false);
+			setMuted(false);
 		}
-		// TODO: Actually change volume
 	};
 
 	const handlePlayPause = () => {
-		setIsNarrationPlaying(!isNarrationPlaying);
-		// TODO: Implement play/pause
+		togglePlayPause();
 	};
 
 	const handleCaptionsToggle = () => {
@@ -316,7 +320,7 @@ export function Toolbar() {
 							onClick={handlePlayPause}
 							className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-2"
 						>
-							{isNarrationPlaying ? (
+							{isPlaying ? (
 								<svg
 									className="h-3 w-3 text-white"
 									fill="currentColor"

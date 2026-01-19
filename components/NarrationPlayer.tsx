@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { getNarrationUrl } from "@/lib/story-config";
+import { useAudio } from "@/contexts/AudioContext";
 
 interface NarrationPlayerProps {
 	sceneIndex: number;
@@ -14,7 +15,7 @@ export function NarrationPlayer({
 	shouldPlay,
 	onEnded,
 }: NarrationPlayerProps) {
-	const audioRef = useRef<HTMLAudioElement>(null);
+	const { audioRef } = useAudio();
 	const currentSceneRef = useRef(sceneIndex);
 
 	// Reset when scene changes
@@ -25,9 +26,11 @@ export function NarrationPlayer({
 			if (audio) {
 				audio.pause();
 				audio.currentTime = 0;
+				audio.src = getNarrationUrl(sceneIndex);
+				audio.load();
 			}
 		}
-	}, [sceneIndex]);
+	}, [sceneIndex, audioRef]);
 
 	// Handle playback
 	useEffect(() => {
@@ -50,18 +53,23 @@ export function NarrationPlayer({
 			.catch((error) => {
 				console.error("NarrationPlayer: Error playing narration:", error);
 			});
-	}, [sceneIndex, shouldPlay]);
+	}, [sceneIndex, shouldPlay, audioRef]);
 
-	const handleEnded = () => {
-		onEnded?.();
-	};
+	useEffect(() => {
+		const audio = audioRef.current;
+		if (!audio) return;
+
+		const handleEnded = () => {
+			onEnded?.();
+		};
+
+		audio.addEventListener("ended", handleEnded);
+		return () => audio.removeEventListener("ended", handleEnded);
+	}, [audioRef, onEnded]);
 
 	return (
-		<audio
-			ref={audioRef}
-			src={getNarrationUrl(sceneIndex)}
-			onEnded={handleEnded}
-			preload="auto"
-		/>
+		<audio ref={audioRef} src={getNarrationUrl(sceneIndex)} preload="auto">
+			<track kind="captions" />
+		</audio>
 	);
 }

@@ -8,7 +8,14 @@ import { scenes } from "@/data/scenes";
 import Image from "next/image";
 
 export function SceneNavigation() {
-	const { goToNextScene, goToPreviousScene, canGoNext, canGoBack, currentSceneIndex, isTransitioning } = useStory();
+	const {
+		goToNextScene,
+		goToPreviousScene,
+		canGoNext,
+		canGoBack,
+		currentSceneIndex,
+		isTransitioning,
+	} = useStory();
 	const [hoveredSide, setHoveredSide] = useState<"left" | "right" | null>(null);
 
 	const getSceneName = (index: number) => {
@@ -23,162 +30,133 @@ export function SceneNavigation() {
 		<>
 			{/* Left Navigation - Go Back */}
 			{canGoBack && (
-				<>
-					{/* Hover trigger area */}
-					<div
-						className="fixed left-0 top-0 bottom-0 w-32 z-40"
-						onMouseEnter={() => !isTransitioning && setHoveredSide("left")}
-						onMouseLeave={() => setHoveredSide(null)}
-					/>
-
-					{/* Preview card */}
+				<button
+					type="button"
+					onClick={goToPreviousScene}
+					disabled={isTransitioning}
+					onMouseEnter={() => !isTransitioning && setHoveredSide("left")}
+					onMouseLeave={() => setHoveredSide(null)}
+					className={`fixed left-0 top-0 bottom-0 w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-r to-transparent transition-all duration-300 ${hoveredSide === "left" ? "from-black/40" : "from-black/10"}`}
+				>
+					{/* Preview card that slides out */}
 					<AnimatePresence>
-						{hoveredSide === "left" && (
+						{hoveredSide === "left" && !isTransitioning && (
 							<motion.div
-								initial={{ opacity: 0, x: -20 }}
-								animate={{ opacity: 1, x: 0 }}
-								exit={{ opacity: 0, x: -20 }}
-								transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-								className="fixed left-8 top-1/2 -translate-y-1/2 z-40 flex items-center gap-4"
+								initial={{ x: -300 }}
+								animate={{ x: 0 }}
+								exit={{ x: -300 }}
+								transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+								className="absolute left-4 bottom-8 pointer-events-none"
 							>
-								{/* Preview thumbnail */}
+								{/* Card with image and text overlay */}
 								<motion.div
-									initial={{ scale: 0.9, opacity: 0 }}
-									animate={{ scale: 1, opacity: 1 }}
-									transition={{ delay: 0.05 }}
-									className="relative h-24 w-24 overflow-hidden rounded-xl border-2 border-white/30 shadow-2xl"
-								>
-									<Image
-										src={getKeyframeUrl(prevSceneIndex)}
-										alt={getSceneName(prevSceneIndex)}
-										fill
-										className="object-cover"
-										unoptimized
-									/>
-								</motion.div>
-
-								{/* Scene info */}
-								<motion.div
-									initial={{ x: -10, opacity: 0 }}
-									animate={{ x: 0, opacity: 1 }}
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
 									transition={{ delay: 0.1 }}
-									className="flex flex-col gap-1"
+									className="relative rounded-2xl border border-white/20 overflow-hidden shadow-2xl"
 								>
-									<div className="text-xs text-white/60 font-medium">Previous</div>
-									<div className="text-sm text-white font-semibold">
-										{getSceneName(prevSceneIndex)}
+									{/* Preview image */}
+									<div className="relative h-40 w-56">
+										<Image
+											src={getKeyframeUrl(prevSceneIndex)}
+											alt={getSceneName(prevSceneIndex)}
+											fill
+											className="object-cover"
+											unoptimized
+										/>
+										{/* Text overlay */}
+										<div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+											<div
+												className="text-2xl text-white font-bold leading-tight text-center"
+												style={{
+													textShadow:
+														"0 2px 8px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.6)",
+												}}
+											>
+												Chapter {prevSceneIndex}
+											</div>
+											<div
+												className="text-sm text-white/90 font-medium leading-tight text-center mt-1"
+												style={{
+													textShadow:
+														"0 2px 8px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.6)",
+												}}
+											>
+												{getSceneName(prevSceneIndex)}
+											</div>
+										</div>
 									</div>
 								</motion.div>
 							</motion.div>
 						)}
 					</AnimatePresence>
-
-					{/* Chevron button */}
-					<motion.button
-						type="button"
-						onClick={goToPreviousScene}
-						disabled={isTransitioning}
-						onMouseEnter={() => !isTransitioning && setHoveredSide("left")}
-						className="fixed left-4 top-1/2 -translate-y-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/40 backdrop-blur-xl transition-all hover:bg-black/60 hover:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.95 }}
-					>
-						<svg
-							className="h-6 w-6 text-white"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2.5}
-								d="M15 19l-7-7 7-7"
-							/>
-						</svg>
-					</motion.button>
-				</>
+				</button>
 			)}
 
 			{/* Right Navigation - Continue */}
 			{canGoNext && (
-				<>
-					{/* Hover trigger area */}
-					<div
-						className="fixed right-0 top-0 bottom-0 w-32 z-40"
-						onMouseEnter={() => !isTransitioning && setHoveredSide("right")}
-						onMouseLeave={() => setHoveredSide(null)}
-					/>
-
-					{/* Preview card */}
+				<button
+					type="button"
+					onClick={goToNextScene}
+					disabled={isTransitioning}
+					onMouseEnter={() => !isTransitioning && setHoveredSide("right")}
+					onMouseLeave={() => setHoveredSide(null)}
+					className={`fixed right-0 top-0 bottom-0 w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-l from-black/10 to-transparent transition-all duration-300 ${hoveredSide === "right" ? "from-black/40" : "from-black/10"}`}
+				>
+					{/* Preview card that slides out */}
 					<AnimatePresence>
-						{hoveredSide === "right" && (
+						{hoveredSide === "right" && !isTransitioning && (
 							<motion.div
-								initial={{ opacity: 0, x: 20 }}
-								animate={{ opacity: 1, x: 0 }}
-								exit={{ opacity: 0, x: 20 }}
-								transition={{ duration: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
-								className="fixed right-8 top-1/2 -translate-y-1/2 z-40 flex items-center gap-4"
+								initial={{ x: 300 }}
+								animate={{ x: 0 }}
+								exit={{ x: 300 }}
+								transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+								className="absolute right-4 bottom-8 pointer-events-none"
 							>
-								{/* Scene info */}
+								{/* Card with image and text overlay */}
 								<motion.div
-									initial={{ x: 10, opacity: 0 }}
-									animate={{ x: 0, opacity: 1 }}
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
 									transition={{ delay: 0.1 }}
-									className="flex flex-col gap-1 text-right"
+									className="relative rounded-2xl border border-white/20 overflow-hidden shadow-2xl"
 								>
-									<div className="text-xs text-white/60 font-medium">Next</div>
-									<div className="text-sm text-white font-semibold">
-										{getSceneName(nextSceneIndex)}
+									{/* Preview image */}
+									<div className="relative h-40 w-56">
+										<Image
+											src={getKeyframeUrl(nextSceneIndex)}
+											alt={getSceneName(nextSceneIndex)}
+											fill
+											className="object-cover"
+											unoptimized
+										/>
+										{/* Text overlay */}
+										<div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+											<div
+												className="text-2xl text-white font-bold leading-tight text-center"
+												style={{
+													textShadow:
+														"0 2px 8px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.6)",
+												}}
+											>
+												Chapter {nextSceneIndex}
+											</div>
+											<div
+												className="text-sm text-white/90 font-medium leading-tight text-center mt-1"
+												style={{
+													textShadow:
+														"0 2px 8px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.6)",
+												}}
+											>
+												{getSceneName(nextSceneIndex)}
+											</div>
+										</div>
 									</div>
-								</motion.div>
-
-								{/* Preview thumbnail */}
-								<motion.div
-									initial={{ scale: 0.9, opacity: 0 }}
-									animate={{ scale: 1, opacity: 1 }}
-									transition={{ delay: 0.05 }}
-									className="relative h-24 w-24 overflow-hidden rounded-xl border-2 border-white/30 shadow-2xl"
-								>
-									<Image
-										src={getKeyframeUrl(nextSceneIndex)}
-										alt={getSceneName(nextSceneIndex)}
-										fill
-										className="object-cover"
-										unoptimized
-									/>
 								</motion.div>
 							</motion.div>
 						)}
 					</AnimatePresence>
-
-					{/* Chevron button */}
-					<motion.button
-						type="button"
-						onClick={goToNextScene}
-						disabled={isTransitioning}
-						onMouseEnter={() => !isTransitioning && setHoveredSide("right")}
-						className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-black/40 backdrop-blur-xl transition-all hover:bg-black/60 hover:border-white/40 disabled:opacity-50 disabled:cursor-not-allowed"
-						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.95 }}
-					>
-						<svg
-							className="h-6 w-6 text-white"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2.5}
-								d="M9 5l7 7-7 7"
-							/>
-						</svg>
-					</motion.button>
-				</>
+				</button>
 			)}
 		</>
 	);
 }
-
