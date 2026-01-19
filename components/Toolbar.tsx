@@ -272,7 +272,8 @@ export function Toolbar() {
 	return (
 		<motion.div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
 			<motion.div
-				className="flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-4 py-2 backdrop-blur-2xl"
+				className="relative flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-4 py-2 backdrop-blur-2xl"
+				onMouseLeave={() => setIsMenuExpanded(false)}
 				style={{
 					boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
 				}}
@@ -325,7 +326,6 @@ export function Toolbar() {
 							key="menu-button"
 							className="relative flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-white/20 active:scale-95"
 							onMouseEnter={() => setIsMenuExpanded(true)}
-							onMouseLeave={() => setIsMenuExpanded(false)}
 							initial={{ opacity: 0, scale: 0 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0 }}
@@ -354,17 +354,6 @@ export function Toolbar() {
 						</motion.button>
 					)}
 				</AnimatePresence>
-
-				{/* Invisible hover area to keep menu open */}
-				{isMenuExpanded && (
-					<motion.div
-						className="pointer-events-none absolute inset-0 -inset-x-4"
-						onMouseEnter={() => setIsMenuExpanded(true)}
-						onMouseLeave={() => setIsMenuExpanded(false)}
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-					/>
-				)}
 			</motion.div>
 		</motion.div>
 	);
