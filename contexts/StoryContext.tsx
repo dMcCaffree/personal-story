@@ -1,103 +1,98 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
-import { StoryState, PlaybackDirection } from "@/lib/story-config";
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { StoryState } from "@/lib/story-config";
 import { getTotalScenes } from "@/data/scenes";
-import {
-  getNarrationsPlayed,
-  markNarrationPlayed as saveNarrationPlayed,
-  hasNarrationPlayed as checkNarrationPlayed,
-} from "@/utils/session-storage";
 
 interface StoryContextValue extends StoryState {
-  goToNextScene: () => void;
-  goToPreviousScene: () => void;
-  setIsTransitioning: (value: boolean) => void;
-  markNarrationPlayed: (sceneIndex: number) => void;
-  hasNarrationPlayed: (sceneIndex: number) => boolean;
-  totalScenes: number;
-  canGoNext: boolean;
-  canGoBack: boolean;
+	goToNextScene: () => void;
+	goToPreviousScene: () => void;
+	setIsTransitioning: (value: boolean) => void;
+	totalScenes: number;
+	canGoNext: boolean;
+	canGoBack: boolean;
 }
 
 const StoryContext = createContext<StoryContextValue | undefined>(undefined);
 
 export function StoryProvider({ children }: { children: React.ReactNode }) {
-  const totalScenes = getTotalScenes();
+	const totalScenes = getTotalScenes();
 
-  const [state, setState] = useState<StoryState>({
-    currentSceneIndex: 1,
-    previousSceneIndex: null,
-    isTransitioning: false,
-    playbackDirection: "forward",
-  });
+	const [state, setState] = useState<StoryState>({
+		currentSceneIndex: 1,
+		previousSceneIndex: null,
+		isTransitioning: false,
+		playbackDirection: "forward",
+	});
 
-  const canGoNext = state.currentSceneIndex < totalScenes;
-  const canGoBack = state.currentSceneIndex > 1;
+	const canGoNext = state.currentSceneIndex < totalScenes;
+	const canGoBack = state.currentSceneIndex > 1;
 
-  const goToNextScene = useCallback(() => {
-    if (state.isTransitioning || !canGoNext) {
-      return;
-    }
+	const goToNextScene = useCallback(() => {
+		if (state.isTransitioning || !canGoNext) {
+			console.log("StoryContext: Cannot go next", {
+				isTransitioning: state.isTransitioning,
+				canGoNext,
+			});
+			return;
+		}
 
-    setState((prev) => ({
-      ...prev,
-      previousSceneIndex: prev.currentSceneIndex,
-      currentSceneIndex: prev.currentSceneIndex + 1,
-      isTransitioning: true,
-      playbackDirection: "forward",
-    }));
-  }, [state.isTransitioning, canGoNext]);
+		console.log("StoryContext: Going to next scene", {
+			from: state.currentSceneIndex,
+			to: state.currentSceneIndex + 1,
+		});
 
-  const goToPreviousScene = useCallback(() => {
-    if (state.isTransitioning || !canGoBack) {
-      return;
-    }
+		setState((prev) => ({
+			...prev,
+			previousSceneIndex: prev.currentSceneIndex,
+			currentSceneIndex: prev.currentSceneIndex + 1,
+			isTransitioning: true,
+			playbackDirection: "forward",
+		}));
+	}, [state.isTransitioning, state.currentSceneIndex, canGoNext]);
 
-    setState((prev) => ({
-      ...prev,
-      previousSceneIndex: prev.currentSceneIndex,
-      currentSceneIndex: prev.currentSceneIndex - 1,
-      isTransitioning: true,
-      playbackDirection: "reverse",
-    }));
-  }, [state.isTransitioning, canGoBack]);
+	const goToPreviousScene = useCallback(() => {
+		if (state.isTransitioning || !canGoBack) {
+			return;
+		}
 
-  const setIsTransitioning = useCallback((value: boolean) => {
-    setState((prev) => ({
-      ...prev,
-      isTransitioning: value,
-    }));
-  }, []);
+		setState((prev) => ({
+			...prev,
+			previousSceneIndex: prev.currentSceneIndex,
+			currentSceneIndex: prev.currentSceneIndex - 1,
+			isTransitioning: true,
+			playbackDirection: "reverse",
+		}));
+	}, [state.isTransitioning, canGoBack]);
 
-  const markNarrationPlayed = useCallback((sceneIndex: number) => {
-    saveNarrationPlayed(sceneIndex);
-  }, []);
+	const setIsTransitioning = useCallback((value: boolean) => {
+		setState((prev) => ({
+			...prev,
+			isTransitioning: value,
+		}));
+	}, []);
 
-  const hasNarrationPlayed = useCallback((sceneIndex: number): boolean => {
-    return checkNarrationPlayed(sceneIndex);
-  }, []);
+	const contextValue: StoryContextValue = {
+		...state,
+		goToNextScene,
+		goToPreviousScene,
+		setIsTransitioning,
+		totalScenes,
+		canGoNext,
+		canGoBack,
+	};
 
-  const contextValue: StoryContextValue = {
-    ...state,
-    goToNextScene,
-    goToPreviousScene,
-    setIsTransitioning,
-    markNarrationPlayed,
-    hasNarrationPlayed,
-    totalScenes,
-    canGoNext,
-    canGoBack,
-  };
-
-  return <StoryContext.Provider value={contextValue}>{children}</StoryContext.Provider>;
+	return (
+		<StoryContext.Provider value={contextValue}>
+			{children}
+		</StoryContext.Provider>
+	);
 }
 
 export function useStory() {
-  const context = useContext(StoryContext);
-  if (context === undefined) {
-    throw new Error("useStory must be used within a StoryProvider");
-  }
-  return context;
+	const context = useContext(StoryContext);
+	if (context === undefined) {
+		throw new Error("useStory must be used within a StoryProvider");
+	}
+	return context;
 }
-

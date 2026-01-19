@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { getKeyframeUrl } from "@/lib/story-config";
+import { getKeyframeUrl, getTransitionUrl } from "@/lib/story-config";
 import { TransitionPlayer } from "./TransitionPlayer";
 import { NarrationPlayer } from "./NarrationPlayer";
 import { useStory } from "@/contexts/StoryContext";
@@ -14,32 +14,82 @@ export function StoryScene() {
 		isTransitioning,
 		playbackDirection,
 		setIsTransitioning,
+		canGoNext,
+		totalScenes,
 	} = useStory();
 
-	const [displayedSceneIndex, setDisplayedSceneIndex] =
-		useState(currentSceneIndex);
-	const [shouldPlayNarration, setShouldPlayNarration] = useState(false);
+	const [narrationTrigger, setNarrationTrigger] = useState<{
+		sceneIndex: number;
+		shouldPlay: boolean;
+	}>({ sceneIndex: currentSceneIndex, shouldPlay: false });
 
-	// Update displayed scene when not transitioning
+	const [delayedSceneIndex, setDelayedSceneIndex] = useState(currentSceneIndex);
+
+	// Delay keyframe change for forward transitions
 	useEffect(() => {
-		if (!isTransitioning) {
-			setDisplayedSceneIndex(currentSceneIndex);
+		if (isTransitioning && playbackDirection === "forward") {
+			// Wait 4 seconds before updating the keyframe behind the video
+			const timer = setTimeout(() => {
+				setDelayedSceneIndex(currentSceneIndex);
+			}, 4000);
+			return () => clearTimeout(timer);
 		}
-	}, [currentSceneIndex, isTransitioning]);
+	}, [currentSceneIndex, isTransitioning, playbackDirection]);
 
-	const handleTransitionStart = () => {
+	// Compute displayed scene based on transition state
+	const displayedSceneIndex = (() => {
+		if (!isTransitioning) {
+			// Not transitioning: show current scene
+			return currentSceneIndex;
+		} else if (playbackDirection === "reverse") {
+			// Reverse: show previous scene
+			return previousSceneIndex ?? currentSceneIndex;
+		} else {
+			// Forward: show delayed scene (stays on old scene for 4s)
+			return delayedSceneIndex;
+		}
+	})();
+
+	// Preload next transition video
+	useEffect(() => {
+		if (canGoNext && currentSceneIndex < totalScenes) {
+			const nextTransitionUrl = getTransitionUrl(
+				currentSceneIndex,
+				currentSceneIndex + 1,
+			);
+
+			// Preload the video
+			const video = document.createElement("video");
+			video.preload = "auto";
+			video.src = nextTransitionUrl;
+		}
+	}, [currentSceneIndex, canGoNext, totalScenes]);
+
+	const handleTransitionStart = useCallback(() => {
+		console.log("StoryScene: Transition started", {
+			direction: playbackDirection,
+			currentScene: currentSceneIndex,
+		});
+
 		// Start narration when transition begins (only for forward direction)
 		if (playbackDirection === "forward") {
-			setShouldPlayNarration(true);
+			console.log(
+				"StoryScene: Triggering narration for scene",
+				currentSceneIndex,
+			);
+			setNarrationTrigger({
+				sceneIndex: currentSceneIndex,
+				shouldPlay: true,
+			});
 		}
-	};
+	}, [playbackDirection, currentSceneIndex]);
 
-	const handleTransitionEnd = () => {
+	const handleTransitionEnd = useCallback(() => {
+		console.log("StoryScene: Transition ended");
+		// Transition is complete
 		setIsTransitioning(false);
-		setDisplayedSceneIndex(currentSceneIndex);
-		// Stop trying to play narration after transition ends
-		setShouldPlayNarration(false);
-	};
+		// Don't stop narration here - let it play to completion
+	}, [setIsTransitioning]);
 
 	return (
 		<>
@@ -62,21 +112,33 @@ export function StoryScene() {
 			</div>
 
 			{/* Transition video overlay */}
-			{isTransitioning && previousSceneIndex !== null && (
-				<TransitionPlayer
-					fromSceneIndex={previousSceneIndex}
-					toSceneIndex={currentSceneIndex}
-					direction={playbackDirection}
-					isPlaying={isTransitioning}
-					onTransitionStart={handleTransitionStart}
-					onTransitionEnd={handleTransitionEnd}
-				/>
-			)}
+			{(() => {
+				if (!isTransitioning || previousSceneIndex === null) {
+					console.log("StoryScene: Not rendering transition", {
+						isTransitioning,
+						previousSceneIndex,
+					});
+					return null;
+				}
+				return (
+					<TransitionPlayer
+						fromSceneIndex={previousSceneIndex}
+						toSceneIndex={currentSceneIndex}
+						direction={playbackDirection}
+						isPlaying={isTransitioning}
+						onTransitionStart={handleTransitionStart}
+						onTransitionEnd={handleTransitionEnd}
+					/>
+				);
+			})()}
 
 			{/* Narration audio */}
 			<NarrationPlayer
-				sceneIndex={currentSceneIndex}
-				shouldPlay={shouldPlayNarration}
+				sceneIndex={narrationTrigger.sceneIndex}
+				shouldPlay={
+					narrationTrigger.shouldPlay &&
+					narrationTrigger.sceneIndex === currentSceneIndex
+				}
 			/>
 		</>
 	);
