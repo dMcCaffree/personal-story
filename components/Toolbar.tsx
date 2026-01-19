@@ -88,6 +88,7 @@ export function Toolbar() {
 	const [isMenuExpanded, setIsMenuExpanded] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
 	const [captionsEnabled, setCaptionsEnabled] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
 
 	const handleMuteToggle = () => {
 		setIsMuted(!isMuted);
@@ -270,10 +271,24 @@ export function Toolbar() {
 	];
 
 	return (
-		<motion.div className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2">
+		<motion.div
+			drag
+			dragMomentum={false}
+			dragElastic={0.1}
+			dragConstraints={{
+				top: -window.innerHeight / 2 + 100,
+				bottom: window.innerHeight / 2 - 100,
+				left: -window.innerWidth / 2 + 200,
+				right: window.innerWidth / 2 - 200,
+			}}
+			onDragStart={() => setIsDragging(true)}
+			onDragEnd={() => setIsDragging(false)}
+			className="fixed bottom-8 left-1/2 z-50 -translate-x-1/2 cursor-grab active:cursor-grabbing"
+			whileDrag={{ scale: 1.05, cursor: "grabbing" }}
+		>
 			<motion.div
 				className="relative flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-4 py-2 backdrop-blur-2xl"
-				onMouseLeave={() => setIsMenuExpanded(false)}
+				onMouseLeave={() => !isDragging && setIsMenuExpanded(false)}
 				style={{
 					boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
 				}}
@@ -291,10 +306,8 @@ export function Toolbar() {
 							animate={{ opacity: 1, scaleY: 1 }}
 							exit={{ opacity: 0, scaleY: 0 }}
 							transition={{
-								type: "spring",
-								stiffness: 500,
-								damping: 30,
-								mass: 0.5,
+								duration: 0.15,
+								ease: "easeOut",
 							}}
 							className="h-6 w-px bg-white/20"
 						/>
@@ -311,11 +324,9 @@ export function Toolbar() {
 								animate={{ opacity: 1, scale: 1, width: "auto" }}
 								exit={{ opacity: 0, scale: 0, width: 0 }}
 								transition={{
-									type: "spring",
-									stiffness: 500,
-									damping: 30,
-									mass: 0.5,
-									delay: index * 0.03,
+									duration: 0.15,
+									ease: [0.34, 1.56, 0.64, 1], // Custom ease for snappy spring effect
+									delay: index * 0.02,
 								}}
 							>
 								<ToolbarButton {...button} />
@@ -325,17 +336,15 @@ export function Toolbar() {
 						<motion.button
 							key="menu-button"
 							className="relative flex h-10 w-10 items-center justify-center rounded-full transition-all hover:bg-white/20 active:scale-95"
-							onMouseEnter={() => setIsMenuExpanded(true)}
+							onMouseEnter={() => !isDragging && setIsMenuExpanded(true)}
 							initial={{ opacity: 0, scale: 0 }}
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0 }}
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							transition={{
-								type: "spring",
-								stiffness: 500,
-								damping: 30,
-								mass: 0.5,
+								duration: 0.15,
+								ease: [0.34, 1.56, 0.64, 1],
 							}}
 						>
 							<svg
