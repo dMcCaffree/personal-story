@@ -25,7 +25,6 @@ export function Tooltip({ children, label, delay = 0 }: TooltipProps) {
 	const updateTooltipPosition = useCallback(() => {
 		if (containerRef.current) {
 			const rect = containerRef.current.getBoundingClientRect();
-			console.log(rect);
 			setTooltipPos({
 				x: rect.left + rect.width / 2,
 				y: rect.top,

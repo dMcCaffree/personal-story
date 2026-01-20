@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect, memo } from "react";
+import { useState, useRef, useLayoutEffect, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStory } from "@/contexts/StoryContext";
 import { useAudio } from "@/contexts/AudioContext";
@@ -184,6 +184,7 @@ export function Toolbar() {
 		setVolume,
 		setMuted,
 		togglePlayPause,
+		seek,
 	} = useAudio();
 
 	const [isHovered, setIsHovered] = useState(false);
@@ -193,8 +194,12 @@ export function Toolbar() {
 	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
 	const [sceneSelectorOpen, setSceneSelectorOpen] = useState(false);
 	const [polaroidHovered, setPolaroidHovered] = useState(false);
+	const [isDraggingProgress, setIsDraggingProgress] = useState(false);
+	const [isInteractingWithControls, setIsInteractingWithControls] =
+		useState(false);
 	const titleRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const progressBarRef = useRef<HTMLDivElement>(null);
 
 	// Get current scene name
 	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
@@ -255,6 +260,70 @@ export function Toolbar() {
 		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	};
 
+	// Handle progress bar scrubbing
+	const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (!progressBarRef.current || duration === 0) return;
+
+		const rect = progressBarRef.current.getBoundingClientRect();
+		const clickX = e.clientX - rect.left;
+		const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+		const newTime = percentage * duration;
+		seek(newTime);
+	};
+
+	const handleProgressMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation(); // Prevent toolbar from being dragged
+		setIsDraggingProgress(true);
+		setIsInteractingWithControls(true);
+		handleProgressClick(e);
+	};
+
+	const handleProgressClickWrapper = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation(); // Prevent toolbar from being dragged
+		handleProgressClick(e);
+	};
+
+	useEffect(() => {
+		if (!isDraggingProgress) return;
+
+		const handleMouseMove = (e: MouseEvent) => {
+			if (!progressBarRef.current || duration === 0) return;
+
+			const rect = progressBarRef.current.getBoundingClientRect();
+			const clickX = e.clientX - rect.left;
+			const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+			const newTime = percentage * duration;
+			seek(newTime);
+		};
+
+		const handleMouseUp = () => {
+			setIsDraggingProgress(false);
+			setIsInteractingWithControls(false);
+		};
+
+		document.addEventListener("mousemove", handleMouseMove);
+		document.addEventListener("mouseup", handleMouseUp);
+
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove);
+			document.removeEventListener("mouseup", handleMouseUp);
+		};
+	}, [isDraggingProgress, duration, seek]);
+
+	// Global cleanup for control interactions
+	useEffect(() => {
+		const handleGlobalMouseUp = () => {
+			if (isInteractingWithControls && !isDraggingProgress) {
+				setIsInteractingWithControls(false);
+			}
+		};
+
+		document.addEventListener("mouseup", handleGlobalMouseUp);
+		return () => {
+			document.removeEventListener("mouseup", handleGlobalMouseUp);
+		};
+	}, [isInteractingWithControls, isDraggingProgress]);
+
 	// Utility buttons that pop out on hover
 	const utilityButtons = [
 		{
@@ -264,7 +333,9 @@ export function Toolbar() {
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
+					aria-label="Captions"
 				>
+					<title>Captions</title>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -284,7 +355,9 @@ export function Toolbar() {
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
+					aria-label="Hints"
 				>
+					<title>Hints</title>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -303,7 +376,9 @@ export function Toolbar() {
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
+					aria-label="Resume"
 				>
+					<title>Resume</title>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -327,7 +402,9 @@ export function Toolbar() {
 					className="h-4 w-4 text-white"
 					fill="currentColor"
 					viewBox="0 0 24 24"
+					aria-label="LinkedIn"
 				>
+					<title>LinkedIn</title>
 					<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
 				</svg>
 			),
@@ -339,7 +416,7 @@ export function Toolbar() {
 	return (
 		<>
 			<motion.div
-				drag
+				drag={!isInteractingWithControls}
 				dragMomentum={false}
 				dragElastic={0.1}
 				onDragStart={() => setIsDragging(true)}
@@ -414,6 +491,11 @@ export function Toolbar() {
 							<button
 								type="button"
 								onClick={handlePlayPause}
+								onPointerDown={(e) => {
+									e.stopPropagation();
+									setIsInteractingWithControls(true);
+								}}
+								onPointerUp={() => setIsInteractingWithControls(false)}
 								className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors ml-2"
 							>
 								{isPlaying ? (
@@ -421,7 +503,9 @@ export function Toolbar() {
 										className="h-3 w-3 text-white"
 										fill="currentColor"
 										viewBox="0 0 24 24"
+										aria-label="Pause"
 									>
+										<title>Pause</title>
 										<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
 									</svg>
 								) : (
@@ -429,7 +513,9 @@ export function Toolbar() {
 										className="h-3 w-3 text-white"
 										fill="currentColor"
 										viewBox="0 0 24 24"
+										aria-label="Play"
 									>
+										<title>Play</title>
 										<path d="M8 5v14l11-7z" />
 									</svg>
 								)}
@@ -441,12 +527,36 @@ export function Toolbar() {
 									{formatTime(currentTime)} / {formatTime(duration)}
 								</div>
 								{/* Progress bar */}
-								<div className="mt-0.5 h-0.5 w-full rounded-full bg-white/20">
-									<motion.div
-										className="h-full rounded-full bg-white/70"
-										style={{ width: `${(currentTime / duration) * 100}%` }}
-										transition={{ duration: 0.2, ease: "linear" }}
-									/>
+								<div
+									ref={progressBarRef}
+									role="slider"
+									aria-label="Audio progress"
+									aria-valuemin={0}
+									aria-valuemax={duration}
+									aria-valuenow={currentTime}
+									tabIndex={0}
+									className="mt-0.5 py-1.5 w-full cursor-pointer group relative"
+									onClick={handleProgressClickWrapper}
+									onMouseDown={handleProgressMouseDown}
+									onPointerDown={(e) => e.stopPropagation()}
+									onKeyDown={(e) => {
+										if (e.key === "ArrowLeft") {
+											seek(Math.max(0, currentTime - 5));
+										} else if (e.key === "ArrowRight") {
+											seek(Math.min(duration, currentTime + 5));
+										}
+									}}
+								>
+									<div className="h-0.5 w-full rounded-full bg-white/20 relative">
+										<motion.div
+											className="h-full rounded-full bg-white/70 relative"
+											style={{ width: `${(currentTime / duration) * 100}%` }}
+											transition={{ duration: 0.2, ease: "linear" }}
+										>
+											{/* Scrubber handle */}
+											<div className="absolute right-0 top-1/2 -translate-y-1/2 h-2.5 w-2.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+										</motion.div>
+									</div>
 								</div>
 							</div>
 
@@ -456,7 +566,11 @@ export function Toolbar() {
 									type="button"
 									onClick={handleMuteToggle}
 									onMouseEnter={() => setShowVolumeSlider(true)}
-									onMouseLeave={() => setShowVolumeSlider(false)}
+									onPointerDown={(e) => {
+										e.stopPropagation();
+										setIsInteractingWithControls(true);
+									}}
+									onPointerUp={() => setIsInteractingWithControls(false)}
 									className="flex h-7 w-7 items-center justify-center rounded-full hover:bg-white/10 transition-colors"
 								>
 									{isMuted || volume === 0 ? (
@@ -465,7 +579,9 @@ export function Toolbar() {
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
+											aria-label="Muted"
 										>
+											<title>Muted</title>
 											<path
 												strokeLinecap="round"
 												strokeLinejoin="round"
@@ -485,7 +601,9 @@ export function Toolbar() {
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
+											aria-label="Volume"
 										>
+											<title>Volume</title>
 											<path
 												strokeLinecap="round"
 												strokeLinejoin="round"
@@ -500,30 +618,72 @@ export function Toolbar() {
 								<AnimatePresence>
 									{showVolumeSlider && (
 										<motion.div
-											initial={{ opacity: 0, x: -10, scale: 0.9 }}
-											animate={{ opacity: 1, x: 0, scale: 1 }}
-											exit={{ opacity: 0, x: -10, scale: 0.9 }}
+											initial={{ opacity: 0, y: 10, scale: 0.95 }}
+											animate={{ opacity: 1, y: 0, scale: 1 }}
+											exit={{ opacity: 0, y: 10, scale: 0.95 }}
 											transition={{
-												duration: 0.15,
-												ease: [0.34, 1.56, 0.64, 1],
+												type: "spring",
+												stiffness: 500,
+												damping: 30,
+												mass: 0.5,
 											}}
 											onMouseEnter={() => setShowVolumeSlider(true)}
 											onMouseLeave={() => setShowVolumeSlider(false)}
-											className="absolute right-full mr-2 flex items-center gap-2 rounded-lg border border-white/20 bg-black/90 px-3 py-1.5 backdrop-blur-xl"
+											onPointerDown={(e) => {
+												e.stopPropagation();
+												setIsInteractingWithControls(true);
+											}}
+											onPointerUp={() => setIsInteractingWithControls(false)}
+											className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 rounded-2xl border border-white/30 px-3 py-3 backdrop-blur-3xl shadow-2xl"
+											style={{
+												background:
+													"linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%)",
+												boxShadow:
+													"0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)",
+											}}
 										>
-											<input
-												type="range"
-												min="0"
-												max="100"
-												value={volume}
-												onChange={(e) =>
-													handleVolumeChange(Number(e.target.value))
-												}
-												className="h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/20 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125"
-											/>
-											<span className="text-[10px] font-mono text-white/70">
-												{volume}
+											{/* Volume percentage */}
+											<span className="text-[10px] font-mono font-semibold text-white drop-shadow-lg">
+												{volume}%
 											</span>
+
+											{/* Vertical slider */}
+											<div className="relative h-24 w-6 flex items-center justify-center">
+												{/* Track background */}
+												<div className="absolute left-1/2 -translate-x-1/2 w-1 h-full rounded-full bg-white/20" />
+
+												{/* Filled track */}
+												<motion.div
+													className="absolute left-1/2 -translate-x-1/2 bottom-0 w-1 rounded-full"
+													style={{
+														height: `${volume}%`,
+														background:
+															"linear-gradient(to top, rgb(255,255,255), rgba(255,255,255,0.8))",
+													}}
+													transition={{ duration: 0.1, ease: "linear" }}
+												/>
+
+												{/* Vertical range input */}
+												<input
+													type="range"
+													min="0"
+													max="100"
+													value={volume}
+													onChange={(e) =>
+														handleVolumeChange(Number(e.target.value))
+													}
+													className="absolute h-full w-6 cursor-pointer appearance-none bg-transparent vertical-slider"
+													style={{
+														writingMode: "vertical-lr",
+														direction: "rtl",
+													}}
+												/>
+											</div>
+
+											{/* Min indicator */}
+											<div className="text-[8px] text-white/50 drop-shadow">
+												0
+											</div>
 										</motion.div>
 									)}
 								</AnimatePresence>
