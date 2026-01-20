@@ -1,9 +1,16 @@
 "use client";
 
-import React, { createContext, useContext, useState, useRef, useCallback, useEffect } from "react";
+import React, {
+	createContext,
+	useContext,
+	useState,
+	useRef,
+	useCallback,
+	useEffect,
+} from "react";
 
 interface AudioContextValue {
-	audioRef: React.RefObject<HTMLAudioElement>;
+	audioRef: React.RefObject<HTMLAudioElement | null>;
 	isPlaying: boolean;
 	currentTime: number;
 	duration: number;
@@ -120,4 +127,3 @@ export function useAudio() {
 	}
 	return context;
 }
-
