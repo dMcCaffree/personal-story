@@ -24,6 +24,7 @@ export function AsideObject({
 }: AsideObjectProps) {
 	const [isHovered, setIsHovered] = useState(false);
 	const [isPositioned, setIsPositioned] = useState(false);
+	const [isResizing, setIsResizing] = useState(false);
 	const { showHints } = useStory();
 
 	// Calculate position that accounts for object-cover cropping
@@ -46,8 +47,36 @@ export function AsideObject({
 		}
 	}, [position.left, position.top]);
 
+	// Handle window resize: hide during resize, show after
+	useEffect(() => {
+		let resizeTimer: NodeJS.Timeout;
+
+		const handleResize = () => {
+			// Immediately hide
+			setIsResizing(true);
+
+			// Clear existing timer
+			clearTimeout(resizeTimer);
+
+			// Show again after resize stops (debounced)
+			resizeTimer = setTimeout(() => {
+				setIsResizing(false);
+			}, 100);
+		};
+
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+			clearTimeout(resizeTimer);
+		};
+	}, []);
+
 	// Determine if shadow should show
 	const shouldShowShadow = isHovered || showHints;
+
+	// Show only when positioned AND not resizing
+	const shouldShow = isPositioned && !isResizing;
 
 	return (
 		<motion.button
@@ -62,7 +91,7 @@ export function AsideObject({
 				left: position.left,
 				width: position.width,
 				height: position.height,
-				opacity: isPositioned ? 1 : 0,
+				opacity: shouldShow ? 1 : 0,
 			}}
 			transition={{
 				// Instant position/size changes (no animation on resize)
@@ -70,8 +99,10 @@ export function AsideObject({
 				left: { duration: 0 },
 				width: { duration: 0 },
 				height: { duration: 0 },
-				// Smooth fade-in for opacity
-				opacity: { duration: 0.4, ease: "easeOut" },
+				// Instant hide during resize, smooth fade-in after
+				opacity: isResizing
+					? { duration: 0 }
+					: { duration: 1.5, ease: "easeOut" },
 			}}
 			style={{ zIndex: aside.zIndex ?? 1 }}
 		>
