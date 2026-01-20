@@ -74,7 +74,7 @@ export const scenes: Scene[] = [
 			},
 		],
 	},
-	{ index: 3, title: "If You Build It", hasAsides: false },
+	{ index: 3, title: "If You Build It", hasAsides: true, asides: [] },
 	{ index: 4, title: "I Don't Sleep So Good, Baby", hasAsides: false },
 	{ index: 5, title: "No Soliciting", hasAsides: false },
 	{ index: 6, title: "Take A Chance On Me", hasAsides: false },

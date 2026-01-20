@@ -36,7 +36,7 @@ export function SceneNavigation() {
 					disabled={isTransitioning}
 					onMouseEnter={() => !isTransitioning && setHoveredSide("left")}
 					onMouseLeave={() => setHoveredSide(null)}
-					className={`fixed left-0 top-0 bottom-0 w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-r to-transparent transition-all duration-300 ${hoveredSide === "left" ? "from-black/40" : "from-black/10"}`}
+					className={`fixed left-0 top-0 bottom-0 w-24 md:w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-r to-transparent transition-all duration-300 ${hoveredSide === "left" ? "from-black/40" : "from-black/10"}`}
 				>
 					{/* Preview card that slides out */}
 					<AnimatePresence>
@@ -101,7 +101,7 @@ export function SceneNavigation() {
 					disabled={isTransitioning}
 					onMouseEnter={() => !isTransitioning && setHoveredSide("right")}
 					onMouseLeave={() => setHoveredSide(null)}
-					className={`fixed right-0 top-0 bottom-0 w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-l from-black/10 to-transparent transition-all duration-300 ${hoveredSide === "right" ? "from-black/40" : "from-black/10"}`}
+					className={`fixed right-0 top-0 bottom-0 w-24 md:w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-l from-black/10 to-transparent transition-all duration-300 ${hoveredSide === "right" ? "from-black/40" : "from-black/10"}`}
 				>
 					{/* Preview card that slides out */}
 					<AnimatePresence>
