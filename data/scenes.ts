@@ -22,34 +22,58 @@ export const scenes: Scene[] = [
 			{
 				id: "mask",
 				name: "Not All Superheroes Wear Masks",
-				// Placeholder coordinates - measure from your source image
 				source: { x: 1065.5, y: 473, width: 220, height: 168.66 },
 				zIndex: 2,
 			},
 			{
 				id: "shoes",
 				name: "One Shoe, Two Shoe, Red Shoe, Yellow Shoe",
-				// Placeholder coordinates - measure from your source image
 				source: { x: 1904, y: 1120, width: 202.3, height: 310.59 },
 				zIndex: 2,
 			},
 			{
 				id: "teeth",
 				name: "Teeth",
-				// Placeholder coordinates - measure from your source image
 				source: { x: 779, y: 760, width: 92, height: 62.13 },
 				zIndex: 2,
 			},
 			{
 				id: "vineyard",
 				name: "Vineyard",
-				// Placeholder coordinates - measure from your source image
 				source: { x: 747, y: 61, width: 2007, height: 1178.5 },
 				zIndex: 1,
 			},
 		],
 	},
-	{ index: 2, title: "Don't Lecture Me", hasAsides: false },
+	{
+		index: 2,
+		title: "Don't Lecture Me",
+		hasAsides: true,
+		asides: [
+			{
+				id: "byu",
+				name: "BY-U Don't Know What It's Like",
+				source: { x: 613, y: 0, width: 216.5, height: 338 },
+			},
+			{
+				id: "professor",
+				name: "Generic Mormon Dude",
+				source: { x: 1746.8, y: 258.2, width: 252.21, height: 222.51 },
+				zIndex: 2,
+			},
+			{
+				id: "chalkboard",
+				name: "We Need To Chalk",
+				source: { x: 1326, y: 63, width: 1213.5, height: 436.37 },
+				zIndex: 1,
+			},
+			{
+				id: "desk",
+				name: "First Strike, Nano Banana",
+				source: { x: 831, y: 1031, width: 1006.56, height: 505 },
+			},
+		],
+	},
 	{ index: 3, title: "If You Build It", hasAsides: false },
 	{ index: 4, title: "I Don't Sleep So Good, Baby", hasAsides: false },
 	{ index: 5, title: "No Soliciting", hasAsides: false },
