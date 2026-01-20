@@ -24,6 +24,7 @@ export function StoryScene() {
 		canGoNext,
 		totalScenes,
 		setActiveAsideName,
+		hasStarted,
 	} = useStory();
 
 	const [narrationTrigger, setNarrationTrigger] = useState<{
@@ -77,6 +78,18 @@ export function StoryScene() {
 			video.src = nextTransitionUrl;
 		}
 	}, [currentSceneIndex, canGoNext, totalScenes]);
+
+	// Start narration when user clicks play on scene 1
+
+	useEffect(() => {
+		if (hasStarted && currentSceneIndex === 1) {
+			console.log("StoryScene: Starting initial narration for scene 1");
+			setNarrationTrigger({
+				sceneIndex: 1,
+				shouldPlay: true,
+			});
+		}
+	}, [hasStarted, currentSceneIndex]);
 
 	const handleTransitionStart = useCallback(() => {
 		console.log("StoryScene: Transition started", {
@@ -135,21 +148,28 @@ export function StoryScene() {
 				console.log("StoryScene: Aside ended");
 				setActiveAsideId(null);
 				setActiveAsideName(null);
-				
+
 				// Reset audio to beginning of main narration
 				if (audio) {
 					audio.currentTime = 0;
 				}
-				
+
 				audio?.removeEventListener("ended", handleAsideEnd);
 			};
 
 			audio?.addEventListener("ended", handleAsideEnd);
 		},
-		[activeAsideId, audioRef, currentSceneIndex, currentScene, setActiveAsideName],
+		[
+			activeAsideId,
+			audioRef,
+			currentSceneIndex,
+			currentScene,
+			setActiveAsideName,
+		],
 	);
 
 	// Reset active aside when scene changes
+
 	useEffect(() => {
 		setActiveAsideId(null);
 		setActiveAsideName(null);
@@ -176,7 +196,7 @@ export function StoryScene() {
 			</div>
 
 			{/* Aside objects overlay - scales with viewport */}
-			{!isTransitioning && currentScene?.asides && (
+			{!isTransitioning && hasStarted && currentScene?.asides && (
 				<div className="fixed inset-0 z-10">
 					{currentScene.asides.map((aside, index) => (
 						<AsideObject

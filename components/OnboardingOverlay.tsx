@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { AnimatePresence } from "motion/react";
 import { OnboardingCallout } from "./OnboardingCallout";
 import { OnboardingSpotlight } from "./OnboardingSpotlight";
-import { useOnboarding } from "@/hooks/useOnboarding";
 import { useStory } from "@/contexts/StoryContext";
 import { scenes } from "@/data/scenes";
 
@@ -40,21 +39,38 @@ const STEPS: OnboardingStep[] = [
 ];
 
 export function OnboardingOverlay() {
-	const { hasSeenOnboarding, markAsComplete } = useOnboarding();
-	const { currentSceneIndex, toggleHints, showOnboarding, closeOnboarding } =
-		useStory();
+	const {
+		currentSceneIndex,
+		toggleHints,
+		showOnboarding,
+		closeOnboarding,
+		hasStarted,
+		hasSeenOnboarding,
+		markOnboardingComplete,
+		setIsOnboardingActive,
+	} = useStory();
 	const [currentStep, setCurrentStep] = useState(1);
-	const [isVisible, setIsVisible] = useState(false);
 
-	// Determine if onboarding should be visible
-	useEffect(() => {
-		if (hasSeenOnboarding === null) return; // Still loading
+	// Derive visibility from props
+	const isVisible =
+		hasSeenOnboarding !== null &&
+		!hasStarted &&
+		(showOnboarding || hasSeenOnboarding === false);
 
-		if (showOnboarding || hasSeenOnboarding === false) {
-			setIsVisible(true);
+	const prevVisibleRef = useRef(false);
+
+	// Reset step when onboarding becomes visible (use LayoutEffect for immediate synchronous update)
+	useLayoutEffect(() => {
+		if (isVisible && !prevVisibleRef.current) {
 			setCurrentStep(1);
 		}
-	}, [hasSeenOnboarding, showOnboarding]);
+		prevVisibleRef.current = isVisible;
+	}, [isVisible]);
+
+	// Sync onboarding active state with context
+	useEffect(() => {
+		setIsOnboardingActive(isVisible);
+	}, [isVisible, setIsOnboardingActive]);
 
 	const handleNext = () => {
 		if (currentStep < STEPS.length) {
@@ -69,8 +85,8 @@ export function OnboardingOverlay() {
 	};
 
 	const handleComplete = () => {
-		setIsVisible(false);
-		markAsComplete();
+		// Mark as complete (this will cause isVisible to become false)
+		markOnboardingComplete();
 		closeOnboarding();
 
 		// Turn off hints if they were enabled

@@ -1,8 +1,16 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, {
+	createContext,
+	useContext,
+	useState,
+	useCallback,
+	useEffect,
+} from "react";
 import { StoryState } from "@/lib/story-config";
 import { getTotalScenes } from "@/data/scenes";
+
+const ONBOARDING_KEY = "personal-story-onboarding-complete";
 
 interface StoryContextValue extends StoryState {
 	goToNextScene: () => void;
@@ -18,6 +26,12 @@ interface StoryContextValue extends StoryState {
 	showOnboarding: boolean;
 	triggerOnboarding: () => void;
 	closeOnboarding: () => void;
+	hasStarted: boolean;
+	startExperience: () => void;
+	hasSeenOnboarding: boolean | null;
+	markOnboardingComplete: () => void;
+	isOnboardingActive: boolean;
+	setIsOnboardingActive: (active: boolean) => void;
 }
 
 const StoryContext = createContext<StoryContextValue | undefined>(undefined);
@@ -35,6 +49,17 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 	const [showHints, setShowHints] = useState(false);
 	const [activeAsideName, setActiveAsideName] = useState<string | null>(null);
 	const [showOnboarding, setShowOnboarding] = useState(false);
+	const [hasStarted, setHasStarted] = useState(false);
+	const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(
+		null,
+	);
+	const [isOnboardingActive, setIsOnboardingActive] = useState(false);
+
+	// Check localStorage on mount for onboarding status
+	useEffect(() => {
+		const seen = localStorage.getItem(ONBOARDING_KEY);
+		setHasSeenOnboarding(seen === "true");
+	}, []);
 
 	const canGoNext = state.currentSceneIndex < totalScenes;
 	const canGoBack = state.currentSceneIndex > 1;
@@ -95,6 +120,15 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		setShowOnboarding(false);
 	}, []);
 
+	const startExperience = useCallback(() => {
+		setHasStarted(true);
+	}, []);
+
+	const markOnboardingComplete = useCallback(() => {
+		localStorage.setItem(ONBOARDING_KEY, "true");
+		setHasSeenOnboarding(true);
+	}, []);
+
 	const contextValue: StoryContextValue = {
 		...state,
 		goToNextScene,
@@ -110,6 +144,12 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		showOnboarding,
 		triggerOnboarding,
 		closeOnboarding,
+		hasStarted,
+		startExperience,
+		hasSeenOnboarding,
+		markOnboardingComplete,
+		isOnboardingActive,
+		setIsOnboardingActive,
 	};
 
 	return (

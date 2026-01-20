@@ -15,6 +15,8 @@ export function SceneNavigation() {
 		canGoBack,
 		currentSceneIndex,
 		isTransitioning,
+		hasStarted,
+		isOnboardingActive,
 	} = useStory();
 	const [hoveredSide, setHoveredSide] = useState<"left" | "right" | null>(null);
 
@@ -25,6 +27,9 @@ export function SceneNavigation() {
 
 	const nextSceneIndex = currentSceneIndex + 1;
 	const prevSceneIndex = currentSceneIndex - 1;
+
+	// Don't show navigation until user has started the experience or onboarding is active
+	if (!hasStarted && !isOnboardingActive) return null;
 
 	return (
 		<>

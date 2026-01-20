@@ -180,6 +180,8 @@ export function Toolbar() {
 		toggleHints,
 		activeAsideName,
 		triggerOnboarding,
+		hasStarted,
+		isOnboardingActive,
 	} = useStory();
 	const {
 		isPlaying,
@@ -508,6 +510,9 @@ export function Toolbar() {
 			href: LINKEDIN_URL,
 		},
 	];
+
+	// Don't show toolbar until user has started the experience or onboarding is active
+	if (!hasStarted && !isOnboardingActive) return null;
 
 	return (
 		<>

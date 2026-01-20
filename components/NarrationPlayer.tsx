@@ -44,6 +44,21 @@ export function NarrationPlayer({
 		}
 
 		console.log("NarrationPlayer: Starting playback for scene", sceneIndex);
+		
+		// Ensure audio is loaded before playing
+		if (audio.readyState < 2) {
+			console.log("NarrationPlayer: Waiting for audio to load");
+			const handleCanPlay = () => {
+				console.log("NarrationPlayer: Audio ready, starting playback");
+				audio.play().catch((error) => {
+					console.error("NarrationPlayer: Error playing narration:", error);
+				});
+			};
+			audio.addEventListener("canplay", handleCanPlay, { once: true });
+			audio.load();
+			return () => audio.removeEventListener("canplay", handleCanPlay);
+		}
+		
 		// Play the narration
 		audio
 			.play()
