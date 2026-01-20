@@ -5,6 +5,7 @@ import { AudioProvider } from "@/contexts/AudioContext";
 import { StoryScene } from "@/components/StoryScene";
 import { Toolbar } from "@/components/Toolbar";
 import { SceneNavigation } from "@/components/SceneNavigation";
+import { OnboardingOverlay } from "@/components/OnboardingOverlay";
 
 export default function Home() {
 	return (
@@ -14,6 +15,7 @@ export default function Home() {
 					<StoryScene />
 					<SceneNavigation />
 					<Toolbar />
+					<OnboardingOverlay />
 				</main>
 			</AudioProvider>
 		</StoryProvider>

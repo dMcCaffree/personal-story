@@ -15,6 +15,9 @@ interface StoryContextValue extends StoryState {
 	toggleHints: () => void;
 	activeAsideName: string | null;
 	setActiveAsideName: (name: string | null) => void;
+	showOnboarding: boolean;
+	triggerOnboarding: () => void;
+	closeOnboarding: () => void;
 }
 
 const StoryContext = createContext<StoryContextValue | undefined>(undefined);
@@ -31,6 +34,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 
 	const [showHints, setShowHints] = useState(false);
 	const [activeAsideName, setActiveAsideName] = useState<string | null>(null);
+	const [showOnboarding, setShowOnboarding] = useState(false);
 
 	const canGoNext = state.currentSceneIndex < totalScenes;
 	const canGoBack = state.currentSceneIndex > 1;
@@ -83,6 +87,14 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		setShowHints((prev) => !prev);
 	}, []);
 
+	const triggerOnboarding = useCallback(() => {
+		setShowOnboarding(true);
+	}, []);
+
+	const closeOnboarding = useCallback(() => {
+		setShowOnboarding(false);
+	}, []);
+
 	const contextValue: StoryContextValue = {
 		...state,
 		goToNextScene,
@@ -95,6 +107,9 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		toggleHints,
 		activeAsideName,
 		setActiveAsideName,
+		showOnboarding,
+		triggerOnboarding,
+		closeOnboarding,
 	};
 
 	return (

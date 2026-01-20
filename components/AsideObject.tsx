@@ -81,6 +81,7 @@ export function AsideObject({
 	return (
 		<motion.button
 			type="button"
+			data-aside-object
 			onClick={onClick}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
