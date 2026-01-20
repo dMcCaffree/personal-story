@@ -13,7 +13,7 @@ interface AsideObjectProps {
 	sceneIndex: number;
 	onClick: () => void;
 	isActive: boolean;
-	asideIndex: number; // For staggering the shine effect
+	asideIndex?: number; // Optional: For staggering effects
 }
 
 export function AsideObject({
@@ -21,10 +21,9 @@ export function AsideObject({
 	sceneIndex,
 	onClick,
 	isActive,
-	asideIndex,
 }: AsideObjectProps) {
 	const [isHovered, setIsHovered] = useState(false);
-	const [isShining, setIsShining] = useState(false);
+	const [isPositioned, setIsPositioned] = useState(false);
 	const { showHints } = useStory();
 
 	// Calculate position that accounts for object-cover cropping
@@ -38,8 +37,17 @@ export function AsideObject({
 	// Use calculated position (from source coords) or fallback to manual position
 	const position = aside.position || calculatedPosition;
 
+	// Fade in once position is calculated (not at default 0%)
+	useEffect(() => {
+		if (position.left !== "0%" || position.top !== "0%") {
+			// Small delay to ensure DOM has painted with new position
+			const timer = setTimeout(() => setIsPositioned(true), 50);
+			return () => clearTimeout(timer);
+		}
+	}, [position.left, position.top]);
+
 	// Determine if shadow should show
-	const shouldShowShadow = isHovered || showHints || isShining;
+	const shouldShowShadow = isHovered || showHints;
 
 	return (
 		<motion.button
@@ -48,12 +56,13 @@ export function AsideObject({
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 			className="absolute cursor-pointer"
-			initial={false}
+			initial={{ opacity: 0 }}
 			animate={{
 				top: position.top,
 				left: position.left,
 				width: position.width,
 				height: position.height,
+				opacity: isPositioned ? 1 : 0,
 			}}
 			transition={{
 				// Instant position/size changes (no animation on resize)
@@ -61,6 +70,8 @@ export function AsideObject({
 				left: { duration: 0 },
 				width: { duration: 0 },
 				height: { duration: 0 },
+				// Smooth fade-in for opacity
+				opacity: { duration: 0.4, ease: "easeOut" },
 			}}
 			style={{ zIndex: aside.zIndex ?? 1 }}
 		>
@@ -80,28 +91,6 @@ export function AsideObject({
 								: "brightness(1)",
 					}}
 				/>
-
-				{/* Animated shine effect overlay */}
-				{isShining && (
-					<motion.div
-						className="absolute inset-0 pointer-events-none overflow-hidden"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: [0, 1, 0] }}
-						transition={{ duration: 1.5, times: [0, 0.5, 1] }}
-					>
-						<motion.div
-							className="absolute inset-0"
-							style={{
-								background:
-									"linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%)",
-								width: "50%",
-							}}
-							initial={{ x: "-100%" }}
-							animate={{ x: "300%" }}
-							transition={{ duration: 1.5, ease: "easeInOut" }}
-						/>
-					</motion.div>
-				)}
 
 				{/* Active indicator */}
 				{isActive && (
