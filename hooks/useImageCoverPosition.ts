@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 import { SOURCE_IMAGE_DIMENSIONS } from "@/lib/story-config";
 
 /**
@@ -8,7 +8,7 @@ import { SOURCE_IMAGE_DIMENSIONS } from "@/lib/story-config";
 export function useImageCoverPosition(sourceX: number, sourceY: number, sourceWidth: number, sourceHeight: number) {
 	const [position, setPosition] = useState({ left: "0%", top: "0%", width: "0%", height: "0%" });
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const calculatePosition = () => {
 			const viewportWidth = window.innerWidth;
 			const viewportHeight = window.innerHeight;

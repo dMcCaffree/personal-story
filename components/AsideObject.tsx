@@ -1,17 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import type { Aside } from "@/lib/story-config";
 import { getAsideImageUrl } from "@/lib/story-config";
 import { useImageCoverPosition } from "@/hooks/useImageCoverPosition";
+import { useStory } from "@/contexts/StoryContext";
 
 interface AsideObjectProps {
 	aside: Aside;
 	sceneIndex: number;
 	onClick: () => void;
 	isActive: boolean;
+	asideIndex: number; // For staggering the shine effect
 }
 
 export function AsideObject({
@@ -19,8 +21,11 @@ export function AsideObject({
 	sceneIndex,
 	onClick,
 	isActive,
+	asideIndex,
 }: AsideObjectProps) {
 	const [isHovered, setIsHovered] = useState(false);
+	const [isShining, setIsShining] = useState(false);
+	const { showHints } = useStory();
 
 	// Calculate position that accounts for object-cover cropping
 	const calculatedPosition = useImageCoverPosition(
@@ -32,6 +37,9 @@ export function AsideObject({
 
 	// Use calculated position (from source coords) or fallback to manual position
 	const position = aside.position || calculatedPosition;
+
+	// Determine if shadow should show
+	const shouldShowShadow = isHovered || showHints || isShining;
 
 	return (
 		<motion.button
@@ -47,17 +55,14 @@ export function AsideObject({
 				width: position.width,
 				height: position.height,
 			}}
-			whileHover={{ scale: 1.05 }}
-			whileTap={{ scale: 0.95 }}
 			transition={{
 				// Instant position/size changes (no animation on resize)
 				top: { duration: 0 },
 				left: { duration: 0 },
 				width: { duration: 0 },
 				height: { duration: 0 },
-				// Spring animation for scale (hover/tap)
-				scale: { type: "spring", stiffness: 400, damping: 25 },
 			}}
+			style={{ zIndex: aside.zIndex ?? 1 }}
 		>
 			{/* The clickable image */}
 			<div className="relative w-full h-full">
@@ -65,16 +70,38 @@ export function AsideObject({
 					src={getAsideImageUrl(sceneIndex, aside.id)}
 					alt={aside.name}
 					fill
-					className="object-contain transition-all duration-200"
+					className="object-contain transition-all duration-300"
 					unoptimized
 					style={{
-						filter: isHovered
-							? "drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)) brightness(1.1)"
+						filter: shouldShowShadow
+							? "drop-shadow(1px 1px 0 rgba(255, 255, 255, 1)) drop-shadow(-1px -1px 0 rgba(255, 255, 255, 1)) drop-shadow(1px -1px 0 rgba(255, 255, 255, 1)) drop-shadow(-1px 1px 0 rgba(255, 255, 255, 1)) brightness(1.4)"
 							: isActive
-								? "brightness(1.2)"
+								? "brightness(1.4)"
 								: "brightness(1)",
 					}}
 				/>
+
+				{/* Animated shine effect overlay */}
+				{isShining && (
+					<motion.div
+						className="absolute inset-0 pointer-events-none overflow-hidden"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: [0, 1, 0] }}
+						transition={{ duration: 1.5, times: [0, 0.5, 1] }}
+					>
+						<motion.div
+							className="absolute inset-0"
+							style={{
+								background:
+									"linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%)",
+								width: "50%",
+							}}
+							initial={{ x: "-100%" }}
+							animate={{ x: "300%" }}
+							transition={{ duration: 1.5, ease: "easeInOut" }}
+						/>
+					</motion.div>
+				)}
 
 				{/* Active indicator */}
 				{isActive && (

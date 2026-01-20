@@ -165,13 +165,14 @@ export function StoryScene() {
 			{/* Aside objects overlay - scales with viewport */}
 			{!isTransitioning && currentScene?.asides && (
 				<div className="fixed inset-0 z-10">
-					{currentScene.asides.map((aside) => (
+					{currentScene.asides.map((aside, index) => (
 						<AsideObject
 							key={aside.id}
 							aside={aside}
 							sceneIndex={currentSceneIndex}
 							onClick={() => handleAsideClick(aside.id)}
 							isActive={activeAsideId === aside.id}
+							asideIndex={index}
 						/>
 					))}
 				</div>

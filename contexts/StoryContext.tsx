@@ -11,6 +11,8 @@ interface StoryContextValue extends StoryState {
 	totalScenes: number;
 	canGoNext: boolean;
 	canGoBack: boolean;
+	showHints: boolean;
+	toggleHints: () => void;
 }
 
 const StoryContext = createContext<StoryContextValue | undefined>(undefined);
@@ -24,6 +26,8 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		isTransitioning: false,
 		playbackDirection: "forward",
 	});
+
+	const [showHints, setShowHints] = useState(false);
 
 	const canGoNext = state.currentSceneIndex < totalScenes;
 	const canGoBack = state.currentSceneIndex > 1;
@@ -72,6 +76,10 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		}));
 	}, []);
 
+	const toggleHints = useCallback(() => {
+		setShowHints((prev) => !prev);
+	}, []);
+
 	const contextValue: StoryContextValue = {
 		...state,
 		goToNextScene,
@@ -80,6 +88,8 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		totalScenes,
 		canGoNext,
 		canGoBack,
+		showHints,
+		toggleHints,
 	};
 
 	return (

@@ -17,30 +17,35 @@ export const scenes: Scene[] = [
 				id: "books",
 				name: "Books",
 				source: { x: 215, y: 1064, width: 509.87, height: 295.5 },
+				zIndex: 2,
 			},
 			{
 				id: "mask",
 				name: "Mask",
 				// Placeholder coordinates - measure from your source image
 				source: { x: 1065.5, y: 473, width: 220, height: 168.66 },
+				zIndex: 2,
 			},
 			{
 				id: "shoes",
 				name: "Shoes",
 				// Placeholder coordinates - measure from your source image
 				source: { x: 1904, y: 1120, width: 202.3, height: 310.59 },
+				zIndex: 2,
 			},
 			{
 				id: "teeth",
 				name: "Teeth",
 				// Placeholder coordinates - measure from your source image
 				source: { x: 779, y: 760, width: 92, height: 62.13 },
+				zIndex: 2,
 			},
 			{
 				id: "vineyard",
 				name: "Vineyard",
 				// Placeholder coordinates - measure from your source image
 				source: { x: 747, y: 61, width: 2007, height: 1178.5 },
+				zIndex: 1,
 			},
 		],
 	},

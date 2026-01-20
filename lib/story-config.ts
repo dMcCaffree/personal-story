@@ -21,6 +21,7 @@ export interface Aside {
 		width: string;
 		height: string;
 	};
+	zIndex?: number;
 }
 
 /**
@@ -37,6 +38,7 @@ export interface Scene {
 	title: string;
 	hasAsides: boolean;
 	asides?: Aside[];
+	zIndex?: number;
 }
 
 export interface StoryState {

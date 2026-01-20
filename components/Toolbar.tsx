@@ -174,7 +174,7 @@ const PolaroidStackButton = memo(
 PolaroidStackButton.displayName = "PolaroidStackButton";
 
 export function Toolbar() {
-	const { currentSceneIndex } = useStory();
+	const { currentSceneIndex, showHints, toggleHints } = useStory();
 	const {
 		isPlaying,
 		currentTime,
@@ -251,8 +251,7 @@ export function Toolbar() {
 	};
 
 	const handleHintToggle = () => {
-		// TODO: Implement hint/aside highlighting
-		console.log("Show hints for clickable asides");
+		toggleHints();
 	};
 
 	const formatTime = (seconds: number) => {
@@ -430,8 +429,9 @@ export function Toolbar() {
 					/>
 				</svg>
 			),
-			label: "Show Hints",
+			label: showHints ? "Hide Hints" : "Show Hints",
 			onClick: handleHintToggle,
+			isActive: showHints,
 		},
 		{
 			icon: (
