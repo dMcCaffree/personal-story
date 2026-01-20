@@ -2,10 +2,17 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { getKeyframeUrl, getTransitionUrl } from "@/lib/story-config";
+import {
+	getKeyframeUrl,
+	getTransitionUrl,
+	getAsideAudioUrl,
+} from "@/lib/story-config";
 import { TransitionPlayer } from "./TransitionPlayer";
 import { NarrationPlayer } from "./NarrationPlayer";
+import { AsideObject } from "./AsideObject";
 import { useStory } from "@/contexts/StoryContext";
+import { useAudio } from "@/contexts/AudioContext";
+import { scenes } from "@/data/scenes";
 
 export function StoryScene() {
 	const {
@@ -24,6 +31,11 @@ export function StoryScene() {
 	}>({ sceneIndex: currentSceneIndex, shouldPlay: false });
 
 	const [delayedSceneIndex, setDelayedSceneIndex] = useState(currentSceneIndex);
+	const [activeAsideId, setActiveAsideId] = useState<string | null>(null);
+	const { audioRef } = useAudio();
+
+	// Get current scene data
+	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
 
 	// Delay keyframe change for forward transitions
 	useEffect(() => {
@@ -91,9 +103,48 @@ export function StoryScene() {
 		// Don't stop narration here - let it play to completion
 	}, [setIsTransitioning]);
 
+	// Handle aside click
+	const handleAsideClick = useCallback(
+		(asideId: string) => {
+			console.log("StoryScene: Aside clicked", asideId);
+
+			// If this aside is already playing, do nothing
+			if (activeAsideId === asideId) return;
+
+			// Stop current audio
+			const audio = audioRef.current;
+			if (audio) {
+				audio.pause();
+				audio.src = getAsideAudioUrl(currentSceneIndex, asideId);
+				audio.load();
+				audio.play().catch((error) => {
+					console.error("Error playing aside audio:", error);
+				});
+			}
+
+			setActiveAsideId(asideId);
+
+			// Listen for when aside ends to return to main narration
+			const handleAsideEnd = () => {
+				console.log("StoryScene: Aside ended");
+				setActiveAsideId(null);
+				// Could resume main narration here if needed
+				audio?.removeEventListener("ended", handleAsideEnd);
+			};
+
+			audio?.addEventListener("ended", handleAsideEnd);
+		},
+		[activeAsideId, audioRef, currentSceneIndex],
+	);
+
+	// Reset active aside when scene changes
+	useEffect(() => {
+		setActiveAsideId(null);
+	}, [currentSceneIndex]);
+
 	return (
 		<>
-			{/* Main keyframe image */}
+			{/* Full-screen keyframe image */}
 			<div className="fixed inset-0 z-0">
 				<Image
 					src={getKeyframeUrl(displayedSceneIndex)}
@@ -110,6 +161,21 @@ export function StoryScene() {
 					unoptimized
 				/>
 			</div>
+
+			{/* Aside objects overlay - scales with viewport */}
+			{!isTransitioning && currentScene?.asides && (
+				<div className="fixed inset-0 z-10">
+					{currentScene.asides.map((aside) => (
+						<AsideObject
+							key={aside.id}
+							aside={aside}
+							sceneIndex={currentSceneIndex}
+							onClick={() => handleAsideClick(aside.id)}
+							isActive={activeAsideId === aside.id}
+						/>
+					))}
+				</div>
+			)}
 
 			{/* Transition video overlay */}
 			{(() => {

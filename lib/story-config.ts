@@ -4,10 +4,39 @@ export const R2_BASE_URL = "https://file.swell.so/story/";
 
 export type PlaybackDirection = "forward" | "reverse";
 
+export interface Aside {
+	id: string;
+	name: string;
+	// Store source coordinates for accurate positioning with object-cover
+	source: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	};
+	// Legacy: For backwards compatibility or manual positioning
+	position?: {
+		top: string;
+		left: string;
+		width: string;
+		height: string;
+	};
+}
+
+/**
+ * Source image dimensions for Scene 1
+ * All asides should be positioned relative to these dimensions
+ */
+export const SOURCE_IMAGE_DIMENSIONS = {
+	width: 2752,
+	height: 1536,
+};
+
 export interface Scene {
 	index: number;
 	title: string;
 	hasAsides: boolean;
+	asides?: Aside[];
 }
 
 export interface StoryState {
@@ -53,6 +82,22 @@ export function getTransitionUrl(fromIndex: number, toIndex: number): string {
 export function getNarrationUrl(sceneIndex: number): string {
 	const formatted = formatSceneIndex(sceneIndex);
 	return `${R2_BASE_URL}narration/scene-${formatted}.mp3`;
+}
+
+/**
+ * Get the aside image URL for a scene
+ */
+export function getAsideImageUrl(sceneIndex: number, asideId: string): string {
+	const formatted = formatSceneIndex(sceneIndex);
+	return `${R2_BASE_URL}asides/scene-${formatted}/${asideId}.png`;
+}
+
+/**
+ * Get the aside audio URL for a scene
+ */
+export function getAsideAudioUrl(sceneIndex: number, asideId: string): string {
+	const formatted = formatSceneIndex(sceneIndex);
+	return `${R2_BASE_URL}asides/scene-${formatted}/${asideId}.mp3`;
 }
 
 /**
