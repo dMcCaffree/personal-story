@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	images: {
-		domains: ["file.swell.so"],
+		remotePatterns: [{ hostname: "file.swell.so", protocol: "https" }],
 	},
 };
 
