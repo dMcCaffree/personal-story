@@ -12,7 +12,7 @@ import Image from "next/image";
 
 const LINKEDIN_URL = "https://linkedin.com/in/dMcCaffree";
 const RESUME_URL = "#"; // Placeholder for now
-const MAX_TITLE_LENGTH_BEFORE_ANIMATING = 20;
+const MAX_TITLE_LENGTH_BEFORE_ANIMATING = 50;
 
 interface ToolbarButtonProps {
 	icon: React.ReactNode;
@@ -174,7 +174,8 @@ const PolaroidStackButton = memo(
 PolaroidStackButton.displayName = "PolaroidStackButton";
 
 export function Toolbar() {
-	const { currentSceneIndex, showHints, toggleHints } = useStory();
+	const { currentSceneIndex, showHints, toggleHints, activeAsideName } =
+		useStory();
 	const {
 		isPlaying,
 		currentTime,
@@ -202,9 +203,10 @@ export function Toolbar() {
 	const progressBarRef = useRef<HTMLDivElement>(null);
 	const volumeSliderTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-	// Get current scene name
+	// Get current scene name or aside name
 	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
-	const sceneName = currentScene?.title || `Scene ${currentSceneIndex}`;
+	const sceneTitle = currentScene?.title || `Scene ${currentSceneIndex}`;
+	const displayTitle = activeAsideName || sceneTitle;
 
 	// Calculate scroll distance for long titles
 	useLayoutEffect(() => {
@@ -520,7 +522,7 @@ export function Toolbar() {
 							ref={containerRef}
 							className="relative px-1 text-center text-xs font-medium text-white/90 overflow-hidden max-w-[280px] mx-auto"
 						>
-							{sceneName.length > MAX_TITLE_LENGTH_BEFORE_ANIMATING ? (
+							{displayTitle.length > MAX_TITLE_LENGTH_BEFORE_ANIMATING ? (
 								<div className="flex items-center justify-center w-full">
 									<motion.div
 										ref={titleRef}
@@ -543,12 +545,12 @@ export function Toolbar() {
 										className="whitespace-nowrap will-change-transform"
 										style={{ paddingLeft: "2rem" }}
 									>
-										{sceneName}
+										{displayTitle}
 									</motion.div>
 								</div>
 							) : (
 								<div ref={titleRef} className="whitespace-nowrap">
-									{sceneName}
+									{displayTitle}
 								</div>
 							)}
 						</div>

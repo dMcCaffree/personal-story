@@ -13,6 +13,8 @@ interface StoryContextValue extends StoryState {
 	canGoBack: boolean;
 	showHints: boolean;
 	toggleHints: () => void;
+	activeAsideName: string | null;
+	setActiveAsideName: (name: string | null) => void;
 }
 
 const StoryContext = createContext<StoryContextValue | undefined>(undefined);
@@ -28,6 +30,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 	});
 
 	const [showHints, setShowHints] = useState(false);
+	const [activeAsideName, setActiveAsideName] = useState<string | null>(null);
 
 	const canGoNext = state.currentSceneIndex < totalScenes;
 	const canGoBack = state.currentSceneIndex > 1;
@@ -90,6 +93,8 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		canGoBack,
 		showHints,
 		toggleHints,
+		activeAsideName,
+		setActiveAsideName,
 	};
 
 	return (

@@ -73,7 +73,7 @@ export function AsideObject({
 	}, []);
 
 	// Determine if shadow should show
-	const shouldShowShadow = isHovered || showHints;
+	const shouldShowShadow = isHovered || showHints || isActive;
 
 	// Show only when positioned AND not resizing
 	const shouldShow = isPositioned && !isResizing;
@@ -117,23 +117,9 @@ export function AsideObject({
 					style={{
 						filter: shouldShowShadow
 							? "drop-shadow(1px 1px 0 rgba(255, 255, 255, 1)) drop-shadow(-1px -1px 0 rgba(255, 255, 255, 1)) drop-shadow(1px -1px 0 rgba(255, 255, 255, 1)) drop-shadow(-1px 1px 0 rgba(255, 255, 255, 1)) brightness(1.4)"
-							: isActive
-								? "brightness(1.4)"
-								: "brightness(1)",
+							: "brightness(1)",
 					}}
 				/>
-
-				{/* Active indicator */}
-				{isActive && (
-					<motion.div
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						className="absolute -top-2 -right-2 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"
-						style={{
-							boxShadow: "0 0 10px rgba(59, 130, 246, 0.8)",
-						}}
-					/>
-				)}
 			</div>
 		</motion.button>
 	);

@@ -23,6 +23,7 @@ export function StoryScene() {
 		setIsTransitioning,
 		canGoNext,
 		totalScenes,
+		setActiveAsideName,
 	} = useStory();
 
 	const [narrationTrigger, setNarrationTrigger] = useState<{
@@ -111,6 +112,10 @@ export function StoryScene() {
 			// If this aside is already playing, do nothing
 			if (activeAsideId === asideId) return;
 
+			// Find the aside to get its name
+			const aside = currentScene?.asides?.find((a) => a.id === asideId);
+			const asideName = aside?.name || asideId;
+
 			// Stop current audio
 			const audio = audioRef.current;
 			if (audio) {
@@ -123,24 +128,32 @@ export function StoryScene() {
 			}
 
 			setActiveAsideId(asideId);
+			setActiveAsideName(asideName);
 
 			// Listen for when aside ends to return to main narration
 			const handleAsideEnd = () => {
 				console.log("StoryScene: Aside ended");
 				setActiveAsideId(null);
-				// Could resume main narration here if needed
+				setActiveAsideName(null);
+				
+				// Reset audio to beginning of main narration
+				if (audio) {
+					audio.currentTime = 0;
+				}
+				
 				audio?.removeEventListener("ended", handleAsideEnd);
 			};
 
 			audio?.addEventListener("ended", handleAsideEnd);
 		},
-		[activeAsideId, audioRef, currentSceneIndex],
+		[activeAsideId, audioRef, currentSceneIndex, currentScene, setActiveAsideName],
 	);
 
 	// Reset active aside when scene changes
 	useEffect(() => {
 		setActiveAsideId(null);
-	}, [currentSceneIndex]);
+		setActiveAsideName(null);
+	}, [currentSceneIndex, setActiveAsideName]);
 
 	return (
 		<>
