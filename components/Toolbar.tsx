@@ -200,6 +200,7 @@ export function Toolbar() {
 	const titleRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const progressBarRef = useRef<HTMLDivElement>(null);
+	const volumeSliderTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	// Get current scene name
 	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
@@ -324,6 +325,69 @@ export function Toolbar() {
 		};
 	}, [isInteractingWithControls, isDraggingProgress]);
 
+	// Better volume slider dismissal - close if mouse moves away from both button and slider
+	useEffect(() => {
+		if (!showVolumeSlider) return;
+
+		let hideTimer: NodeJS.Timeout;
+
+		const handleMouseMove = (e: MouseEvent) => {
+			// Clear any existing timer
+			if (hideTimer) clearTimeout(hideTimer);
+
+			// Get the volume button and slider elements
+			const volumeButton = document
+				.querySelector('[aria-label="Volume"]')
+				?.closest("button");
+			const volumeSlider = document
+				.querySelector(".vertical-slider")
+				?.closest('[class*="absolute bottom-full"]');
+
+			if (!volumeButton) return;
+
+			// Check if mouse is over button or slider
+			const buttonRect = volumeButton.getBoundingClientRect();
+			const isOverButton =
+				e.clientX >= buttonRect.left &&
+				e.clientX <= buttonRect.right &&
+				e.clientY >= buttonRect.top &&
+				e.clientY <= buttonRect.bottom;
+
+			let isOverSlider = false;
+			if (volumeSlider) {
+				const sliderRect = volumeSlider.getBoundingClientRect();
+				isOverSlider =
+					e.clientX >= sliderRect.left &&
+					e.clientX <= sliderRect.right &&
+					e.clientY >= sliderRect.top &&
+					e.clientY <= sliderRect.bottom;
+			}
+
+			// If not over either, set a timer to hide
+			if (!isOverButton && !isOverSlider) {
+				hideTimer = setTimeout(() => {
+					setShowVolumeSlider(false);
+				}, 100);
+			}
+		};
+
+		document.addEventListener("mousemove", handleMouseMove);
+
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove);
+			if (hideTimer) clearTimeout(hideTimer);
+		};
+	}, [showVolumeSlider]);
+
+	// Cleanup volume slider timer on unmount
+	useEffect(() => {
+		return () => {
+			if (volumeSliderTimerRef.current) {
+				clearTimeout(volumeSliderTimerRef.current);
+			}
+		};
+	}, []);
+
 	// Utility buttons that pop out on hover
 	const utilityButtons = [
 		{
@@ -425,7 +489,7 @@ export function Toolbar() {
 				whileDrag={{ scale: 1.05, cursor: "grabbing" }}
 			>
 				<motion.div
-					className="relative flex flex-col rounded-2xl border border-white/20 bg-black/40 px-3 py-2 backdrop-blur-2xl"
+					className="relative flex flex-col rounded-2xl border border-white/20 px-3 py-2"
 					onMouseEnter={() => !isDragging && setIsHovered(true)}
 					onMouseLeave={() => {
 						if (!isDragging) {
@@ -433,7 +497,11 @@ export function Toolbar() {
 						}
 					}}
 					style={{
-						boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+						background: "rgba(0, 0, 0, 0.4)",
+						backdropFilter: "blur(40px)",
+						WebkitBackdropFilter: "blur(40px)",
+						boxShadow:
+							"0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1)",
 					}}
 				>
 					{/* Top section - Scene info and narration controls */}
@@ -565,7 +633,20 @@ export function Toolbar() {
 								<button
 									type="button"
 									onClick={handleMuteToggle}
-									onMouseEnter={() => setShowVolumeSlider(true)}
+									onMouseEnter={() => {
+										// Clear any pending hide timer
+										if (volumeSliderTimerRef.current) {
+											clearTimeout(volumeSliderTimerRef.current);
+											volumeSliderTimerRef.current = null;
+										}
+										setShowVolumeSlider(true);
+									}}
+									onMouseLeave={() => {
+										// Set a timer to hide the slider if mouse doesn't enter it
+										volumeSliderTimerRef.current = setTimeout(() => {
+											setShowVolumeSlider(false);
+										}, 200);
+									}}
 									onPointerDown={(e) => {
 										e.stopPropagation();
 										setIsInteractingWithControls(true);
@@ -627,19 +708,27 @@ export function Toolbar() {
 												damping: 30,
 												mass: 0.5,
 											}}
-											onMouseEnter={() => setShowVolumeSlider(true)}
+											onMouseEnter={() => {
+												// Clear any pending hide timer when entering slider
+												if (volumeSliderTimerRef.current) {
+													clearTimeout(volumeSliderTimerRef.current);
+													volumeSliderTimerRef.current = null;
+												}
+												setShowVolumeSlider(true);
+											}}
 											onMouseLeave={() => setShowVolumeSlider(false)}
 											onPointerDown={(e) => {
 												e.stopPropagation();
 												setIsInteractingWithControls(true);
 											}}
 											onPointerUp={() => setIsInteractingWithControls(false)}
-											className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 rounded-2xl border border-white/30 px-3 py-3 backdrop-blur-3xl shadow-2xl"
+											className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 rounded-2xl border border-white/20 px-3 py-3"
 											style={{
-												background:
-													"linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%)",
+												background: "rgba(0, 0, 0, 0.4)",
+												backdropFilter: "blur(40px)",
+												WebkitBackdropFilter: "blur(40px)",
 												boxShadow:
-													"0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.3)",
+													"0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1)",
 											}}
 										>
 											{/* Volume percentage */}
