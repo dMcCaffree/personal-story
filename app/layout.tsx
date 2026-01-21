@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "My Story",
+	title: "The Dustin McCaffree Story",
 	description: "An interactive journey through my experiences",
 };
 
