@@ -69,7 +69,7 @@ export const scenes: Scene[] = [
 			},
 			{
 				id: "desk",
-				name: "First Strike, Nano Banana",
+				name: "Strike 1, Nano Banana",
 				source: { x: 831, y: 1031, width: 1006.56, height: 505 },
 			},
 		],
@@ -86,7 +86,7 @@ export const scenes: Scene[] = [
 			},
 			{
 				id: "coffee",
-				name: "I've Literally Never Had One",
+				name: "Strike 2, Little Man",
 				source: { x: 1051, y: 822, width: 142.91, height: 217.55 },
 				zIndex: 2,
 			},
@@ -97,20 +97,233 @@ export const scenes: Scene[] = [
 			},
 		],
 	},
-	{ index: 4, title: "I Don't Sleep So Good, Baby", hasAsides: false },
-	{ index: 5, title: "No Soliciting", hasAsides: false },
-	{ index: 6, title: "Take A Chance On Me", hasAsides: false },
-	{ index: 7, title: "Icarus Has Takeoff", hasAsides: false },
+	{
+		index: 4,
+		title: "I Don't Sleep So Good, Baby",
+		hasAsides: true,
+		asides: [
+			{
+				id: "clock",
+				name: "2:13 AM",
+				source: { x: 2317, y: 1108, width: 259.83, height: 170.59 },
+			},
+			{
+				id: "coffee",
+				name: "Strike 3, You're Out",
+				source: { x: 1452, y: 746, width: 64.5, height: 96.88 },
+			},
+			{
+				id: "picture",
+				name: "Based On A True Story",
+				source: { x: 1885, y: 1, width: 551, height: 436 },
+			},
+			{
+				id: "wife",
+				name: "Keep My Wife's Name Out of Your F**** Mouth",
+				source: { x: 1740, y: 772, width: 536.22, height: 443.71 },
+			},
+		],
+	},
+	{
+		index: 5,
+		title: "No Soliciting",
+		hasAsides: true,
+		asides: [
+			{
+				id: "arm",
+				name: "Well Beyond Strikes",
+				source: { x: 2113.8, y: 570, width: 356.55, height: 396.65 },
+			},
+			{
+				id: "tablet",
+				name: "Who's The Real Pest?",
+				source: { x: 1719, y: 851, width: 306.8, height: 379.88 },
+			},
+			{
+				id: "sun",
+				name: "(insert parched spongebob meme here)",
+				source: { x: 832, y: 49, width: 330, height: 330 },
+			},
+		],
+	},
+	{
+		index: 6,
+		title: "Take A Chance On Me",
+		hasAsides: true,
+		asides: [
+			{
+				id: "coffee",
+				name: "Brews Like Coffee, Tastes Like Heaven",
+				source: { x: 2301, y: 1071, width: 217.06, height: 219.07 },
+			},
+			{
+				id: "screen",
+				name: "Kids React",
+				source: { x: 1839, y: 228, width: 642.5, height: 683.5 },
+			},
+			{
+				id: "smarty",
+				name: "SmartyStreets === Smarty",
+				source: { x: 1372, y: 337, width: 435, height: 119 },
+			},
+		],
+	},
+	{
+		index: 7,
+		title: "Icarus Has Takeoff",
+		hasAsides: true,
+		asides: [
+			{
+				id: "stickies",
+				name: "Sticky, Sticky On The Wall",
+				source: { x: 1502, y: 269, width: 1095.82, height: 915 },
+			},
+			{
+				id: "mockup",
+				name: "The Long & Shirt Of It",
+				source: { x: 1695, y: 1109, width: 644.78, height: 214 },
+				zIndex: 2,
+			},
+			{
+				id: "desk",
+				name: "Pen Tools... IYKYK Ughhh",
+				source: { x: 0, y: 510, width: 615.65, height: 781.77 },
+			},
+		],
+	},
 	{
 		index: 8,
 		title: "Never regret thy fall, O Icarus of the fearless flight",
-		hasAsides: false,
+		hasAsides: true,
+		asides: [
+			{
+				id: "hat",
+				name: "The Swag That Never Was",
+				source: { x: 1034, y: 125, width: 436.98, height: 225.75 },
+			},
+			{
+				id: "screens",
+				name: "React Native, Vue, React, Node, MongoDB",
+				source: { x: 494, y: 1018, width: 1645.5, height: 352.5 },
+			},
+		],
 	},
-	{ index: 9, title: "It Burns Us", hasAsides: false },
-	{ index: 10, title: "When It Rains, It's Just Rain", hasAsides: false },
-	{ index: 11, title: "4 Years @ Copy.ai", hasAsides: false },
-	{ index: 12, title: "GTM Engine (GOATS)", hasAsides: false },
-	{ index: 13, title: "The Return", hasAsides: false },
+	{
+		index: 9,
+		title: "It Burns Us",
+		hasAsides: true,
+		asides: [
+			{
+				id: "calendar",
+				name: "X Does Not, In Fact, Mark The Spot",
+				source: { x: 584, y: 311, width: 280.02, height: 284 },
+			},
+			{
+				id: "shoes",
+				name: "AI <3 Converse",
+				source: { x: 1120, y: 1300, width: 266.55, height: 112.32 },
+			},
+			{
+				id: "nate",
+				name: "Nate Carr, Product Guy & Design GOAT",
+				source: { x: 1586, y: 310, width: 432.5, height: 1117.4 },
+			},
+		],
+	},
+	{
+		index: 10,
+		title: "When It Rains, It's Just Rain",
+		hasAsides: true,
+		asides: [
+			{
+				id: "coffee",
+				name: "If We're Being Honest, I'm a Celsius Soyboy",
+				source: { x: 890, y: 943, width: 155.03, height: 145 },
+			},
+			{
+				id: "window",
+				name: "Everything Really Is Bigger",
+				source: { x: 313, y: 0, width: 1002, height: 872 },
+			},
+			{
+				id: "secret-plant",
+				name: "Our Love Fern",
+				source: { x: 2558, y: 628, width: 93, height: 89.5 },
+			},
+		],
+	},
+	{
+		index: 11,
+		title: "4 Years @ Copy.ai",
+		hasAsides: true,
+		asides: [
+			{
+				id: "copyai",
+				name: "3 Cheers For 4 Years",
+				source: { x: 1009.5, y: 176.5, width: 711.5, height: 586 },
+			},
+			{
+				id: "pizza",
+				name: "Cowabunga",
+				source: { x: 0, y: 740, width: 267.5, height: 509 },
+			},
+			{
+				id: "coffee",
+				name: "Son of a...",
+				source: { x: 891, y: 942, width: 155, height: 146.06 },
+			},
+		],
+	},
+	{
+		index: 12,
+		title: "GTM Engine (GOATS)",
+		hasAsides: true,
+		asides: [
+			{
+				id: "holoscreens",
+				name: "It's Giving... Minority Report",
+				source: { x: 109, y: 210, width: 2580, height: 1018.13 },
+			},
+			{
+				id: "glowup",
+				name: "Dude, You're Glowing",
+				source: { x: 1131, y: 86, width: 502.77, height: 817.77 },
+				zIndex: 2,
+			},
+		],
+	},
+	{
+		index: 13,
+		title: "The Return",
+		hasAsides: true,
+		asides: [
+			{
+				id: "builder",
+				name: "Bob The",
+				source: { x: 1693, y: 124.5, width: 535, height: 163.02 },
+			},
+			{
+				id: "founder",
+				name: "Just 1 Letter From Flounder",
+				source: { x: 1634, y: 318, width: 533.5, height: 131 },
+			},
+			{
+				id: "operator",
+				name: "You Ever Play Operation?",
+				source: { x: 1705, y: 494, width: 527.5, height: 139.54 },
+			},
+			{
+				id: "creator",
+				name: "We're Meant To Create",
+				source: { x: 1663, y: 661, width: 510.06, height: 150 },
+			},
+			{
+				id: "sun",
+				name: "The Big Yellow One's The Sun",
+				source: { x: 1288, y: 440.5, width: 207, height: 130.01 },
+			},
+		],
+	},
 ];
 
 /**
