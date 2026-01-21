@@ -299,7 +299,7 @@ export const scenes: Scene[] = [
 		asides: [
 			{
 				id: "builder",
-				name: "Bob The",
+				name: "That's What She Said",
 				source: { x: 1693, y: 124.5, width: 535, height: 163.02 },
 			},
 			{
