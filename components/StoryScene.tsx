@@ -13,6 +13,7 @@ import { NarrationPlayer } from "./NarrationPlayer";
 import { AsideObject } from "./AsideObject";
 import { useStory } from "@/contexts/StoryContext";
 import { useAudio } from "@/contexts/AudioContext";
+import { useAchievementContext } from "@/contexts/AchievementContext";
 import { scenes } from "@/data/scenes";
 
 export function StoryScene() {
@@ -37,6 +38,10 @@ export function StoryScene() {
 	const [delayedSceneIndex, setDelayedSceneIndex] = useState(currentSceneIndex);
 	const [activeAsideId, setActiveAsideId] = useState<string | null>(null);
 	const { audioRef } = useAudio();
+
+	// Achievement tracking
+	const { unlockAchievement, markCoffeeFound, markSceneVisited } =
+		useAchievementContext();
 
 	// Get current scene data
 	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
@@ -153,6 +158,25 @@ export function StoryScene() {
 			const aside = currentScene?.asides?.find((a) => a.id === asideId);
 			const asideName = aside?.name || asideId;
 
+			// Track achievements for specific asides
+			// First aside achievement
+			unlockAchievement("first-aside");
+
+			// Coffee asides (scenes 3, 4, 6, 9, 11)
+			if (asideId === "coffee") {
+				markCoffeeFound(currentSceneIndex);
+			}
+
+			// Secret plant aside (scene 10)
+			if (asideId === "secret-plant" && currentSceneIndex === 10) {
+				unlockAchievement("secret-plant");
+			}
+
+			// Final plea - sun aside (scene 13)
+			if (asideId === "sun" && currentSceneIndex === 13) {
+				unlockAchievement("final-plea");
+			}
+
 			// Stop current audio
 			const audio = audioRef.current;
 			if (audio) {
@@ -189,6 +213,8 @@ export function StoryScene() {
 			currentSceneIndex,
 			currentScene,
 			setActiveAsideName,
+			unlockAchievement,
+			markCoffeeFound,
 		],
 	);
 
@@ -198,6 +224,13 @@ export function StoryScene() {
 		setActiveAsideId(null);
 		setActiveAsideName(null);
 	}, [currentSceneIndex, setActiveAsideName]);
+
+	// Track scene visits for achievement
+	useEffect(() => {
+		if (currentSceneIndex) {
+			markSceneVisited(currentSceneIndex);
+		}
+	}, [currentSceneIndex, markSceneVisited]);
 
 	return (
 		<>

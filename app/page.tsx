@@ -2,11 +2,13 @@
 
 import { StoryProvider } from "@/contexts/StoryContext";
 import { AudioProvider } from "@/contexts/AudioContext";
+import { AchievementProvider } from "@/contexts/AchievementContext";
 import { StoryScene } from "@/components/StoryScene";
 import { Toolbar } from "@/components/Toolbar";
 import { SceneNavigation } from "@/components/SceneNavigation";
 import { OnboardingOverlay } from "@/components/OnboardingOverlay";
 import { InitialPlayButton } from "@/components/InitialPlayButton";
+import { AchievementNotification } from "@/components/AchievementNotification";
 import { useStory } from "@/contexts/StoryContext";
 import { AnimatePresence } from "motion/react";
 
@@ -32,6 +34,9 @@ function StoryExperience() {
 			<AnimatePresence>
 				{showPlayButton && <InitialPlayButton onPlay={startExperience} />}
 			</AnimatePresence>
+
+			{/* Achievement notifications */}
+			<AchievementNotification />
 		</main>
 	);
 }
@@ -40,7 +45,9 @@ export default function Home() {
 	return (
 		<StoryProvider>
 			<AudioProvider>
-				<StoryExperience />
+				<AchievementProvider>
+					<StoryExperience />
+				</AchievementProvider>
 			</AudioProvider>
 		</StoryProvider>
 	);

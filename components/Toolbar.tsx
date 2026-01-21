@@ -4,14 +4,17 @@ import { useState, useRef, useLayoutEffect, useEffect, memo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useStory } from "@/contexts/StoryContext";
 import { useAudio } from "@/contexts/AudioContext";
+import { useAchievementContext } from "@/contexts/AchievementContext";
 import { scenes } from "@/data/scenes";
 import { getKeyframeUrl } from "@/lib/story-config";
 import { SceneSelector } from "@/components/SceneSelector";
+import { AchievementsModal } from "@/components/AchievementsModal";
 import { Tooltip } from "@/components/Tooltip";
 import Image from "next/image";
 
 const LINKEDIN_URL = "https://linkedin.com/in/dMcCaffree";
 const RESUME_URL = "#"; // Placeholder for now
+const EMAIL = "mailto:dustin@terrible.app";
 const MAX_TITLE_LENGTH_BEFORE_ANIMATING = 50;
 
 interface ToolbarButtonProps {
@@ -179,7 +182,6 @@ export function Toolbar() {
 		showHints,
 		toggleHints,
 		activeAsideName,
-		triggerOnboarding,
 		hasStarted,
 		isOnboardingActive,
 		onboardingStep,
@@ -200,7 +202,10 @@ export function Toolbar() {
 	// Force toolbar to be expanded during onboarding step 1
 	const isToolbarExpanded = isHovered || onboardingStep === 1;
 	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-	const [captionsEnabled, setCaptionsEnabled] = useState(false);
+	const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
+
+	// Achievement tracking
+	const { unlockAchievement } = useAchievementContext();
 	const [isDragging, setIsDragging] = useState(false);
 	const [titleScrollDistance, setTitleScrollDistance] = useState(0);
 	const [sceneSelectorOpen, setSceneSelectorOpen] = useState(false);
@@ -257,17 +262,19 @@ export function Toolbar() {
 		togglePlayPause();
 	};
 
-	const handleCaptionsToggle = () => {
-		setCaptionsEnabled(!captionsEnabled);
-		// TODO: Implement captions toggle
+	const handleAchievementsClick = () => {
+		setAchievementsModalOpen(true);
 	};
 
 	const handleHintToggle = () => {
 		toggleHints();
+		// Track hints achievement
+		unlockAchievement("hints-enabled");
 	};
 
-	const handleHelpClick = () => {
-		triggerOnboarding();
+	const handleResumeClick = () => {
+		// Track resume achievement
+		unlockAchievement("view-resume");
 	};
 
 	const formatTime = (seconds: number) => {
@@ -412,19 +419,19 @@ export function Toolbar() {
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
-					aria-label="Help"
+					aria-label="Email"
 				>
-					<title>Help</title>
+					<title>Email</title>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
 						strokeWidth={2}
-						d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
 					/>
 				</svg>
 			),
-			label: "Tutorial",
-			onClick: handleHelpClick,
+			label: "Email Me",
+			href: EMAIL,
 		},
 		{
 			icon: (
@@ -433,20 +440,19 @@ export function Toolbar() {
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
-					aria-label="Captions"
+					aria-label="Achievements"
 				>
-					<title>Captions</title>
+					<title>Achievements</title>
 					<path
 						strokeLinecap="round"
 						strokeLinejoin="round"
 						strokeWidth={2}
-						d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+						d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
 					/>
 				</svg>
 			),
-			label: captionsEnabled ? "Hide Captions" : "Show Captions",
-			onClick: handleCaptionsToggle,
-			isActive: captionsEnabled,
+			label: "Achievements",
+			onClick: handleAchievementsClick,
 		},
 		{
 			icon: (
@@ -496,6 +502,7 @@ export function Toolbar() {
 			),
 			label: "View Resume",
 			href: RESUME_URL,
+			onClick: handleResumeClick,
 		},
 		{
 			icon: (
@@ -910,6 +917,12 @@ export function Toolbar() {
 				isOpen={sceneSelectorOpen}
 				onClose={() => setSceneSelectorOpen(false)}
 				currentSceneIndex={currentSceneIndex}
+			/>
+
+			{/* Achievements Modal - Outside toolbar container */}
+			<AchievementsModal
+				isOpen={achievementsModalOpen}
+				onClose={() => setAchievementsModalOpen(false)}
 			/>
 		</>
 	);
