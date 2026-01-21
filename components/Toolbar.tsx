@@ -182,6 +182,7 @@ export function Toolbar() {
 		triggerOnboarding,
 		hasStarted,
 		isOnboardingActive,
+		onboardingStep,
 	} = useStory();
 	const {
 		isPlaying,
@@ -196,6 +197,8 @@ export function Toolbar() {
 	} = useAudio();
 
 	const [isHovered, setIsHovered] = useState(false);
+	// Force toolbar to be expanded during onboarding step 1
+	const isToolbarExpanded = isHovered || onboardingStep === 1;
 	const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 	const [captionsEnabled, setCaptionsEnabled] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
@@ -546,7 +549,7 @@ export function Toolbar() {
 					<motion.div
 						className="flex flex-col gap-1"
 						animate={{
-							paddingBottom: isHovered ? "0.5rem" : "0rem",
+							paddingBottom: isToolbarExpanded ? "0.5rem" : "0rem",
 						}}
 						transition={{
 							duration: 0.2,
@@ -820,7 +823,7 @@ export function Toolbar() {
 
 					{/* Utility buttons - pop out on hover */}
 					<AnimatePresence initial={false}>
-						{isHovered && (
+						{isToolbarExpanded && (
 							<motion.div
 								initial={{ height: 0, opacity: 0 }}
 								animate={{ height: "auto", opacity: 1 }}

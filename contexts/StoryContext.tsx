@@ -33,6 +33,8 @@ interface StoryContextValue extends StoryState {
 	markOnboardingComplete: () => void;
 	isOnboardingActive: boolean;
 	setIsOnboardingActive: (active: boolean) => void;
+	onboardingStep: number;
+	setOnboardingStep: (step: number) => void;
 }
 
 const StoryContext = createContext<StoryContextValue | undefined>(undefined);
@@ -55,6 +57,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		null,
 	);
 	const [isOnboardingActive, setIsOnboardingActive] = useState(false);
+	const [onboardingStep, setOnboardingStep] = useState(0);
 
 	// Check localStorage on mount for onboarding status
 	useEffect(() => {
@@ -174,6 +177,8 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		markOnboardingComplete,
 		isOnboardingActive,
 		setIsOnboardingActive,
+		onboardingStep,
+		setOnboardingStep,
 	};
 
 	return (

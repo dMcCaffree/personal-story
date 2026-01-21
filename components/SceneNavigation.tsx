@@ -17,8 +17,13 @@ export function SceneNavigation() {
 		isTransitioning,
 		hasStarted,
 		isOnboardingActive,
+		onboardingStep,
 	} = useStory();
 	const [hoveredSide, setHoveredSide] = useState<"left" | "right" | null>(null);
+
+	// Force show previews during onboarding step 2
+	const showLeftPreview = hoveredSide === "left" || onboardingStep === 2;
+	const showRightPreview = hoveredSide === "right" || onboardingStep === 2;
 
 	const getSceneName = (index: number) => {
 		const scene = scenes.find((s) => s.index === index);
@@ -41,11 +46,11 @@ export function SceneNavigation() {
 					disabled={isTransitioning}
 					onMouseEnter={() => !isTransitioning && setHoveredSide("left")}
 					onMouseLeave={() => setHoveredSide(null)}
-					className={`fixed left-0 top-0 bottom-0 w-24 md:w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-r to-transparent transition-all duration-300 ${hoveredSide === "left" ? "from-black/40" : "from-black/10"}`}
+					className={`fixed left-0 top-0 bottom-0 w-24 md:w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-r to-transparent transition-all duration-300 ${showLeftPreview ? "from-black/40" : "from-black/10"}`}
 				>
 					{/* Preview card that slides out */}
 					<AnimatePresence>
-						{hoveredSide === "left" && !isTransitioning && (
+						{showLeftPreview && !isTransitioning && (
 							<motion.div
 								initial={{ x: -300 }}
 								animate={{ x: 0 }}
@@ -106,11 +111,11 @@ export function SceneNavigation() {
 					disabled={isTransitioning}
 					onMouseEnter={() => !isTransitioning && setHoveredSide("right")}
 					onMouseLeave={() => setHoveredSide(null)}
-					className={`fixed right-0 top-0 bottom-0 w-24 md:w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-l from-black/10 to-transparent transition-all duration-300 ${hoveredSide === "right" ? "from-black/40" : "from-black/10"}`}
+					className={`fixed right-0 top-0 bottom-0 w-24 md:w-64 z-40 cursor-pointer disabled:cursor-not-allowed bg-linear-to-l from-black/10 to-transparent transition-all duration-300 ${showRightPreview ? "from-black/40" : "from-black/10"}`}
 				>
 					{/* Preview card that slides out */}
 					<AnimatePresence>
-						{hoveredSide === "right" && !isTransitioning && (
+						{showRightPreview && !isTransitioning && (
 							<motion.div
 								initial={{ x: 300 }}
 								animate={{ x: 0 }}

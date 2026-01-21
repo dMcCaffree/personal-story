@@ -42,12 +42,14 @@ export function OnboardingOverlay() {
 	const {
 		currentSceneIndex,
 		toggleHints,
+		showHints,
 		showOnboarding,
 		closeOnboarding,
 		hasStarted,
 		hasSeenOnboarding,
 		markOnboardingComplete,
 		setIsOnboardingActive,
+		setOnboardingStep,
 	} = useStory();
 	const [currentStep, setCurrentStep] = useState(1);
 
@@ -67,10 +69,15 @@ export function OnboardingOverlay() {
 		prevVisibleRef.current = isVisible;
 	}, [isVisible]);
 
-	// Sync onboarding active state with context
+	// Sync onboarding active state and step with context
 	useEffect(() => {
 		setIsOnboardingActive(isVisible);
-	}, [isVisible, setIsOnboardingActive]);
+		if (isVisible) {
+			setOnboardingStep(currentStep);
+		} else {
+			setOnboardingStep(0);
+		}
+	}, [isVisible, currentStep, setIsOnboardingActive, setOnboardingStep]);
 
 	const handleNext = () => {
 		if (currentStep < STEPS.length) {
@@ -85,16 +92,14 @@ export function OnboardingOverlay() {
 	};
 
 	const handleComplete = () => {
+		// Turn off hints if they were enabled
+		if (showHints) {
+			toggleHints();
+		}
+
 		// Mark as complete (this will cause isVisible to become false)
 		markOnboardingComplete();
 		closeOnboarding();
-
-		// Turn off hints if they were enabled
-		const currentScene = scenes.find((s) => s.index === currentSceneIndex);
-		if (currentStep === 3 && currentScene?.hasAsides) {
-			// Hints were toggled on for step 3, toggle them off
-			toggleHints();
-		}
 	};
 
 	// Enable hints mode for step 3 if asides exist
@@ -103,10 +108,15 @@ export function OnboardingOverlay() {
 
 		const currentScene = scenes.find((s) => s.index === currentSceneIndex);
 		if (currentStep === 3 && currentScene?.hasAsides) {
-			// Temporarily enable hints to show the asides
+			// Enable hints to show the asides (only if not already enabled)
+			if (!showHints) {
+				toggleHints();
+			}
+		} else if (currentStep !== 3 && showHints && isVisible) {
+			// Disable hints when leaving step 3
 			toggleHints();
 		}
-	}, [currentStep, isVisible, currentSceneIndex, toggleHints]);
+	}, [currentStep, isVisible, currentSceneIndex, showHints, toggleHints]);
 
 	// Calculate highlight rectangles based on current step
 	const getHighlightRects = () => {
@@ -121,10 +131,10 @@ export function OnboardingOverlay() {
 					const rect = toolbar.getBoundingClientRect();
 					return [
 						{
-							top: rect.top - 20,
-							left: rect.left - 20,
-							width: rect.width + 40,
-							height: rect.height + 40,
+							top: rect.top - 10,
+							left: rect.left - 10,
+							width: rect.width + 20,
+							height: rect.height + 20,
 							borderRadius: 24,
 						},
 					];
@@ -132,10 +142,10 @@ export function OnboardingOverlay() {
 				// Fallback if toolbar not found
 				return [
 					{
-						top: window.innerHeight - 200,
-						left: window.innerWidth / 2 - 200,
-						width: 400,
-						height: 150,
+						top: window.innerHeight - 180,
+						left: window.innerWidth / 2 - 170,
+						width: 340,
+						height: 155,
 						borderRadius: 24,
 					},
 				];
@@ -145,20 +155,12 @@ export function OnboardingOverlay() {
 				// Highlight left and right edges
 				const edgeWidth = Math.min(window.innerWidth * 0.2, 300);
 				return [
-					// Left edge
-					{
-						top: window.innerHeight - 320,
-						left: 20,
-						width: edgeWidth,
-						height: 300,
-						borderRadius: 16,
-					},
 					// Right edge
 					{
-						top: window.innerHeight - 320,
-						left: window.innerWidth - edgeWidth - 20,
-						width: edgeWidth,
-						height: 300,
+						top: window.innerHeight - 215,
+						left: window.innerWidth - 255,
+						width: 250,
+						height: 200,
 						borderRadius: 16,
 					},
 				];
