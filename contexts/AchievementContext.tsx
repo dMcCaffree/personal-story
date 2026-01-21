@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useAchievements } from "@/hooks/useAchievements";
 import type { Achievement } from "@/lib/achievements";
+import { TOTAL_ASIDES } from "@/lib/achievements";
 
 interface NotificationItem extends Achievement {
 	notificationId: string;
@@ -29,6 +30,9 @@ interface AchievementContextValue {
 	markCoffeeFound: (sceneIndex: number) => void;
 	scenesVisited: Set<number>;
 	markSceneVisited: (sceneIndex: number) => void;
+	// Aside tracking for completionist
+	asidesClicked: Set<string>;
+	markAsideClicked: (sceneIndex: number, asideId: string) => void;
 	// Notifications
 	activeNotifications: NotificationItem[];
 	dismissNotification: (notificationId: string) => void;
@@ -54,6 +58,7 @@ export function AchievementProvider({
 	// Track coffee and scenes
 	const [coffeeFound, setCoffeeFound] = useState<Set<string>>(new Set());
 	const [scenesVisited, setScenesVisited] = useState<Set<number>>(new Set());
+	const [asidesClicked, setAsidesClicked] = useState<Set<string>>(new Set());
 
 	// Notification queue
 	const [activeNotifications, setActiveNotifications] = useState<
@@ -138,6 +143,46 @@ export function AchievementProvider({
 		[scenesVisited, updateProgress],
 	);
 
+	// Aside tracking for completionist
+	const markAsideClicked = useCallback(
+		(sceneIndex: number, asideId: string) => {
+			const asideKey = `scene-${sceneIndex}-${asideId}`;
+			if (!asidesClicked.has(asideKey)) {
+				const newAsidesClicked = new Set(asidesClicked);
+				newAsidesClicked.add(asideKey);
+				setAsidesClicked(newAsidesClicked);
+
+				// Update progress
+				updateProgress("completionist", newAsidesClicked.size);
+			}
+		},
+		[asidesClicked, updateProgress],
+	);
+
+	// Check for completionist achievement when all other achievements are done
+	useEffect(() => {
+		// Get all non-completionist achievements
+		const otherAchievements = achievements.filter(
+			(a) => a.id !== "completionist",
+		);
+		const allOthersComplete = otherAchievements.every((a) => a.completed);
+
+		// If all other achievements are complete AND all asides are clicked
+		if (
+			allOthersComplete &&
+			asidesClicked.size === TOTAL_ASIDES &&
+			!hasAchievementHook("completionist")
+		) {
+			console.log("Unlocking completionist achievement!");
+			unlockAchievement("completionist");
+		}
+	}, [
+		achievements,
+		asidesClicked,
+		hasAchievementHook,
+		unlockAchievement,
+	]);
+
 	// Dismiss notification manually
 	const dismissNotification = useCallback((notificationId: string) => {
 		setActiveNotifications((prev) =>
@@ -160,6 +205,8 @@ export function AchievementProvider({
 		markCoffeeFound,
 		scenesVisited,
 		markSceneVisited,
+		asidesClicked,
+		markAsideClicked,
 		activeNotifications,
 		dismissNotification,
 	};

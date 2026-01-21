@@ -40,8 +40,12 @@ export function StoryScene() {
 	const { audioRef } = useAudio();
 
 	// Achievement tracking
-	const { unlockAchievement, markCoffeeFound, markSceneVisited } =
-		useAchievementContext();
+	const {
+		unlockAchievement,
+		markCoffeeFound,
+		markSceneVisited,
+		markAsideClicked,
+	} = useAchievementContext();
 
 	// Get current scene data
 	const currentScene = scenes.find((s) => s.index === currentSceneIndex);
@@ -162,6 +166,9 @@ export function StoryScene() {
 			// First aside achievement
 			unlockAchievement("first-aside");
 
+			// Track this aside click for completionist
+			markAsideClicked(currentSceneIndex, asideId);
+
 			// Coffee asides (scenes 3, 4, 6, 9, 11)
 			if (asideId === "coffee") {
 				markCoffeeFound(currentSceneIndex);
@@ -215,6 +222,7 @@ export function StoryScene() {
 			setActiveAsideName,
 			unlockAchievement,
 			markCoffeeFound,
+			markAsideClicked,
 		],
 	);
 

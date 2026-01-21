@@ -1,6 +1,12 @@
 // Achievement system types and utilities
 
 import { getAsideImageUrl } from "./story-config";
+import { scenes } from "@/data/scenes";
+
+// Calculate total number of asides across all scenes dynamically
+export const TOTAL_ASIDES = scenes.reduce((total, scene) => {
+	return total + (scene.asides?.length || 0);
+}, 0);
 
 export interface Achievement {
 	id: string;
@@ -73,6 +79,13 @@ export const ACHIEVEMENT_DEFINITIONS: Omit<
 		name: "Document Inspector",
 		description: "Look at Dustin's resume",
 		icon: "/achievements/document.svg", // Custom SVG
+	},
+	{
+		id: "completionist",
+		name: "Completionist",
+		description: "Complete all achievements and discover every aside",
+		icon: getAsideImageUrl(12, "glowup"), // glowup from scene 12
+		maxProgress: TOTAL_ASIDES,
 	},
 ];
 
