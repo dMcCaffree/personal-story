@@ -419,27 +419,6 @@ export function Toolbar() {
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
-					aria-label="Email"
-				>
-					<title>Email</title>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth={2}
-						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-					/>
-				</svg>
-			),
-			label: "Email Me",
-			href: EMAIL,
-		},
-		{
-			icon: (
-				<svg
-					className="h-4 w-4 text-white"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
 					aria-label="Achievements"
 				>
 					<title>Achievements</title>
@@ -503,6 +482,27 @@ export function Toolbar() {
 			label: "View Resume",
 			href: RESUME_URL,
 			onClick: handleResumeClick,
+		},
+		{
+			icon: (
+				<svg
+					className="h-4 w-4 text-white"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					aria-label="Email"
+				>
+					<title>Email</title>
+					<path
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth={2}
+						d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+					/>
+				</svg>
+			),
+			label: "Email Me",
+			href: EMAIL,
 		},
 		{
 			icon: (
