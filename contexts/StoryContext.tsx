@@ -15,6 +15,7 @@ const ONBOARDING_KEY = "personal-story-onboarding-complete";
 interface StoryContextValue extends StoryState {
 	goToNextScene: () => void;
 	goToPreviousScene: () => void;
+	jumpToScene: (sceneIndex: number) => void;
 	setIsTransitioning: (value: boolean) => void;
 	totalScenes: number;
 	canGoNext: boolean;
@@ -101,6 +102,28 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		}));
 	}, [state.isTransitioning, canGoBack]);
 
+	const jumpToScene = useCallback(
+		(sceneIndex: number) => {
+			if (state.isTransitioning || sceneIndex < 1 || sceneIndex > totalScenes) {
+				return;
+			}
+
+			console.log("StoryContext: Jumping to scene", {
+				from: state.currentSceneIndex,
+				to: sceneIndex,
+			});
+
+			setState((prev) => ({
+				...prev,
+				previousSceneIndex: prev.currentSceneIndex,
+				currentSceneIndex: sceneIndex,
+				isTransitioning: false, // No transition, just jump
+				playbackDirection: "forward",
+			}));
+		},
+		[state.isTransitioning, state.currentSceneIndex, totalScenes],
+	);
+
 	const setIsTransitioning = useCallback((value: boolean) => {
 		setState((prev) => ({
 			...prev,
@@ -133,6 +156,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 		...state,
 		goToNextScene,
 		goToPreviousScene,
+		jumpToScene,
 		setIsTransitioning,
 		totalScenes,
 		canGoNext,

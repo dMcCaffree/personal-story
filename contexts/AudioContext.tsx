@@ -32,7 +32,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 	const [volume, setVolumeState] = useState(100);
 	const [isMuted, setIsMuted] = useState(false);
 
-	// Update current time
+	// Update current time and listen for audio events
 	useEffect(() => {
 		const audio = audioRef.current;
 		if (!audio) return;
@@ -42,16 +42,28 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		};
 
 		const updateDuration = () => {
-			setDuration(audio.duration || 0);
+			const newDuration = audio.duration || 0;
+			// Check if duration is valid (not NaN or Infinity)
+			if (Number.isFinite(newDuration) && newDuration > 0) {
+				console.log("AudioContext: Duration updated:", newDuration);
+				setDuration(newDuration);
+			}
 		};
 
 		const handlePlay = () => setIsPlaying(true);
 		const handlePause = () => setIsPlaying(false);
 		const handleEnded = () => setIsPlaying(false);
 
+		// Also check duration on mount in case metadata is already loaded
+		if (audio.readyState >= 1) {
+			updateDuration();
+		}
+
 		audio.addEventListener("timeupdate", updateTime);
 		audio.addEventListener("durationchange", updateDuration);
 		audio.addEventListener("loadedmetadata", updateDuration);
+		audio.addEventListener("loadeddata", updateDuration); // Additional event for duration
+		audio.addEventListener("canplay", updateDuration); // Additional event for duration
 		audio.addEventListener("play", handlePlay);
 		audio.addEventListener("pause", handlePause);
 		audio.addEventListener("ended", handleEnded);
@@ -60,6 +72,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 			audio.removeEventListener("timeupdate", updateTime);
 			audio.removeEventListener("durationchange", updateDuration);
 			audio.removeEventListener("loadedmetadata", updateDuration);
+			audio.removeEventListener("loadeddata", updateDuration);
+			audio.removeEventListener("canplay", updateDuration);
 			audio.removeEventListener("play", handlePlay);
 			audio.removeEventListener("pause", handlePause);
 			audio.removeEventListener("ended", handleEnded);

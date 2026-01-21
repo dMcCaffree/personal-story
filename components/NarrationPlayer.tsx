@@ -18,17 +18,27 @@ export function NarrationPlayer({
 	const { audioRef } = useAudio();
 	const currentSceneRef = useRef(sceneIndex);
 
-	// Reset when scene changes
+	// Update audio source when scene changes
 	useEffect(() => {
+		const audio = audioRef.current;
+		if (!audio) return;
+
+		// Always update the source for the current scene
+		const narrationUrl = getNarrationUrl(sceneIndex);
+		
+		// Only reload if the scene actually changed
 		if (currentSceneRef.current !== sceneIndex) {
+			console.log("NarrationPlayer: Scene changed, loading new audio", sceneIndex);
 			currentSceneRef.current = sceneIndex;
-			const audio = audioRef.current;
-			if (audio) {
-				audio.pause();
-				audio.currentTime = 0;
-				audio.src = getNarrationUrl(sceneIndex);
-				audio.load();
-			}
+			audio.pause();
+			audio.currentTime = 0;
+			audio.src = narrationUrl;
+			audio.load(); // This triggers loadedmetadata event
+		} else if (audio.src !== narrationUrl || !audio.src) {
+			// Initial load or src mismatch
+			console.log("NarrationPlayer: Initial load for scene", sceneIndex);
+			audio.src = narrationUrl;
+			audio.load(); // This triggers loadedmetadata event
 		}
 	}, [sceneIndex, audioRef]);
 
@@ -45,18 +55,19 @@ export function NarrationPlayer({
 
 		console.log("NarrationPlayer: Starting playback for scene", sceneIndex);
 		
-		// Ensure audio is loaded before playing
-		if (audio.readyState < 2) {
-			console.log("NarrationPlayer: Waiting for audio to load");
-			const handleCanPlay = () => {
-				console.log("NarrationPlayer: Audio ready, starting playback");
+		// Ensure audio metadata is loaded before playing
+		// readyState >= 1 means HAVE_METADATA (duration is available)
+		if (audio.readyState < 1) {
+			console.log("NarrationPlayer: Waiting for audio metadata to load");
+			const handleMetadataLoaded = () => {
+				console.log("NarrationPlayer: Metadata loaded, starting playback");
 				audio.play().catch((error) => {
 					console.error("NarrationPlayer: Error playing narration:", error);
 				});
 			};
-			audio.addEventListener("canplay", handleCanPlay, { once: true });
+			audio.addEventListener("loadedmetadata", handleMetadataLoaded, { once: true });
 			audio.load();
-			return () => audio.removeEventListener("canplay", handleCanPlay);
+			return () => audio.removeEventListener("loadedmetadata", handleMetadataLoaded);
 		}
 		
 		// Play the narration

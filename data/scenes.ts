@@ -74,7 +74,29 @@ export const scenes: Scene[] = [
 			},
 		],
 	},
-	{ index: 3, title: "If You Build It", hasAsides: true, asides: [] },
+	{
+		index: 3,
+		title: "If You Build It",
+		hasAsides: true,
+		asides: [
+			{
+				id: "screens",
+				name: "More Screens Please",
+				source: { x: 73, y: 90, width: 1345.11, height: 1225.25 },
+			},
+			{
+				id: "coffee",
+				name: "I've Literally Never Had One",
+				source: { x: 1051, y: 822, width: 142.91, height: 217.55 },
+				zIndex: 2,
+			},
+			{
+				id: "phone",
+				name: "It Was The Best Of Times",
+				source: { x: 751, y: 1325, width: 444.24, height: 181.15 },
+			},
+		],
+	},
 	{ index: 4, title: "I Don't Sleep So Good, Baby", hasAsides: false },
 	{ index: 5, title: "No Soliciting", hasAsides: false },
 	{ index: 6, title: "Take A Chance On Me", hasAsides: false },

@@ -107,23 +107,11 @@ export function SceneSelector({
 	onClose,
 	currentSceneIndex,
 }: SceneSelectorProps) {
-	const { goToNextScene, goToPreviousScene } = useStory();
+	const { jumpToScene } = useStory();
 
 	const handleSceneClick = (targetIndex: number) => {
-		// Calculate how many scenes to navigate
-		const diff = targetIndex - currentSceneIndex;
-
-		// Navigate multiple times
-		if (diff > 0) {
-			for (let i = 0; i < diff; i++) {
-				setTimeout(() => goToNextScene(), i * 100);
-			}
-		} else if (diff < 0) {
-			for (let i = 0; i < Math.abs(diff); i++) {
-				setTimeout(() => goToPreviousScene(), i * 100);
-			}
-		}
-
+		// Jump directly to the selected scene without transitions
+		jumpToScene(targetIndex);
 		onClose();
 	};
 
