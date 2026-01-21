@@ -26,6 +26,7 @@ export function StoryScene() {
 		totalScenes,
 		setActiveAsideName,
 		hasStarted,
+		onboardingStep,
 	} = useStory();
 
 	const [narrationTrigger, setNarrationTrigger] = useState<{
@@ -219,20 +220,22 @@ export function StoryScene() {
 			</div>
 
 			{/* Aside objects overlay - scales with viewport */}
-			{!isTransitioning && hasStarted && currentScene?.asides && (
-				<div className="fixed inset-0 z-10">
-					{currentScene.asides.map((aside, index) => (
-						<AsideObject
-							key={aside.id}
-							aside={aside}
-							sceneIndex={currentSceneIndex}
-							onClick={() => handleAsideClick(aside.id)}
-							isActive={activeAsideId === aside.id}
-							asideIndex={index}
-						/>
-					))}
-				</div>
-			)}
+			{!isTransitioning &&
+				(hasStarted || onboardingStep === 3) &&
+				currentScene?.asides && (
+					<div className="fixed inset-0 z-10">
+						{currentScene.asides.map((aside, index) => (
+							<AsideObject
+								key={aside.id}
+								aside={aside}
+								sceneIndex={currentSceneIndex}
+								onClick={() => handleAsideClick(aside.id)}
+								isActive={activeAsideId === aside.id}
+								asideIndex={index}
+							/>
+						))}
+					</div>
+				)}
 
 			{/* Transition overlay - video for forward, cross-fade for reverse/jump */}
 			{(() => {

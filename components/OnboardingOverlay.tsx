@@ -52,6 +52,7 @@ export function OnboardingOverlay() {
 		setOnboardingStep,
 	} = useStory();
 	const [currentStep, setCurrentStep] = useState(1);
+	const hintsEnabledForOnboardingRef = useRef(false);
 
 	// Derive visibility from props
 	const isVisible =
@@ -92,9 +93,10 @@ export function OnboardingOverlay() {
 	};
 
 	const handleComplete = () => {
-		// Turn off hints if they were enabled
-		if (showHints) {
+		// Turn off hints if they were enabled by onboarding
+		if (hintsEnabledForOnboardingRef.current && showHints) {
 			toggleHints();
+			hintsEnabledForOnboardingRef.current = false;
 		}
 
 		// Mark as complete (this will cause isVisible to become false)
@@ -104,17 +106,32 @@ export function OnboardingOverlay() {
 
 	// Enable hints mode for step 3 if asides exist
 	useEffect(() => {
-		if (!isVisible) return;
+		if (!isVisible) {
+			// Clean up hints when onboarding closes
+			if (hintsEnabledForOnboardingRef.current && showHints) {
+				toggleHints();
+				hintsEnabledForOnboardingRef.current = false;
+			}
+			return;
+		}
 
 		const currentScene = scenes.find((s) => s.index === currentSceneIndex);
-		if (currentStep === 3 && currentScene?.hasAsides) {
-			// Enable hints to show the asides (only if not already enabled)
-			if (!showHints) {
-				toggleHints();
-			}
-		} else if (currentStep !== 3 && showHints && isVisible) {
-			// Disable hints when leaving step 3
+		const shouldShowHints = currentStep === 3 && currentScene?.hasAsides;
+
+		if (shouldShowHints && !showHints) {
+			// Enable hints for step 3
+			console.log("Onboarding: Enabling hints for step 3");
 			toggleHints();
+			hintsEnabledForOnboardingRef.current = true;
+		} else if (
+			!shouldShowHints &&
+			showHints &&
+			hintsEnabledForOnboardingRef.current
+		) {
+			// Disable hints when leaving step 3
+			console.log("Onboarding: Disabling hints when leaving step 3");
+			toggleHints();
+			hintsEnabledForOnboardingRef.current = false;
 		}
 	}, [currentStep, isVisible, currentSceneIndex, showHints, toggleHints]);
 
@@ -152,10 +169,8 @@ export function OnboardingOverlay() {
 			}
 
 			case "navigation": {
-				// Highlight left and right edges
-				const edgeWidth = Math.min(window.innerWidth * 0.2, 300);
+				// Highlight right edge navigation preview
 				return [
-					// Right edge
 					{
 						top: window.innerHeight - 215,
 						left: window.innerWidth - 255,
@@ -184,9 +199,9 @@ export function OnboardingOverlay() {
 				// Fallback: show centered message area
 				return [
 					{
-						top: window.innerHeight / 2 - 100,
-						left: window.innerWidth / 2 - 200,
-						width: 400,
+						top: window.innerHeight / 2 - 250,
+						left: window.innerWidth / 2 - 280,
+						width: 300,
 						height: 200,
 						borderRadius: 16,
 					},

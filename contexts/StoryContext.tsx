@@ -135,7 +135,10 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	const toggleHints = useCallback(() => {
-		setShowHints((prev) => !prev);
+		setShowHints((prev) => {
+			console.log("StoryContext: toggleHints called, changing from", prev, "to", !prev);
+			return !prev;
+		});
 	}, []);
 
 	const triggerOnboarding = useCallback(() => {
