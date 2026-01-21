@@ -228,4 +228,3 @@ export function getCompletionStats(): {
 
 	return { completed, total, percentage };
 }
-

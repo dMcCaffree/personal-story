@@ -1,11 +1,12 @@
 "use client";
 
-import React, {
+import {
 	createContext,
 	useContext,
 	useState,
 	useCallback,
 	useEffect,
+	type ReactNode,
 } from "react";
 import { useAchievements } from "@/hooks/useAchievements";
 import type { Achievement } from "@/lib/achievements";
@@ -42,11 +43,7 @@ const AchievementContext = createContext<AchievementContextValue | undefined>(
 	undefined,
 );
 
-export function AchievementProvider({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+export function AchievementProvider({ children }: { children: ReactNode }) {
 	const {
 		achievements,
 		stats,
@@ -55,15 +52,86 @@ export function AchievementProvider({
 		updateAchievementProgress,
 	} = useAchievements();
 
-	// Track coffee and scenes
-	const [coffeeFound, setCoffeeFound] = useState<Set<string>>(new Set());
-	const [scenesVisited, setScenesVisited] = useState<Set<number>>(new Set());
-	const [asidesClicked, setAsidesClicked] = useState<Set<string>>(new Set());
+	// Initialize tracking sets from localStorage
+	const [coffeeFound, setCoffeeFound] = useState<Set<string>>(() => {
+		if (typeof window === "undefined") return new Set();
+		try {
+			const stored = localStorage.getItem("story-coffee-found");
+			const parsed = stored ? JSON.parse(stored) : [];
+			return new Set(parsed);
+		} catch {
+			return new Set();
+		}
+	});
+
+	const [scenesVisited, setScenesVisited] = useState<Set<number>>(() => {
+		if (typeof window === "undefined") return new Set();
+		try {
+			const stored = localStorage.getItem("story-scenes-visited");
+			return stored ? new Set(JSON.parse(stored)) : new Set();
+		} catch {
+			return new Set();
+		}
+	});
+
+	const [asidesClicked, setAsidesClicked] = useState<Set<string>>(() => {
+		if (typeof window === "undefined") return new Set();
+		try {
+			const stored = localStorage.getItem("story-asides-clicked");
+			return stored ? new Set(JSON.parse(stored)) : new Set();
+		} catch {
+			return new Set();
+		}
+	});
 
 	// Notification queue
 	const [activeNotifications, setActiveNotifications] = useState<
 		NotificationItem[]
 	>([]);
+
+	// Persist tracking sets to localStorage
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		const coffeeArray = Array.from(coffeeFound);
+		localStorage.setItem("story-coffee-found", JSON.stringify(coffeeArray));
+	}, [coffeeFound]);
+
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		localStorage.setItem(
+			"story-scenes-visited",
+			JSON.stringify(Array.from(scenesVisited)),
+		);
+	}, [scenesVisited]);
+
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		localStorage.setItem(
+			"story-asides-clicked",
+			JSON.stringify(Array.from(asidesClicked)),
+		);
+	}, [asidesClicked]);
+
+	// Sync achievement progress with Sets on mount (Sets are source of truth)
+	// This ensures that if localStorage gets out of sync, the Sets are authoritative
+	useEffect(() => {
+		// Run once on mount to sync initial state
+		// Wait for next tick to ensure achievements have loaded
+		const timer = setTimeout(() => {
+			if (coffeeFound.size > 0) {
+				updateAchievementProgress("all-coffee", coffeeFound.size);
+			}
+			if (scenesVisited.size > 0) {
+				updateAchievementProgress("complete-story", scenesVisited.size);
+			}
+			if (asidesClicked.size > 0) {
+				updateAchievementProgress("completionist", asidesClicked.size);
+			}
+		}, 0);
+
+		return () => clearTimeout(timer);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []); // Only run on mount
 
 	// Show notification for newly unlocked achievement
 	const showNotification = useCallback((achievement: Achievement) => {
@@ -123,6 +191,7 @@ export function AchievementProvider({
 
 				// Update progress
 				updateProgress("all-coffee", newCoffeeFound.size);
+			} else {
 			}
 		},
 		[coffeeFound, updateProgress],
@@ -173,15 +242,9 @@ export function AchievementProvider({
 			asidesClicked.size === TOTAL_ASIDES &&
 			!hasAchievementHook("completionist")
 		) {
-			console.log("Unlocking completionist achievement!");
 			unlockAchievement("completionist");
 		}
-	}, [
-		achievements,
-		asidesClicked,
-		hasAchievementHook,
-		unlockAchievement,
-	]);
+	}, [achievements, asidesClicked, hasAchievementHook, unlockAchievement]);
 
 	// Dismiss notification manually
 	const dismissNotification = useCallback((notificationId: string) => {
@@ -227,4 +290,3 @@ export function useAchievementContext() {
 	}
 	return context;
 }
-

@@ -96,7 +96,6 @@ export function StoryScene() {
 	// Start narration when user clicks play on scene 1
 	useEffect(() => {
 		if (hasStarted && currentSceneIndex === 1) {
-			console.log("StoryScene: Starting initial narration for scene 1");
 			setNarrationTrigger({
 				sceneIndex: 1,
 				shouldPlay: true,
@@ -111,10 +110,6 @@ export function StoryScene() {
 			previousSceneIndex !== null &&
 			previousSceneIndex !== currentSceneIndex
 		) {
-			console.log(
-				"StoryScene: Scene jumped, starting narration for scene",
-				currentSceneIndex,
-			);
 			setNarrationTrigger({
 				sceneIndex: currentSceneIndex,
 				shouldPlay: true,
@@ -125,17 +120,8 @@ export function StoryScene() {
 	}, [currentSceneIndex, previousSceneIndex, isTransitioning]);
 
 	const handleTransitionStart = useCallback(() => {
-		console.log("StoryScene: Transition started", {
-			direction: playbackDirection,
-			currentScene: currentSceneIndex,
-		});
-
 		// Start narration when transition begins (for forward and jump directions)
 		if (playbackDirection === "forward" || playbackDirection === "jump") {
-			console.log(
-				"StoryScene: Triggering narration for scene",
-				currentSceneIndex,
-			);
 			setNarrationTrigger({
 				sceneIndex: currentSceneIndex,
 				shouldPlay: true,
@@ -144,7 +130,6 @@ export function StoryScene() {
 	}, [playbackDirection, currentSceneIndex]);
 
 	const handleTransitionEnd = useCallback(() => {
-		console.log("StoryScene: Transition ended");
 		// Transition is complete
 		setIsTransitioning(false);
 		// Don't stop narration here - let it play to completion
@@ -153,8 +138,6 @@ export function StoryScene() {
 	// Handle aside click
 	const handleAsideClick = useCallback(
 		(asideId: string) => {
-			console.log("StoryScene: Aside clicked", asideId);
-
 			// If this aside is already playing, do nothing
 			if (activeAsideId === asideId) return;
 
@@ -169,7 +152,7 @@ export function StoryScene() {
 			// Track this aside click for completionist
 			markAsideClicked(currentSceneIndex, asideId);
 
-			// Coffee asides (scenes 3, 4, 6, 9, 11)
+			// Coffee asides (scenes 3, 4, 6, 10, 11)
 			if (asideId === "coffee") {
 				markCoffeeFound(currentSceneIndex);
 			}
@@ -200,7 +183,6 @@ export function StoryScene() {
 
 			// Listen for when aside ends to return to main narration
 			const handleAsideEnd = () => {
-				console.log("StoryScene: Aside ended");
 				setActiveAsideId(null);
 				setActiveAsideName(null);
 
@@ -281,10 +263,6 @@ export function StoryScene() {
 			{/* Transition overlay - video for forward, cross-fade for reverse/jump */}
 			{(() => {
 				if (!isTransitioning || previousSceneIndex === null) {
-					console.log("StoryScene: Not rendering transition", {
-						isTransitioning,
-						previousSceneIndex,
-					});
 					return null;
 				}
 

@@ -70,17 +70,8 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 
 	const goToNextScene = useCallback(() => {
 		if (state.isTransitioning || !canGoNext) {
-			console.log("StoryContext: Cannot go next", {
-				isTransitioning: state.isTransitioning,
-				canGoNext,
-			});
 			return;
 		}
-
-		console.log("StoryContext: Going to next scene", {
-			from: state.currentSceneIndex,
-			to: state.currentSceneIndex + 1,
-		});
 
 		setState((prev) => ({
 			...prev,
@@ -89,7 +80,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 			isTransitioning: true,
 			playbackDirection: "forward",
 		}));
-	}, [state.isTransitioning, state.currentSceneIndex, canGoNext]);
+	}, [state.isTransitioning, canGoNext]);
 
 	const goToPreviousScene = useCallback(() => {
 		if (state.isTransitioning || !canGoBack) {
@@ -111,11 +102,6 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 				return;
 			}
 
-			console.log("StoryContext: Jumping to scene", {
-				from: state.currentSceneIndex,
-				to: sceneIndex,
-			});
-
 			setState((prev) => ({
 				...prev,
 				previousSceneIndex: prev.currentSceneIndex,
@@ -124,7 +110,7 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 				playbackDirection: "jump",
 			}));
 		},
-		[state.isTransitioning, state.currentSceneIndex, totalScenes],
+		[state.isTransitioning, totalScenes],
 	);
 
 	const setIsTransitioning = useCallback((value: boolean) => {
@@ -136,7 +122,6 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 
 	const toggleHints = useCallback(() => {
 		setShowHints((prev) => {
-			console.log("StoryContext: toggleHints called, changing from", prev, "to", !prev);
 			return !prev;
 		});
 	}, []);

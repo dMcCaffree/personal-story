@@ -33,12 +33,6 @@ export function TransitionPlayer({
 			return;
 		}
 
-		console.log("TransitionPlayer: Starting transition", {
-			direction,
-			from: fromSceneIndex,
-			to: toSceneIndex,
-		});
-
 		let isCancelled = false;
 		hasNotifiedNearEndRef.current = false;
 		setIsVisible(false);
@@ -50,16 +44,17 @@ export function TransitionPlayer({
 				// Wait for video metadata to be loaded
 				await new Promise<void>((resolve) => {
 					if (video.readyState >= 1) {
-						console.log("TransitionPlayer: Video metadata ready");
 						resolve();
 					} else {
-						console.log("TransitionPlayer: Waiting for metadata");
-						video.addEventListener("loadedmetadata", () => {
-							console.log("TransitionPlayer: Metadata loaded");
-							resolve();
-						}, {
-							once: true,
-						});
+						video.addEventListener(
+							"loadedmetadata",
+							() => {
+								resolve();
+							},
+							{
+								once: true,
+							},
+						);
 					}
 				});
 
@@ -68,19 +63,16 @@ export function TransitionPlayer({
 					video.currentTime = 0;
 					video.playbackRate = 1;
 
-					console.log("TransitionPlayer: Starting forward playback");
-
 					// Set visible immediately, then fade in
 					if (isCancelled) return;
 					setIsVisible(true);
-					
+
 					// Start playing
 					await video.play();
-					
+
 					if (isCancelled) return;
-					console.log("TransitionPlayer: Video playing, triggering start");
 					onTransitionStart?.();
-					
+
 					// Fade in over 200ms
 					requestAnimationFrame(() => {
 						if (!isCancelled) {
@@ -89,15 +81,14 @@ export function TransitionPlayer({
 					});
 				} else {
 					// Reverse: manually step through frames backwards
-					console.log("TransitionPlayer: Starting reverse playback");
-					
+
 					if (isCancelled) return;
-					
+
 					// Start from the end
 					video.currentTime = video.duration;
 					setIsVisible(true);
 					onTransitionStart?.();
-					
+
 					// Fade in over 200ms
 					requestAnimationFrame(() => {
 						if (!isCancelled) {
@@ -152,7 +143,6 @@ export function TransitionPlayer({
 					animationFrameRef.current = requestAnimationFrame(stepBackward);
 				}
 			} catch (error) {
-				console.error("Error playing transition:", error);
 				onTransitionEnd?.();
 				setIsVisible(false);
 			}
@@ -166,7 +156,7 @@ export function TransitionPlayer({
 				cancelAnimationFrame(animationFrameRef.current);
 			}
 		};
-	}, [fromSceneIndex, toSceneIndex, direction, isPlaying]);
+	}, [direction, isPlaying, onTransitionStart, onTransitionEnd]);
 
 	// Monitor video progress to fade out near end
 	useEffect(() => {
@@ -240,4 +230,3 @@ export function TransitionPlayer({
 		</div>
 	);
 }
-

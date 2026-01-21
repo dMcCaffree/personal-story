@@ -25,10 +25,9 @@ export function NarrationPlayer({
 
 		// Always update the source for the current scene
 		const narrationUrl = getNarrationUrl(sceneIndex);
-		
+
 		// Only reload if the scene actually changed
 		if (currentSceneRef.current !== sceneIndex) {
-			console.log("NarrationPlayer: Scene changed, loading new audio", sceneIndex);
 			currentSceneRef.current = sceneIndex;
 			audio.pause();
 			audio.currentTime = 0;
@@ -36,7 +35,6 @@ export function NarrationPlayer({
 			audio.load(); // This triggers loadedmetadata event
 		} else if (audio.src !== narrationUrl || !audio.src) {
 			// Initial load or src mismatch
-			console.log("NarrationPlayer: Initial load for scene", sceneIndex);
 			audio.src = narrationUrl;
 			audio.load(); // This triggers loadedmetadata event
 		}
@@ -46,40 +44,33 @@ export function NarrationPlayer({
 	useEffect(() => {
 		const audio = audioRef.current;
 		if (!audio || !shouldPlay) {
-			console.log("NarrationPlayer: Not playing", {
-				audio: !!audio,
-				shouldPlay,
-			});
 			return;
 		}
 
-		console.log("NarrationPlayer: Starting playback for scene", sceneIndex);
-		
 		// Ensure audio metadata is loaded before playing
 		// readyState >= 1 means HAVE_METADATA (duration is available)
 		if (audio.readyState < 1) {
-			console.log("NarrationPlayer: Waiting for audio metadata to load");
 			const handleMetadataLoaded = () => {
-				console.log("NarrationPlayer: Metadata loaded, starting playback");
 				audio.play().catch((error) => {
 					console.error("NarrationPlayer: Error playing narration:", error);
 				});
 			};
-			audio.addEventListener("loadedmetadata", handleMetadataLoaded, { once: true });
+			audio.addEventListener("loadedmetadata", handleMetadataLoaded, {
+				once: true,
+			});
 			audio.load();
-			return () => audio.removeEventListener("loadedmetadata", handleMetadataLoaded);
+			return () =>
+				audio.removeEventListener("loadedmetadata", handleMetadataLoaded);
 		}
-		
+
 		// Play the narration
 		audio
 			.play()
-			.then(() => {
-				console.log("NarrationPlayer: Playback started successfully");
-			})
+			.then(() => {})
 			.catch((error) => {
 				console.error("NarrationPlayer: Error playing narration:", error);
 			});
-	}, [sceneIndex, shouldPlay, audioRef]);
+	}, [shouldPlay, audioRef]);
 
 	useEffect(() => {
 		const audio = audioRef.current;

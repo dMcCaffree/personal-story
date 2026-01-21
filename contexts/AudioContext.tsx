@@ -45,7 +45,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 			const newDuration = audio.duration || 0;
 			// Check if duration is valid (not NaN or Infinity)
 			if (Number.isFinite(newDuration) && newDuration > 0) {
-				console.log("AudioContext: Duration updated:", newDuration);
 				setDuration(newDuration);
 			}
 		};

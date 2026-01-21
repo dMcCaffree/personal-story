@@ -25,21 +25,15 @@ export function CrossFadeTransition({
 			return;
 		}
 
-		console.log("CrossFadeTransition: Starting", {
-			from: fromSceneIndex,
-			to: toSceneIndex,
-		});
-
 		onTransitionStart?.();
 
 		// Duration: 600ms for a snappy but smooth cross-fade
 		const timer = setTimeout(() => {
-			console.log("CrossFadeTransition: Complete");
 			onTransitionEnd?.();
 		}, 600);
 
 		return () => clearTimeout(timer);
-	}, [isPlaying, fromSceneIndex, toSceneIndex, onTransitionStart, onTransitionEnd]);
+	}, [isPlaying, onTransitionStart, onTransitionEnd]);
 
 	if (!isPlaying) return null;
 
@@ -67,4 +61,3 @@ export function CrossFadeTransition({
 		</motion.div>
 	);
 }
-

@@ -120,7 +120,6 @@ export function OnboardingOverlay() {
 
 		if (shouldShowHints && !showHints) {
 			// Enable hints for step 3
-			console.log("Onboarding: Enabling hints for step 3");
 			toggleHints();
 			hintsEnabledForOnboardingRef.current = true;
 		} else if (
@@ -129,7 +128,6 @@ export function OnboardingOverlay() {
 			hintsEnabledForOnboardingRef.current
 		) {
 			// Disable hints when leaving step 3
-			console.log("Onboarding: Disabling hints when leaving step 3");
 			toggleHints();
 			hintsEnabledForOnboardingRef.current = false;
 		}

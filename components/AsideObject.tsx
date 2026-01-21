@@ -75,16 +75,6 @@ export function AsideObject({
 	// Determine if shadow should show
 	const shouldShowShadow = isHovered || showHints || isActive;
 
-	// Debug logging for hints
-	useEffect(() => {
-		if (showHints) {
-			console.log(
-				`AsideObject (${aside.id}): showHints is TRUE, shouldShowShadow:`,
-				shouldShowShadow,
-			);
-		}
-	}, [showHints, shouldShowShadow, aside.id]);
-
 	// Show only when positioned AND not resizing
 	const shouldShow = isPositioned && !isResizing;
 
