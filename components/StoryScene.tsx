@@ -56,8 +56,11 @@ export function StoryScene() {
 		if (!isTransitioning) {
 			// Not transitioning: show current scene
 			return currentSceneIndex;
-		} else if (playbackDirection === "reverse") {
-			// Reverse: show destination scene (cross-fade overlay will show source)
+		} else if (
+			playbackDirection === "reverse" ||
+			playbackDirection === "jump"
+		) {
+			// Reverse/Jump: show destination scene (cross-fade overlay will show source)
 			return currentSceneIndex;
 		} else {
 			// Forward: show delayed scene (stays on old scene for 4s)
@@ -117,8 +120,8 @@ export function StoryScene() {
 			currentScene: currentSceneIndex,
 		});
 
-		// Start narration when transition begins (only for forward direction)
-		if (playbackDirection === "forward") {
+		// Start narration when transition begins (for forward and jump directions)
+		if (playbackDirection === "forward" || playbackDirection === "jump") {
 			console.log(
 				"StoryScene: Triggering narration for scene",
 				currentSceneIndex,
@@ -231,7 +234,7 @@ export function StoryScene() {
 				</div>
 			)}
 
-			{/* Transition overlay - video for forward, cross-fade for reverse */}
+			{/* Transition overlay - video for forward, cross-fade for reverse/jump */}
 			{(() => {
 				if (!isTransitioning || previousSceneIndex === null) {
 					console.log("StoryScene: Not rendering transition", {
@@ -241,8 +244,8 @@ export function StoryScene() {
 					return null;
 				}
 
-				// Use sleek cross-fade for going back (more reliable than reverse video)
-				if (playbackDirection === "reverse") {
+				// Use sleek cross-fade for going back or jumping (more reliable than reverse video)
+				if (playbackDirection === "reverse" || playbackDirection === "jump") {
 					return (
 						<CrossFadeTransition
 							fromSceneIndex={previousSceneIndex}

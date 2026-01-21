@@ -2,7 +2,7 @@
 
 export const R2_BASE_URL = "https://file.swell.so/story/";
 
-export type PlaybackDirection = "forward" | "reverse";
+export type PlaybackDirection = "forward" | "reverse" | "jump";
 
 export interface Aside {
 	id: string;

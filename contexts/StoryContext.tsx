@@ -117,8 +117,8 @@ export function StoryProvider({ children }: { children: React.ReactNode }) {
 				...prev,
 				previousSceneIndex: prev.currentSceneIndex,
 				currentSceneIndex: sceneIndex,
-				isTransitioning: false, // No transition, just jump
-				playbackDirection: "forward",
+				isTransitioning: true, // Use transition with cross-fade
+				playbackDirection: "jump",
 			}));
 		},
 		[state.isTransitioning, state.currentSceneIndex, totalScenes],
