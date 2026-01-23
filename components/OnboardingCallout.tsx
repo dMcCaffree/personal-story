@@ -60,18 +60,12 @@ export function OnboardingCallout({
 				<h3 className="text-xl font-semibold text-white">{title}</h3>
 
 				{/* Description */}
-				<p className="text-sm text-white/80 leading-relaxed">{description}</p>
+				<p className="text-sm text-white/80 leading-relaxed -mt-2">
+					{description}
+				</p>
 
 				{/* Buttons */}
-				<div className="flex items-center justify-between gap-4 pt-2">
-					<button
-						type="button"
-						onClick={onSkip}
-						className="text-sm text-white/60 hover:text-white/90 transition-colors"
-					>
-						Skip tutorial
-					</button>
-
+				<div className="flex items-center justify-end gap-4 pt-2">
 					<motion.button
 						type="button"
 						onClick={onNext}
@@ -87,4 +81,3 @@ export function OnboardingCallout({
 		</motion.div>
 	);
 }
-

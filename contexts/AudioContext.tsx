@@ -20,6 +20,8 @@ interface AudioContextValue {
 	setMuted: (muted: boolean) => void;
 	togglePlayPause: () => void;
 	seek: (time: number) => void;
+	loadAndPlay: (src: string) => void;
+	preloadAudio: (src: string) => void;
 }
 
 const AudioContext = createContext<AudioContextValue | undefined>(undefined);
@@ -31,6 +33,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 	const [duration, setDuration] = useState(0);
 	const [volume, setVolumeState] = useState(100);
 	const [isMuted, setIsMuted] = useState(false);
+	const pendingPlayRef = useRef(false);
 
 	// Update current time and listen for audio events
 	useEffect(() => {
@@ -113,6 +116,67 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, []);
 
+	// Load and play audio synchronously - MUST be called from user interaction
+	const loadAndPlay = useCallback((src: string) => {
+		const audio = audioRef.current;
+		if (!audio) return;
+
+		// Pause current audio
+		audio.pause();
+		audio.currentTime = 0;
+
+		// If the src is already loaded, just play it
+		if (audio.src.endsWith(src)) {
+			audio.play().catch((error) => {
+				console.error("Error playing audio:", error);
+			});
+			return;
+		}
+
+		// Set new source and mark that we want to play
+		pendingPlayRef.current = true;
+		audio.src = src;
+		audio.load();
+
+		// Try to play immediately (works if already loaded)
+		audio.play().catch(() => {
+			// If it fails, it will play when loadeddata fires
+		});
+	}, []);
+
+	// Preload audio without playing
+	const preloadAudio = useCallback((src: string) => {
+		const audio = audioRef.current;
+		if (!audio) return;
+
+		// Only preload if not already the current src
+		if (!audio.src.endsWith(src)) {
+			// Create a temporary audio element to preload
+			const tempAudio = new Audio();
+			tempAudio.src = src;
+			tempAudio.preload = "auto";
+			tempAudio.load();
+		}
+	}, []);
+
+	// Auto-play when audio is loaded if pendingPlay is set
+	useEffect(() => {
+		const audio = audioRef.current;
+		if (!audio) return;
+
+		const handleLoadedData = () => {
+			if (pendingPlayRef.current) {
+				pendingPlayRef.current = false;
+				audio.play().catch((error) => {
+					console.error("Error auto-playing loaded audio:", error);
+				});
+			}
+		};
+
+		audio.addEventListener("loadeddata", handleLoadedData);
+		return () => audio.removeEventListener("loadeddata", handleLoadedData);
+	}, []);
+
 	const contextValue: AudioContextValue = {
 		audioRef,
 		isPlaying,
@@ -124,6 +188,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		setMuted,
 		togglePlayPause,
 		seek,
+		loadAndPlay,
+		preloadAudio,
 	};
 
 	return (

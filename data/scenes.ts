@@ -21,7 +21,7 @@ export const scenes: Scene[] = [
 			},
 			{
 				id: "mask",
-				name: "Not All Superheroes Wear Masks",
+				name: "Not All Heroes Wear Masks",
 				source: { x: 1065.5, y: 473, width: 220, height: 168.66 },
 				zIndex: 2,
 			},

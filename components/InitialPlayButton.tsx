@@ -1,19 +1,38 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "motion/react";
+import { useAudio } from "@/contexts/AudioContext";
+import { getNarrationUrl } from "@/lib/story-config";
 
 interface InitialPlayButtonProps {
 	onPlay: () => void;
 }
 
 export function InitialPlayButton({ onPlay }: InitialPlayButtonProps) {
+	const { loadAndPlay, preloadAudio } = useAudio();
+
+	// Preload scene 1 narration so it's ready when user clicks
+	useEffect(() => {
+		preloadAudio(getNarrationUrl(1));
+	}, [preloadAudio]);
+
+	const handleClick = () => {
+		// CRITICAL: Load and play audio synchronously in click handler for iOS
+		// This maintains the user gesture context
+		loadAndPlay(getNarrationUrl(1));
+		
+		// Then trigger the experience
+		onPlay();
+	};
+
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
 			transition={{ duration: 0.4 }}
-			onClick={onPlay}
+			onClick={handleClick}
 			whileTap={{ scale: 0.98 }}
 			className="fixed inset-0 z-70 flex items-center justify-center bg-black/30 backdrop-blur-sm cursor-pointer"
 			style={{ pointerEvents: "auto" }}

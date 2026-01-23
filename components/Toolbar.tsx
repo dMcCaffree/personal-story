@@ -640,7 +640,7 @@ export function Toolbar() {
 
 							{/* Time display */}
 							<div className="flex-1 text-center">
-								<div className="text-[10px] text-white/70 font-mono">
+								<div className="text-[10px] text-white/70 font-mono whitespace-nowrap">
 									{formatTime(currentTime)} / {formatTime(duration)}
 								</div>
 								{/* Progress bar */}

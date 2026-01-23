@@ -30,14 +30,9 @@ export function StoryScene() {
 		onboardingStep,
 	} = useStory();
 
-	const [narrationTrigger, setNarrationTrigger] = useState<{
-		sceneIndex: number;
-		shouldPlay: boolean;
-	}>({ sceneIndex: currentSceneIndex, shouldPlay: false });
-
 	const [delayedSceneIndex, setDelayedSceneIndex] = useState(currentSceneIndex);
 	const [activeAsideId, setActiveAsideId] = useState<string | null>(null);
-	const { audioRef } = useAudio();
+	const { loadAndPlay, audioRef } = useAudio();
 
 	// Achievement tracking
 	const {
@@ -93,41 +88,21 @@ export function StoryScene() {
 		}
 	}, [currentSceneIndex, canGoNext, totalScenes]);
 
-	// Start narration when user clicks play on scene 1
-	useEffect(() => {
-		if (hasStarted && currentSceneIndex === 1) {
-			setNarrationTrigger({
-				sceneIndex: 1,
-				shouldPlay: true,
-			});
-		}
-	}, [hasStarted, currentSceneIndex]);
-
-	// Start narration when jumping to a scene (no transition)
+	// Update delayed scene index when jumping
 	useEffect(() => {
 		if (
 			!isTransitioning &&
 			previousSceneIndex !== null &&
 			previousSceneIndex !== currentSceneIndex
 		) {
-			setNarrationTrigger({
-				sceneIndex: currentSceneIndex,
-				shouldPlay: true,
-			});
-			// Update delayed scene index immediately when jumping
 			setDelayedSceneIndex(currentSceneIndex);
 		}
 	}, [currentSceneIndex, previousSceneIndex, isTransitioning]);
 
 	const handleTransitionStart = useCallback(() => {
-		// Start narration when transition begins (for forward and jump directions)
-		if (playbackDirection === "forward" || playbackDirection === "jump") {
-			setNarrationTrigger({
-				sceneIndex: currentSceneIndex,
-				shouldPlay: true,
-			});
-		}
-	}, [playbackDirection, currentSceneIndex]);
+		// Transition started - no need to trigger narration here
+		// Navigation handlers already called loadAndPlay
+	}, []);
 
 	const handleTransitionEnd = useCallback(() => {
 		// Transition is complete
@@ -167,16 +142,8 @@ export function StoryScene() {
 				unlockAchievement("final-plea");
 			}
 
-			// Stop current audio
-			const audio = audioRef.current;
-			if (audio) {
-				audio.pause();
-				audio.src = getAsideAudioUrl(currentSceneIndex, asideId);
-				audio.load();
-				audio.play().catch((error) => {
-					console.error("Error playing aside audio:", error);
-				});
-			}
+			// CRITICAL: Load and play aside audio synchronously for iOS
+			loadAndPlay(getAsideAudioUrl(currentSceneIndex, asideId));
 
 			setActiveAsideId(asideId);
 			setActiveAsideName(asideName);
@@ -187,6 +154,7 @@ export function StoryScene() {
 				setActiveAsideName(null);
 
 				// Reset audio to beginning of main narration
+				const audio = audioRef.current;
 				if (audio) {
 					audio.currentTime = 0;
 				}
@@ -194,6 +162,7 @@ export function StoryScene() {
 				audio?.removeEventListener("ended", handleAsideEnd);
 			};
 
+			const audio = audioRef.current;
 			audio?.addEventListener("ended", handleAsideEnd);
 		},
 		[
@@ -205,6 +174,7 @@ export function StoryScene() {
 			unlockAchievement,
 			markCoffeeFound,
 			markAsideClicked,
+			loadAndPlay,
 		],
 	);
 
@@ -293,13 +263,7 @@ export function StoryScene() {
 			})()}
 
 			{/* Narration audio */}
-			<NarrationPlayer
-				sceneIndex={narrationTrigger.sceneIndex}
-				shouldPlay={
-					narrationTrigger.shouldPlay &&
-					narrationTrigger.sceneIndex === currentSceneIndex
-				}
-			/>
+			<NarrationPlayer sceneIndex={currentSceneIndex} />
 		</>
 	);
 }
