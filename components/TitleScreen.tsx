@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { TitleMenuItem } from "@/components/TitleMenuItem";
 import { OptionsModal } from "@/components/OptionsModal";
 import { getKeyframeUrl } from "@/lib/story-config";
+import { projects } from "@/lib/projects-data";
 
 const ONBOARDING_KEY = "personal-story-onboarding-complete";
 
 // Background images for each menu option
 const MENU_BACKGROUNDS = {
 	story: getKeyframeUrl(1), // First scene for NEW GAME/CONTINUE
-	projects: undefined, // Scene 5 for PROJECTS
-	thoughts: undefined, // Scene 3 for THOUGHTS
+	projects: projects[2].image, // Scene 5 for PROJECTS
+	thoughts: getKeyframeUrl(3), // Scene 3 for THOUGHTS
 	options: undefined, // Scene 7 for OPTIONS
 };
 
@@ -31,28 +31,31 @@ export function TitleScreen() {
 		setHasSeenStory(seen === "true");
 	}, []);
 
-	const menuItems = [
-		{
-			label: hasSeenStory ? "CONTINUE" : "START",
-			action: () => router.push("/story"),
-			background: MENU_BACKGROUNDS.story,
-		},
-		{
-			label: "PROJECTS",
-			action: () => router.push("/projects"),
-			background: MENU_BACKGROUNDS.projects,
-		},
-		{
-			label: "THOUGHTS",
-			action: () => router.push("/thoughts"),
-			background: MENU_BACKGROUNDS.thoughts,
-		},
-		{
-			label: "OPTIONS",
-			action: () => setShowOptions(true),
-			background: MENU_BACKGROUNDS.options,
-		},
-	];
+	const menuItems = useMemo(
+		() => [
+			{
+				label: hasSeenStory ? "CONTINUE" : "START",
+				action: () => router.push("/story"),
+				background: MENU_BACKGROUNDS.story,
+			},
+			{
+				label: "PROJECTS",
+				action: () => router.push("/projects"),
+				background: MENU_BACKGROUNDS.projects,
+			},
+			{
+				label: "THOUGHTS",
+				action: () => router.push("/thoughts"),
+				background: MENU_BACKGROUNDS.thoughts,
+			},
+			{
+				label: "OPTIONS",
+				action: () => setShowOptions(true),
+				background: MENU_BACKGROUNDS.options,
+			},
+		],
+		[hasSeenStory, router],
+	);
 
 	const currentBackground = menuItems[selectedIndex].background;
 
@@ -110,86 +113,175 @@ export function TitleScreen() {
 									: "none",
 								backgroundSize: "cover",
 								backgroundPosition: "center",
-								filter: "blur(20px) brightness(0.4)",
+								filter: "blur(5px) brightness(0.3)",
 							}}
 						/>
 					</AnimatePresence>
 				</div>
 
+				{/* Vignette overlay */}
+				<div
+					className="absolute inset-0"
+					style={{
+						background:
+							"radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%)",
+					}}
+				/>
+
 				{/* Gradient overlay */}
 				<div
-					className={`absolute inset-0 transition-colors duration-300 ${
+					className={`absolute inset-0 ${
 						theme === "dark"
-							? "bg-gradient-to-br from-black/60 via-black/40 to-black/60"
-							: "bg-gradient-to-br from-white/60 via-white/40 to-white/60"
+							? "bg-gradient-to-r from-black/80 via-black/40 to-transparent"
+							: "bg-gradient-to-r from-white/80 via-white/40 to-transparent"
 					}`}
 				/>
 
 				{/* Content */}
-				<div className="relative flex h-full w-full flex-col items-center justify-center gap-8">
-					{/* Title */}
-					<motion.div
-						initial={{ opacity: 0, y: -20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{
-							duration: 0.8,
-							ease: "easeOut",
-						}}
-						className="mb-8"
-					>
-						<h1
-							className={`text-5xl font-bold tracking-wider ${
-								theme === "dark" ? "text-white" : "text-black"
-							}`}
+				<div className="relative flex h-full w-full items-center px-12 sm:px-16 md:px-24">
+					<div className="w-full max-w-xl">
+						{/* Title */}
+						<motion.div
+							initial={{ opacity: 0, x: -30 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{
+								duration: 0.8,
+								ease: "easeOut",
+							}}
+							className="mb-16"
 						>
-							DUSTIN MCCAFFREE
-						</h1>
-					</motion.div>
-
-					{/* Menu items */}
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{
-							duration: 0.6,
-							delay: 0.3,
-						}}
-						className="flex flex-col gap-4"
-					>
-						{menuItems.map((item, index) => (
-							<motion.div
-								key={item.label}
-								initial={{ opacity: 0, x: -20 }}
-								animate={{ opacity: 1, x: 0 }}
-								transition={{
-									duration: 0.5,
-									delay: 0.4 + index * 0.1,
+							<h1
+								className={`mb-2 text-6xl font-bold tracking-wider ${
+									theme === "dark" ? "text-white" : "text-black"
+								}`}
+								style={{
+									textShadow:
+										theme === "dark"
+											? "0 0 20px rgba(0,0,0,0.5)"
+											: "0 0 20px rgba(255,255,255,0.5)",
 								}}
 							>
-								<TitleMenuItem
-									label={item.label}
-									isSelected={selectedIndex === index}
-									onClick={item.action}
-									onMouseEnter={() => setSelectedIndex(index)}
-								/>
-							</motion.div>
-						))}
-					</motion.div>
+								DUSTIN MCCAFFREE
+							</h1>
+							<div
+								className={`h-0.5 w-32 ${
+									theme === "dark" ? "bg-white/30" : "bg-black/30"
+								}`}
+							/>
+						</motion.div>
 
-					{/* Subtle hint text */}
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{
-							duration: 0.6,
-							delay: 1.2,
-						}}
-						className={`mt-8 text-xs ${
-							theme === "dark" ? "text-white/40" : "text-black/40"
-						}`}
-					>
-						Use arrow keys or mouse to navigate
-					</motion.div>
+						{/* Menu items */}
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{
+								duration: 0.6,
+								delay: 0.3,
+							}}
+							className="space-y-2"
+						>
+							{menuItems.map((item, index) => {
+								const isSelected = selectedIndex === index;
+								return (
+									<motion.button
+										key={item.label}
+										type="button"
+										initial={{ opacity: 0, x: -20 }}
+										animate={{ opacity: 1, x: 0 }}
+										transition={{
+											duration: 0.5,
+											delay: 0.4 + index * 0.08,
+										}}
+										onClick={item.action}
+										onMouseEnter={() => setSelectedIndex(index)}
+										className={`group relative w-full text-left transition-all ${
+											isSelected ? "pl-6" : "pl-4"
+										}`}
+									>
+										{/* Border indicator */}
+										<motion.div
+											className={`absolute left-0 top-0 h-full w-1 ${
+												theme === "dark" ? "bg-white" : "bg-black"
+											}`}
+											initial={{ scaleY: 0 }}
+											animate={{ scaleY: isSelected ? 1 : 0 }}
+											transition={{
+												type: "spring",
+												stiffness: 500,
+												damping: 30,
+											}}
+										/>
+
+										{/* Text */}
+										<span
+											className={`block py-3 font-mono text-lg tracking-wider transition-colors ${
+												isSelected
+													? theme === "dark"
+														? "text-white"
+														: "text-black"
+													: theme === "dark"
+														? "text-white/50"
+														: "text-black/50"
+											}`}
+											style={{
+												textShadow: isSelected
+													? theme === "dark"
+														? "0 0 10px rgba(255,255,255,0.3)"
+														: "0 0 10px rgba(0,0,0,0.3)"
+													: "none",
+											}}
+										>
+											{item.label}
+										</span>
+
+										{/* Subtle background on hover */}
+										{isSelected && (
+											<motion.div
+												layoutId="menu-bg"
+												className={`absolute inset-0 -z-10 ${
+													theme === "dark" ? "bg-white/5" : "bg-black/5"
+												}`}
+												transition={{
+													type: "spring",
+													stiffness: 500,
+													damping: 30,
+												}}
+											/>
+										)}
+									</motion.button>
+								);
+							})}
+						</motion.div>
+
+						{/* Hint text */}
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{
+								duration: 0.6,
+								delay: 1.2,
+							}}
+							className={`mt-12 flex items-center gap-4 text-xs font-mono ${
+								theme === "dark" ? "text-white/30" : "text-black/30"
+							}`}
+						>
+							<div className="flex items-center gap-2">
+								<kbd className="rounded border border-current px-1.5 py-0.5">
+									↑
+								</kbd>
+								<kbd className="rounded border border-current px-1.5 py-0.5">
+									↓
+								</kbd>
+								<span>NAVIGATE</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<kbd className="rounded border border-current px-2 py-0.5">
+									ENTER
+								</kbd>
+								<span>SELECT</span>
+							</div>
+						</motion.div>
+					</div>
 				</div>
 			</div>
 
