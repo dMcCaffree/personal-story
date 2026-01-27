@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { html } from "motion/react-client";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeWrapper } from "@/components/ThemeWrapper";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "The Dustin McCaffree Story",
-	description: "An interactive journey through my experiences",
+	title: "Dustin McCaffree",
+	description: "Software engineer, builder, and storyteller",
 };
 
 export default function RootLayout({
@@ -46,7 +47,9 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				{children}
+				<ThemeProvider>
+					<ThemeWrapper>{children}</ThemeWrapper>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

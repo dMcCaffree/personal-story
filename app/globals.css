@@ -1,8 +1,14 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #000000;
   --foreground: #ffffff;
+}
+
+:root.light {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @theme inline {
