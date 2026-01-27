@@ -148,10 +148,10 @@ export function TitleScreen() {
 								duration: 0.8,
 								ease: "easeOut",
 							}}
-							className="mb-16"
+							className="mb-12 sm:mb-16"
 						>
 							<h1
-								className={`mb-2 text-6xl font-bold tracking-wider ${
+								className={`mb-2 text-4xl sm:text-5xl md:text-6xl font-bold tracking-wider ${
 									theme === "dark" ? "text-white" : "text-black"
 								}`}
 								style={{
@@ -164,7 +164,7 @@ export function TitleScreen() {
 								DUSTIN MCCAFFREE
 							</h1>
 							<div
-								className={`h-0.5 w-32 ${
+								className={`h-0.5 w-24 sm:w-32 ${
 									theme === "dark" ? "bg-white/30" : "bg-black/30"
 								}`}
 							/>
