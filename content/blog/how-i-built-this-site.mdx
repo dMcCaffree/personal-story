@@ -1,0 +1,168 @@
+export const metadata = {
+  title: "How I Built This Interactive Story Site",
+  date: "2026-01-27",
+  excerpt: "The complete journey of creating an AI-powered interactive experience that bridges image generation, video synthesis, and human storytelling.",
+  readTime: "14 min",
+  coverImageDark: "https://file.swell.so/story/blog/how-i-built-this-site/cover.png",
+  coverImageLight: "https://file.swell.so/story/blog/how-i-built-this-site/cover.png"
+}
+
+## Introduction
+
+I recently lost my job, and so I decided to make a new personal site—something I had been meaning to do forever. But I didn't just want another portfolio. I thought about what would be a cool experience that's only possible now with the most up-to-date AI models.
+
+One of the ideas that excited me most was using the combination of image models and video models, bridging the two using Google's **Veo 3 frame-to-frame API**. This would let me create an interactive story where each scene transitions seamlessly with AI-generated video, creating something that feels alive and cinematic.
+
+You can experience the full interactive story at [/story](/story).
+
+![Screenshot: Interactive story experience](https://file.swell.so/story/blog/how-i-built-this-site/interactive-story.png)
+
+## Production
+
+### Storyboarding with Claude
+
+I started with storyboarding. I went into Claude and decided to create JSON for every scene that was going to be in the interactive site. This gave me a structured foundation to work from—each scene with its own description, elements, and narrative arc.
+
+```json
+{
+  "scene_id": "dream",
+  "title": "The Dream",
+  "visual_prompt": "Cartoonized, cinematic illustration of a teenage boy in an orthodontist office. Bright, idealized lighting. Orthodontist chair in the foreground. An orthodontist calmly working nearby. A large window shows a lush vineyard outside, symbolizing an ideal lifestyle. Warm, aspirational mood.",
+  "objects": [
+    "teenage boy",
+    "orthodontist chair",
+    "orthodontist working",
+    "vineyard outside window",
+    "school textbooks"
+  ]
+}
+```
+
+### Generating Images
+
+After I had the JSON, I went over to [Fal.ai](https://fal.ai) (f-a-l.ai) to use their models so I didn't have to deal with Google's Flux or anything like that. I started by generating the images first using their [Nano Banana Pro model](https://fal.ai/models/fal-ai/nano-banana-pro) at **$0.15 per generation**.
+
+I did them one by one and had to generate several variations of each scene, even though the JSON was fairly descriptive. Getting the right composition, mood, and specific elements I needed took multiple attempts per scene.
+
+![Screenshot: Fal.ai Nano Banana Pro interface](https://file.swell.so/story/blog/how-i-built-this-site/fal-nano-banana-api.png)
+
+### Creating Transition Videos
+
+Once I had images I was happy with, I tested bridging them with Veo 3. I needed to make sure that the frame-to-frame transitions would work properly. I used [Veo 3.1's first-last-frame-to-video model](https://fal.ai/models/fal-ai/veo3.1/first-last-frame-to-video) at **$0.40 per second**.
+
+This stage was easily the most expensive. I think I spent around **$50 between images and videos** doing all the different variations. Even though I did it without any sound on the videos, it still ends up being fairly expensive. Each transition video is 8 seconds long, so any time I needed to regenerate one of the transition videos, it cost me just over **$3 each time**.
+
+I used Nano Banana Pro for images and Veo 3 quality mode (not the cheaper version) so that I could have better results because the cheaper one wasn't working for me.
+
+![Screenshot: Veo 3 video generation results](https://file.swell.so/story/blog/how-i-built-this-site/fal-veo-frames-small.png)
+
+### Managing Assets with file.rocks
+
+After I had all the images and videos that I thought would work well, I needed to host them somewhere. I went in and tested in the code to make sure that everything would work properly.
+
+I added all of the images and videos to **Cloudflare R2** using another project that I made, [file.rocks](https://file.rocks)—a GUI for S3-compatible object storage. This allowed me to just drag and drop all the images and videos directly in and get public links very easily that I could use.
+
+![Screenshot: file.rocks interface with uploaded assets](https://file.swell.so/story/blog/how-i-built-this-site/filerocks.png)
+
+Then I went and created the prototype of the site, including playing with transitions between images and videos and pre-loading all of the images and videos to see how performance would be and if it was viable.
+
+### Recording Narrations
+
+Once all of the images and videos felt like they were working properly, I recorded narrations for all of the scenes. I decided on narration, and potentially at some point, I'll be adding captions.
+
+The reason I did this was:
+
+1. **To make it stand out** - Not every portfolio site has personal narration
+2. **To help people get to know me** as they end up on the site
+3. **I didn't want the whole thing to feel like it was all AI-generated** - I thought that this human element would really help instead of just generating audio with ElevenLabs or something like that
+
+So I went with actually recording. I used a **Shure SM7B microphone**. I used to be in a punk band, and so I have all kinds of recording gear living here in Nashville. I just took advantage of what I already had there.
+
+### Creating Interactive Asides
+
+The next thing I decided was to make this story more interactive by adding **asides**—little stories, little clickables that would also trigger their own narrations.
+
+Doing this was actually the most challenging part of the whole thing because I went into Figma, dropped each image into Figma, decided which things should be clickable (I had already had in my mind what I wanted), and added in the JSON for what I wanted to be in each scene specifically.
+
+So for the first scene, I said, "Make sure that there's textbooks, make sure that there's an orthodontist, a Vineyard, all of these things," so I knew somewhat what would be clickable, but not everything, because the AI kind of goes rogue.
+
+I went between the things I had planned and then the more spontaneous or AI-generated things. I decided what would be clickable. I went in and used the **pen tool** on every single one of those things, and that actually took the most time out of anything between recording and masking with a pen tool in Figma for every single one of these asides.
+
+That definitely extended the project to be multiple more days of long days of work.
+
+![Screenshot: Figma masking workflow](https://file.swell.so/story/blog/how-i-built-this-site/figma.png)
+
+## Post-Production
+
+### Engineering Responsive Positioning
+
+The next thing I had to do was create a system that would allow these images to be in the right spot. These clickable asides needed to be in the right spot **no matter what the screen size was**. This was an engineering challenge.
+
+What I decided on was to use math from the original image. I took the masks that I masked out (the asides that I masked out), overlaid them directly on the original image, and got the **X and Y coordinates** on each image and then just the **width and height** of the aside.
+
+Then, no matter how big that full-scene image was, I knew exactly where the clickable aside should be within that image. Figma was helpful here again in just getting the X and Y coordinates of the clickable aside when overlaid on the original image.
+
+Was there another way to remove the background or all the rest of the image programmatically without having to pen tool out each one? Maybe. But I was positive I could do it this way, and I hit dead ends initially when trying to automate that part. Sometimes you just have to use brute force to make magic.
+
+I then combined all the audio to the clickable asides, which ended up being the easy part.
+
+![Screenshot: Clickable asides in action](https://file.swell.so/story/blog/how-i-built-this-site/clickable-asides.gif)
+
+## Design Decisions
+
+### Glass Morphism and Motion
+
+I knew the components that overlaid and controlled this whole thing would be one of the most important parts since the point of the project wasn't just generating AI or to show my story but to really show what I'm capable of as an engineer.
+
+I knew I wanted to use **[motion.dev](https://motion.dev)** to add animations and interactions. I love micro-interactions, so this piece of it was really important to me.
+
+I settled on **Glass morphism** even though it's not the newest trend in design. It's one that I really love and feel like can be pretty slick, and I don't see enough still in software in general outside of native apps. I wanted this to feel more like a **native app** than just your average web app, and so that's the direction I went.
+
+### The Toolbar Component
+
+I love the little toolbar component, the little player that I created at the bottom—that's my favorite component. I played a lot with interactions of how to go forward and backward through the story and what would trigger that, and overall it took many hours of playing with what would work the best.
+
+Here it is in action:
+
+![Screenshot: Toolbar player component with glass morphism](https://file.swell.so/story/blog/how-i-built-this-site/toolbar.gif)
+
+This is the piece that I always love the most: these micro-interactions, the magic that you can bring to products. So I was in my element, I was really loving this piece of iterating on the actual product feeling of this interactive story.
+
+After it was all done, I decided to add a few more things that were unplanned.
+
+## Additions
+
+### Achievements
+
+I decided to add **achievements**, which were actually a big deal. It's one of the things that people have really loved about the project. Depending on which asides you clicked and how far through the story you made it, you start to accrue these achievements and you can view your progress on those.
+
+It's all stored in your **local storage**, so it feels more persistent. I think that this has brought an additional layer of magic to the experience.
+
+Here's what the achievement system looks like:
+
+![Screenshot: Achievements dialog](https://file.swell.so/story/blog/how-i-built-this-site/achievements.png)
+
+### Hints
+
+I also decided to add the ability to **toggle hints**, which highlights all of the clickable elements in the scene. This helps people get achievements that they have been stuck on, or also figure out how to see more of the story if they're interested.
+
+![Screenshot: Hints feature highlighting clickables](https://file.swell.so/story/blog/how-i-built-this-site/hints-toggle.gif)
+
+### Start Menu & Personal Site
+
+I finished all this and shared it around. But eventually I came back to add a **video game-inspired splash screen / start menu** and list of projects I've built, as well as a blog section just to have somewhere where I can just write and share my writings on social media, on LinkedIn as I search for a job, and beyond that as well.
+
+I loved building this piece of it as well because this ended up being a really cool, subtly animated with Motion.dev piece of the site. I added **page transitions** using the **View Transition API** in React along with Motion.dev, and I just love the way that this menu selection turned out, both with arrow keys and just hovering your mouse over things.
+
+I think it feels really good. There's a subtle animation between each item, and I love the background shifting for each item. I think that ended up feeling really, really good.
+
+![Screenshot: Start menu with video game aesthetic](https://file.swell.so/story/blog/how-i-built-this-site/start-menu.png)
+
+## Conclusion
+
+A project like this just really pushes what I'm capable of. And I think it did it in a very subtle way where most people wouldn't realize how much went into this experience and how much thought was necessary to create something that felt good, fun, and interesting to go through.
+
+Truthfully, this whole thing is just a self-serving way to show people my work history. But I think it's potentially **the most interesting way anyone has shown their work history in the history of mankind**. And that was my goal, and I hope you love it.
+
+If you haven't experienced the interactive story yet, [head over to /story](/story) and dive in. And if you're interested in working together or just want to chat about the tech, [reach out on LinkedIn](https://linkedin.com/in/dMcCaffree).
+
