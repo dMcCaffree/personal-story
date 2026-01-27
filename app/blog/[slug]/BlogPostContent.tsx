@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { MDXContent } from "./MDXContent";
 import type { Post } from "@/lib/mdx";
 
@@ -23,6 +24,15 @@ export function BlogPostContent({
 			}`}
 		>
 			<article className="mx-auto min-h-full max-w-3xl px-6 py-16 sm:px-8 lg:px-12">
+				{/* Breadcrumbs */}
+				<Breadcrumbs
+					items={[
+						{ label: "Home", href: "/" },
+						{ label: "Blog", href: "/blog" },
+						{ label: post.title },
+					]}
+				/>
+
 				{/* Header */}
 				<motion.header
 					initial={{ opacity: 0, y: -20 }}
@@ -99,57 +109,7 @@ export function BlogPostContent({
 				>
 					<MDXContent>{children}</MDXContent>
 				</motion.div>
-
-				{/* Navigation */}
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{
-						duration: 0.6,
-						delay: 0.4,
-					}}
-					className="mt-24 flex flex-wrap gap-3"
-				>
-					<motion.button
-						type="button"
-						onClick={() => router.push("/blog")}
-						className={`group flex items-center gap-2 rounded-2xl border px-6 py-3.5 font-mono text-sm tracking-wider transition-all ${
-							theme === "dark"
-								? "border-white/20 hover:border-white/40 hover:bg-white/5 text-white"
-								: "border-black/20 hover:border-black/40 hover:bg-black/5 text-black"
-						}`}
-						whileHover={{ x: -4 }}
-						whileTap={{ scale: 0.98 }}
-						transition={{
-							type: "spring",
-							stiffness: 400,
-							damping: 25,
-						}}
-					>
-						<span className="transition-transform group-hover:-translate-x-1">←</span>
-						<span>ALL POSTS</span>
-					</motion.button>
-					<motion.button
-						type="button"
-						onClick={() => router.push("/")}
-						className={`rounded-2xl border px-6 py-3.5 font-mono text-sm tracking-wider transition-all ${
-							theme === "dark"
-								? "border-white/20 hover:border-white/40 hover:bg-white/5 text-white"
-								: "border-black/20 hover:border-black/40 hover:bg-black/5 text-black"
-						}`}
-						whileHover={{ scale: 1.02 }}
-						whileTap={{ scale: 0.98 }}
-						transition={{
-							type: "spring",
-							stiffness: 400,
-							damping: 25,
-						}}
-					>
-						HOME
-					</motion.button>
-				</motion.div>
 			</article>
 		</div>
 	);
 }
-

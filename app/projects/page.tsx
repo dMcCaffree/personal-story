@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { ProjectListItem } from "@/components/ProjectListItem";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { projects, type Project } from "@/lib/projects-data";
 import Image from "next/image";
 
@@ -21,6 +22,11 @@ export default function ProjectsPage() {
 		>
 			<div className="flex min-h-full w-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
 				<div className="w-full max-w-3xl">
+					{/* Breadcrumbs */}
+					<Breadcrumbs
+						items={[{ label: "Home", href: "/" }, { label: "Projects" }]}
+					/>
+
 					{/* Header */}
 					<motion.div
 						initial={{ opacity: 0, y: -20 }}
@@ -59,36 +65,6 @@ export default function ProjectsPage() {
 							/>
 						))}
 					</motion.ul>
-
-					{/* Back button */}
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{
-							duration: 0.6,
-							delay: 0.6,
-						}}
-					>
-						<motion.button
-							type="button"
-							onClick={() => router.push("/")}
-							className={`rounded-xl border px-8 py-3 font-mono text-sm tracking-wider transition-colors ${
-								theme === "dark"
-									? "border-white/20 hover:bg-white/10 text-white"
-									: "border-black/20 hover:bg-black/10 text-black"
-							}`}
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							transition={{
-								type: "spring",
-								stiffness: 500,
-								damping: 30,
-								mass: 0.5,
-							}}
-						>
-							BACK TO MENU
-						</motion.button>
-					</motion.div>
 				</div>
 			</div>
 

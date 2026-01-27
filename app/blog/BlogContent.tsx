@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import type { Post } from "@/lib/mdx";
 
 export function BlogContent({ posts }: { posts: Post[] }) {
@@ -16,6 +17,11 @@ export function BlogContent({ posts }: { posts: Post[] }) {
 			}`}
 		>
 			<div className="mx-auto min-h-full max-w-3xl px-6 py-16 sm:px-8 lg:px-12">
+				{/* Breadcrumbs */}
+				<Breadcrumbs
+					items={[{ label: "Home", href: "/" }, { label: "Blog" }]}
+				/>
+
 				{/* Header */}
 				<motion.div
 					initial={{ opacity: 0, y: -20 }}
@@ -71,10 +77,7 @@ export function BlogContent({ posts }: { posts: Post[] }) {
 									delay: 0.3 + index * 0.1,
 								}}
 							>
-								<a
-									href={`/blog/${post.slug}`}
-									className="group block"
-								>
+								<a href={`/blog/${post.slug}`} className="group block">
 									<div className="mb-3 flex items-center gap-4 text-sm">
 										<time
 											className={`font-mono tracking-wide ${
@@ -123,38 +126,7 @@ export function BlogContent({ posts }: { posts: Post[] }) {
 						))
 					)}
 				</motion.div>
-
-				{/* Back button */}
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{
-						duration: 0.6,
-						delay: 0.6,
-					}}
-					className="mt-24"
-				>
-					<motion.button
-						type="button"
-						onClick={() => router.push("/")}
-						className={`rounded-2xl border px-6 py-3.5 font-mono text-sm tracking-wider transition-all ${
-							theme === "dark"
-								? "border-white/20 hover:border-white/40 hover:bg-white/5 text-white"
-								: "border-black/20 hover:border-black/40 hover:bg-black/5 text-black"
-						}`}
-						whileHover={{ scale: 1.02 }}
-						whileTap={{ scale: 0.98 }}
-						transition={{
-							type: "spring",
-							stiffness: 400,
-							damping: 25,
-						}}
-					>
-						BACK TO MENU
-					</motion.button>
-				</motion.div>
 			</div>
 		</div>
 	);
 }
-
