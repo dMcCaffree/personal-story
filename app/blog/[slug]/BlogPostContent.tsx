@@ -61,12 +61,31 @@ export function BlogPostContent({
 						</span>
 					</div>
 					<h1
-						className={`text-5xl font-bold leading-tight tracking-tight sm:text-6xl ${
+						className={`mb-8 text-5xl font-bold leading-tight tracking-tight sm:text-6xl ${
 							theme === "dark" ? "text-white" : "text-black"
 						}`}
 					>
 						{post.title}
 					</h1>
+
+					{/* Cover Image */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{
+							duration: 0.6,
+							delay: 0.2,
+						}}
+						className="relative aspect-[2/1] w-full overflow-hidden rounded-2xl"
+					>
+						<img
+							src={
+								theme === "dark" ? post.coverImageDark : post.coverImageLight
+							}
+							alt={post.title}
+							className="h-full w-full object-cover"
+						/>
+					</motion.div>
 				</motion.header>
 
 				{/* Content */}
