@@ -34,7 +34,7 @@ export function TitleScreen() {
 	const menuItems = useMemo(
 		() => [
 			{
-				label: hasSeenStory ? "CONTINUE" : "START",
+				label: hasSeenStory ? "CONTINUE STORY" : "START STORY",
 				action: () => router.push("/story"),
 				background: MENU_BACKGROUNDS.story,
 			},
