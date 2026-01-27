@@ -14,9 +14,25 @@ const geistMono = Geist_Mono({
 	subsets: ["latin"],
 });
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dustin.site";
+
 export const metadata: Metadata = {
+	metadataBase: new URL(baseUrl),
 	title: "Dustin McCaffree",
 	description: "Software engineer, builder, and storyteller",
+	openGraph: {
+		title: "Dustin McCaffree",
+		description: "Software engineer, builder, and storyteller",
+		url: baseUrl,
+		siteName: "Dustin McCaffree",
+		locale: "en_US",
+		type: "website",
+	},
+	twitter: {
+		card: "summary",
+		site: "@dustinmccaffree",
+		creator: "@dustinmccaffree",
+	},
 };
 
 export default function RootLayout({

@@ -35,9 +35,12 @@ export async function generateMetadata({
 	const postUrl = `${baseUrl}/blog/${slug}`;
 
 	return {
+		metadataBase: new URL(baseUrl),
 		title: `${post.title} | Dustin McCaffree`,
 		description: post.excerpt,
 		authors: [{ name: "Dustin McCaffree" }],
+		creator: "Dustin McCaffree",
+		publisher: "Dustin McCaffree",
 		keywords: [
 			"software engineering",
 			"product development",
@@ -52,22 +55,41 @@ export async function generateMetadata({
 			locale: "en_US",
 			type: "article",
 			publishedTime: post.date,
+			modifiedTime: post.date,
 			authors: ["Dustin McCaffree"],
+			section: "Technology",
+			tags: ["software engineering", "web development", "AI"],
 			images: [
 				{
 					url: post.coverImageDark,
 					width: 1200,
 					height: 630,
 					alt: post.title,
+					type: "image/png",
 				},
 			],
 		},
 		twitter: {
 			card: "summary_large_image",
+			site: "@terribledustin",
+			creator: "@terribledustin",
 			title: post.title,
 			description: post.excerpt,
-			creator: "@dustinmccaffree",
-			images: [post.coverImageDark],
+			images: {
+				url: post.coverImageDark,
+				alt: post.title,
+			},
+		},
+		robots: {
+			index: true,
+			follow: true,
+			googleBot: {
+				index: true,
+				follow: true,
+				"max-video-preview": -1,
+				"max-image-preview": "large",
+				"max-snippet": -1,
+			},
 		},
 		alternates: {
 			canonical: postUrl,
