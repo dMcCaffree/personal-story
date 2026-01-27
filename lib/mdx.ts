@@ -8,6 +8,8 @@ export interface PostMetadata {
 	date: string;
 	excerpt: string;
 	readTime: string;
+	coverImageDark: string;
+	coverImageLight: string;
 }
 
 export interface Post extends PostMetadata {
