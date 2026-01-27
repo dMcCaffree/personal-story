@@ -107,7 +107,7 @@ export default function ProjectsPage() {
 							damping: 30,
 							mass: 0.8,
 						}}
-						className="pointer-events-none fixed right-0 transform translate-x-1/2 top-1/2 z-9999 -translate-y-1/2 aspect-video"
+						className="pointer-events-none fixed sm:-right-96 lg:-right-64 xl:right-0 transform translate-x-1/2 top-1/2 z-9999 -translate-y-1/2 aspect-video"
 						style={{
 							height: "80vh",
 						}}

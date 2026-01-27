@@ -49,7 +49,7 @@ export function ProjectListItem({
 				</span>
 
 				{/* Project name */}
-				<span className="text-lg font-medium transition-all group-hover:tracking-wide">
+				<span className="text-lg font-medium transition-all">
 					{project.name}
 				</span>
 

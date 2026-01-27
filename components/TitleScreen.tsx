@@ -13,9 +13,9 @@ const ONBOARDING_KEY = "personal-story-onboarding-complete";
 // Background images for each menu option
 const MENU_BACKGROUNDS = {
 	story: getKeyframeUrl(1), // First scene for NEW GAME/CONTINUE
-	projects: getKeyframeUrl(5), // Scene 5 for PROJECTS
-	thoughts: getKeyframeUrl(3), // Scene 3 for THOUGHTS
-	options: getKeyframeUrl(7), // Scene 7 for OPTIONS
+	projects: undefined, // Scene 5 for PROJECTS
+	thoughts: undefined, // Scene 3 for THOUGHTS
+	options: undefined, // Scene 7 for OPTIONS
 };
 
 export function TitleScreen() {
@@ -33,7 +33,7 @@ export function TitleScreen() {
 
 	const menuItems = [
 		{
-			label: hasSeenStory ? "CONTINUE" : "NEW GAME",
+			label: hasSeenStory ? "CONTINUE" : "START",
 			action: () => router.push("/story"),
 			background: MENU_BACKGROUNDS.story,
 		},
@@ -63,11 +63,15 @@ export function TitleScreen() {
 			switch (e.key) {
 				case "ArrowUp":
 					e.preventDefault();
-					setSelectedIndex((prev) => (prev === 0 ? menuItems.length - 1 : prev - 1));
+					setSelectedIndex((prev) =>
+						prev === 0 ? menuItems.length - 1 : prev - 1,
+					);
 					break;
 				case "ArrowDown":
 					e.preventDefault();
-					setSelectedIndex((prev) => (prev === menuItems.length - 1 ? 0 : prev + 1));
+					setSelectedIndex((prev) =>
+						prev === menuItems.length - 1 ? 0 : prev + 1,
+					);
 					break;
 				case "Enter":
 				case " ":
@@ -101,7 +105,9 @@ export function TitleScreen() {
 							}}
 							className="absolute inset-0"
 							style={{
-								backgroundImage: `url(${currentBackground})`,
+								backgroundImage: currentBackground
+									? `url(${currentBackground})`
+									: "none",
 								backgroundSize: "cover",
 								backgroundPosition: "center",
 								filter: "blur(20px) brightness(0.4)",
@@ -188,8 +194,10 @@ export function TitleScreen() {
 			</div>
 
 			{/* Options Modal */}
-			<OptionsModal isOpen={showOptions} onClose={() => setShowOptions(false)} />
+			<OptionsModal
+				isOpen={showOptions}
+				onClose={() => setShowOptions(false)}
+			/>
 		</>
 	);
 }
-
