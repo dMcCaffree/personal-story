@@ -44,8 +44,8 @@ export function TitleScreen() {
 				background: MENU_BACKGROUNDS.projects,
 			},
 			{
-				label: "THOUGHTS",
-				action: () => router.push("/thoughts"),
+				label: "BLOG",
+				action: () => router.push("/blog"),
 				background: MENU_BACKGROUNDS.thoughts,
 			},
 			{

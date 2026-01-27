@@ -16,9 +16,7 @@ export default function ProjectsPage() {
 	return (
 		<div
 			className={`fixed inset-0 overflow-y-auto transition-colors duration-300 ${
-				theme === "dark"
-					? "bg-gradient-to-br from-black via-gray-900 to-black"
-					: "bg-gradient-to-br from-white via-gray-50 to-white"
+				theme === "dark" ? "bg-black" : "bg-white"
 			}`}
 		>
 			<div className="flex min-h-full w-full items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
