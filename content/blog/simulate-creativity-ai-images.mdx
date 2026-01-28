@@ -1,0 +1,243 @@
+export const metadata = {
+  title: "How To Simulate Human Creativity in AI Image Generation Models",
+  date: "2026-01-28",
+  excerpt: "Discover how to use simulated dice-rolling techniques to break free from generic AI-generated images and create truly unique, interesting visuals for your content.",
+  readTime: "12 min",
+  coverImageDark: "https://file.swell.so/story/blog/simulate-creativity-ai-images/cover.png",
+  coverImageLight: "https://file.swell.so/story/blog/simulate-creativity-ai-images/cover.png"
+}
+
+## Introduction
+
+Picture this: you're browsing a blog about productivity, and every single article shows the same thing... a person at a desk. Maybe they're typing. Maybe they're drinking coffee. Sometimes there's a plant in the background. It's all *so* boring.
+
+This is the problem with AI image generation right now. When you ask an image model to create a cover image for "Top 5 Ways to Stay Productive at the Office," it will give you a very literal picture of someone working at an office. If your next article is "How AI Changed Writing Software Forever," you'll get the exact same scene, but this time with a robot arm thrown in for good measure.
+
+AI is remarkably literal. And when you're creating content at scale, this sameness becomes a real problem. Your entire visual brand starts to blur together into one forgettable mess.
+
+You might think: "I'll just tell the AI to be more creative!" And you'd be right to try. But here's the thing: even if you get it to work once (believe me, I've been through this), it will inevitably fall back into patterns. The AI will start making images that are *different* from the guy-at-desk cliche, but samey in their own new way.
+
+So how do you actually solve this?
+
+## Try Controlled Randomness
+
+The breakthrough isn't about telling the AI to "be creative" or "think outside the box." The key is understanding what should remain **constant** versus what should be **random**.
+
+For example, you might want these things to stay consistent across all your images:
+- Your brand's color palette
+- A specific art style or aesthetic
+- A mascot or recurring character
+- The general mood or tone
+
+But everything else? That's where you inject randomness - controlled, intentional randomness that gives the AI the creative salt it needs to generate something genuinely unique every time.
+
+Let me show you how I systematically improved my cover images, in-article visuals, and video thumbnails using techniques borrowed from tabletop gaming and creative writing exercises.
+
+## Step 1: Generate JSON First
+
+Before you send anything to an image generation model, take a detour through a text model first.
+
+Instead of going straight from idea → image, you go: idea → **JSON description** → image.
+
+This might seem like an extra step, but it's transformative. Here's why:
+
+**Better Control**: Text models are much better at understanding nuance, context, and instructions than image models are at interpreting prompts.
+
+**Consistency**: By generating structured JSON, you can maintain continuity across images - same style, same color schemes, same compositional rules.
+
+**Iteration**: It's much faster (and cheaper) to regenerate JSON descriptions until you're happy with them, rather than burning through expensive image generation credits.
+
+**Quality**: In my testing, and in the experience of countless others, this two-step process produces noticeably better results.
+
+A typical JSON structure might look like this:
+
+```json
+{
+  "title": "Productivity Tips Article Cover",
+  "style": "minimalist illustration",
+  "subject": "person working at desk",
+  "colorPalette": ["#2E5266", "#6E8898", "#9FB1BC"],
+  "mood": "focused and calm",
+  "composition": "rule of thirds",
+  "lighting": "soft natural light from left"
+}
+```
+
+This JSON becomes the *real* prompt you send to the image model. But here's the thing - if you just do this, you're still going to end up with samey images because you're generating the JSON the same way every time.
+
+That's where the dice come in.
+
+## Step 2: Roll The Dice (D20 × 100)
+
+Remember those creative writing exercises where you roll dice with words on each face to get a random writing prompt? (Okay, maybe that was just me in English class.)
+
+That's exactly what we're going to do for image generation.
+
+Imagine giving your AI a 20-sided die with different options on each face. Before generating your JSON description, the AI "rolls the die" and whatever it lands on gets incorporated into the prompt.
+
+Let's say you like the idea of animals as characters in your blog images (it's memorable, it's fun, it differentiates your brand). You could create an "Animal Die" with 20 different animals:
+
+- Pigeon
+- Elephant  
+- Fox
+- Owl
+- Penguin
+- Raccoon
+- ... and so on
+
+Every time you generate an image, you roll this die first. If it lands on "Pigeon," then your article about office productivity now features pigeons as the main characters. This single element of randomness instantly makes your image unique.
+
+<DiceRoller />
+
+Try rolling the die above a few times. Notice how each result would create a completely different vibe for the same article? That's the power of a single variable.
+
+## Step 3: Multiple Dice, Infinite Combinations
+
+One die is good. Ten dice is **exponentially** better.
+
+What if you had multiple categories of dice, each controlling a different aspect of your image? For example:
+
+- **Animal Die** (20 options): Pigeon, Elephant, Fox, Owl...
+- **Color Die** (20 options): Vibrant Blue, Warm Orange, Soft Purple...
+- **Lighting Die** (20 options): Golden Hour, Neon, Soft Studio...
+- **Time of Day Die** (20 options): Dawn, Midday, Twilight, Midnight...
+- **Texture Die** (20 options): Smooth Glass, Rough Canvas, Metallic...
+- **Mood Die** (20 options): Energetic, Calm, Mysterious, Playful...
+
+Now, before generating your JSON prompt, you roll *all* of these dice. The AI incorporates each result into the image description.
+
+Let's see this in action with a simple example:
+
+<MadLibsPrompt />
+
+Look at that transformation! With just 6 variables, you've gone from a generic prompt that would produce the ten-thousandth variation of "person at desk" to something that has never been generated before and will never be generated exactly the same way again.
+
+And here's the beautiful part: if you have 6 dice with 20 options each, you have **64 million** possible combinations. Scale that up to 10-12 dice with 20-100 options each? You're looking at essentially infinite variations.
+
+Your images will never feel samey again.
+
+## Step 4: Putting It All Together
+
+Here's where we take everything we've learned and create a real, production-ready system for generating unique image prompts.
+
+The key is to make your JSON generation prompt include:
+
+1. **Context** about what you're trying to create (article title, excerpt, summary)
+2. **Dice rolls** for all your randomness categories
+3. **Reasoning** for why this particular combination works
+4. **A score** for how well it represents your content
+
+Here's a example prompt structure I use for the JSON generation step:
+
+```
+You are an expert image prompt designer. I need you to create a detailed 
+image prompt for a cover image.
+
+Article Title: "{article_title}"
+Article Excerpt: "{article_excerpt}"
+
+Before creating the prompt, roll these dice and incorporate the results:
+- Animal: {random_animal}
+- Color Palette: {random_color}
+- Lighting: {random_lighting}
+- Time of Day: {random_time}
+- Texture: {random_texture}
+- Weather: {random_weather}
+- Style: {random_style}
+- Mood: {random_mood}
+- Composition: {random_composition}
+- Background Detail: {random_background}
+- Foreground Detail: {random_foreground}
+- Perspective: {random_perspective}
+- Time Period: {random_year}
+
+Generate a JSON response with:
+1. "reasoning": Explain why this combination works for this article
+2. "score": Rate 0-100 how well this represents the article's message
+3. "visualDescription": The complete image prompt incorporating all dice rolls
+4. "imageTitle": A title for this image
+
+Ensure the image is unique, memorable, and effectively communicates 
+the article's core message while incorporating the dice roll elements naturally.
+```
+
+The important thing here is that you're **pre-rolling** all the dice before calling the LLM. You're not asking the AI to "be creative" or "pick something interesting" - you're giving it specific creative constraints that change each time.
+
+Let's try it with this very article you're reading right now:
+
+<PromptGenerator />
+
+Go ahead, click that button a few times. Notice how each generation gives you something completely different, yet each one could work as a compelling cover image for this article? That's the magic of systematic randomness.
+
+## Real-World Benefits
+
+I've been using this approach for several months now, and the results speak for themselves:
+
+**Uniqueness**: Every image is genuinely different. Even generating 100 images for 100 articles, you won't see repetition.
+
+**Brand Consistency**: Despite the randomness, you maintain visual coherence because you control what stays constant (color palette, style, overall mood).
+
+**Engagement**: Unique, interesting imagery gets more clicks, more shares, more attention. People remember the "pigeon in cyberpunk coding tutorial" way more than "generic person at desk."
+
+**Scalability**: Once you set up your dice categories, you can generate unique prompts forever without manual creative work.
+
+**Cost Effective**: By nailing the prompt in JSON form first, you waste fewer image generation credits on unsatisfactory results.
+
+## Beyond Cover Images
+
+These same principles apply to any kind of image or video generation:
+
+- **Social media graphics**: Roll dice for each post
+- **Video thumbnails**: Ensure each video has a distinct visual identity
+- **Product mockups**: Create varied contexts and settings
+- **In-article images**: Match the specific section while maintaining uniqueness
+- **Presentation slides**: Keep your deck visually interesting throughout
+
+The technique works anywhere you're generating visual content at scale and need to avoid the "sameness trap."
+
+## Tips for Creating Your Dice
+
+As you build your own system, keep these guidelines in mind:
+
+**Start with what matters**: Don't create 50 dice categories on day one. Start with 5-6 that make the biggest visual impact for your specific use case.
+
+**Balance randomness and control**: Some elements (like your brand colors) should be in every image. Other elements (like the specific subject) can be totally random.
+
+**Test combinations**: Generate a bunch of prompts and review them before making images. Make sure your dice categories don't create combinations that conflict with each other.
+
+**Iterate on your dice**: If a particular die keeps landing on options that don't work well, replace those options with better ones. Your dice should evolve over time.
+
+**Document what works**: Keep track of which combinations score highest and analyze why. This helps you refine your dice categories.
+
+**Consider your audience**: A tech startup's dice might include "Cyberpunk" and "Holographic" - options that wouldn't make sense for a meditation app's imagery.
+
+## Try It Yourself
+
+The beautiful thing about this technique is that it's not complicated to implement. Here's what you need:
+
+1. A list of categories that affect your images (animal, color, lighting, style, etc.)
+2. 10-20+ options for each category
+3. A way to randomly select from each category (literally just `random.choice()` or equivalent)
+4. A prompt template that incorporates the dice rolls into your JSON generation
+5. Your favorite LLM to generate the JSON description
+6. Your favorite image model to generate the final image
+
+You can build a working prototype in an afternoon. I've used variations of this technique with:
+- Midjourney
+- DALL-E 3  
+- Stable Diffusion
+- Fal.ai's various models
+- And many others
+
+The technique is model-agnostic because you're doing the creative work in the prompt generation phase, not relying on the image model to "be creative" for you.
+
+## Conclusion
+
+AI image generation has an inherent sameness problem. Left to its own devices, it will produce variations on the same literal interpretation of your prompt, over and over.
+
+The solution isn't to prompt harder or pray for creativity. It's to systematically inject controlled randomness through a dice-rolling metaphor - giving the AI specific creative constraints that change with each generation.
+
+By generating JSON descriptions first, incorporating multiple rolled dice across many categories, and using scoring/reasoning to validate the results, you can create genuinely unique imagery that never feels repetitive.
+
+Your blog doesn't need to be an endless scroll of people sitting at desks. It can be penguins in art deco offices during golden hour with coral color palettes. It can be foxes in brutalist laboratories under neon lighting with metallic textures. It can be *anything* - and that's the point.
+

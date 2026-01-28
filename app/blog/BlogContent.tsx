@@ -84,10 +84,11 @@ export function BlogContent({ posts }: { posts: Post[] }) {
 												theme === "dark" ? "text-white/40" : "text-black/40"
 											}`}
 										>
-											{new Date(post.date).toLocaleDateString("en-US", {
+											{new Date(post.date + "T00:00:00").toLocaleDateString("en-US", {
 												year: "numeric",
 												month: "long",
 												day: "numeric",
+												timeZone: "UTC",
 											})}
 										</time>
 										<span

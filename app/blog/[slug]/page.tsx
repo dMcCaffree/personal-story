@@ -4,6 +4,9 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import type { Metadata } from "next";
+import { DiceRoller } from "@/components/blog/DiceRoller";
+import { MadLibsPrompt } from "@/components/blog/MadLibsPrompt";
+import { PromptGenerator } from "@/components/blog/PromptGenerator";
 
 // Force static generation at build time - no runtime functions
 export const dynamic = "force-static";
@@ -140,6 +143,11 @@ export default async function BlogPostPage({
 					remarkPlugins: [remarkGfm],
 					rehypePlugins: [rehypeHighlight],
 				},
+			}}
+			components={{
+				DiceRoller,
+				MadLibsPrompt,
+				PromptGenerator,
 			}}
 		/>
 	);

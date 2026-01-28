@@ -1,7 +1,13 @@
 import type { MDXComponents } from "mdx/types";
+import { DiceRoller } from "@/components/blog/DiceRoller";
+import { MadLibsPrompt } from "@/components/blog/MadLibsPrompt";
+import { PromptGenerator } from "@/components/blog/PromptGenerator";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
+		DiceRoller,
+		MadLibsPrompt,
+		PromptGenerator,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}
@@ -36,6 +42,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 					</code>
 				);
 			}
+			// Code block inside pre - no background, just inherit from pre
 			return (
 				<code className={`font-mono text-sm ${className || ""}`}>
 					{children}
