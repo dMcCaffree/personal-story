@@ -1,0 +1,167 @@
+export const metadata = {
+  title: "How to Build Products in 2026",
+  date: "2026-01-29",
+  excerpt: "The traditional product development process is dead. Here's what building great software looks like in 2026, and why your organization needs to rethink everything.",
+  readTime: "10 min",
+  coverImageDark: "https://file.swell.so/story/blog/building-products-2026/cover.png",
+  coverImageLight: "https://file.swell.so/story/blog/building-products-2026/cover.png"
+}
+
+## The Old Way Was Complicated
+
+Let me walk you through how product development used to work—and in many companies, still works today.
+
+Leadership would decide on a direction for the company. They'd bring this direction to the product team with a clear idea of what they wanted built. The product team would then spend time planning, budgeting, and communicating these requirements to the rest of the organization: designers, engineers, and project managers.
+
+Once everyone was aligned, designers would start creating mockups. They'd design something that looked good, polished, and on-brand. Then they'd go get it approved by leadership or the product managers. Maybe the designer would also check with the engineers to make sure that what they were asking for was actually possible.
+
+After the design was approved by leadership, the project managers, or whoever had authority, the engineers would begin their work. If they confirmed the design was feasible and someone with authority had signed off, they'd spend weeks building exactly what was approved. 
+
+Once the build was complete, engineers would go back to the designer for approval to ensure the implementation met the quality standards the designer expected. Then at least one more engineer would review the code.
+
+After all that, the product manager would review the final work and either approve it or ask for specific changes. At this point, the experience would either be merged and released immediately, put behind a feature flag, scheduled for a subsequent release, or battle-tested on a development or preview branch before being merged or put behind a feature flag.
+
+Let me show you what this process actually looks like:
+
+<WorkflowVisualizer mode="old" />
+
+Did you follow all that? Because it's pretty complicated. It's a long process with countless handoffs, approval gates, and opportunities for miscommunication.
+
+**Now let me show you how this changes in 2026. If you're not doing this, you need to rethink everything inside your organization.**
+
+## The Essential Prerequisite: Sandboxed Experimentation
+
+Before anything else, there's one critical requirement: every person in your organization should be capable of experimenting in the codebase without it being harmful or worrying for your production data, or being able to accidentally push out any code that they shouldn't be allowed to.
+
+This sandboxing and experimentation is absolutely a prerequisite. You want everybody on your team to be able to participate, whether that's the CEO, the CTO, the CMO, the Customer Success Team, a designer, a PM, or any other person on your entire team. It doesn't matter how senior or how junior they are—they should be able to go in and experiment with your product.
+
+**This should be on the CTO, above anybody else in the company, to set up this sort of environment.** 
+
+It may require major changes, or maybe it doesn't, but here are the things I think about when setting this up. You'll have to discuss internally what would be required and how much of a lift this will be, but it will unlock everything else.
+
+### What You Need to Set Up
+
+**Branched Database Environments**  
+Everyone should have access to a sandbox environment where the database is branched off without production data in it. Some sort of staging database that is branched and safe to experiment with.
+
+**Preview Capabilities**  
+They should be able to preview any changes, whether that's a local setup or something like a Vercel preview branch. In some way, they need to be able to view the changes as they happen.
+
+**Shareable Environments**  
+They need to be able to share their work with the rest of the team and allow other people to play around with what they've built.
+
+**Easy Setup**  
+Ideally, it's easy to set up for every member of the team without deep technical knowledge. Otherwise, the engineering team will be spending their time helping people set up and debug their systems, which is a nuisance. So you'd like it to be something that's easy to get going and cuts as much frustration as possible from the rest of the team.
+
+**Production Safety**  
+Most importantly, no one on the team should be worried that code will go into production or mess with production data or anybody else's data or work. This needs to be entirely sandboxed for each person, likely by the Git branch they're working on. You want to really tighten your Git, GitHub, or GitLab permissions so that no one could accidentally push to production.
+
+### AI-Powered Development Tools
+
+In 2026, your team should have access to AI coding assistants like Cursor, Claude, GitHub Copilot, or similar tools. These aren't optional anymore—they're what makes it possible for anyone on your team to prototype ideas quickly without being a senior engineer.
+
+Make sure your team knows how to:
+- Use AI to generate code from natural language descriptions
+- Debug and iterate on prototypes with AI assistance
+- Understand when to ask for help from engineers
+
+The goal isn't to replace engineers—it's to let everyone create working prototypes that engineers can then optimize and polish.
+
+## The New Way: Five Simple Steps
+
+Now, if you complete that prerequisite and get it all out of the way, here's what the rest of this looks like:
+
+### 1. Anyone Has an Idea and Builds a Prototype
+
+Anyone on the team has an idea and, alongside AI, they build a prototype of it. This could be someone in customer success who just got off a call with a frustrated customer. It could be the CEO who noticed a competitor's feature. It could be a designer with an idea for improving the onboarding flow.
+
+The key is that they don't write a document or send a Slack message that gets lost in the shuffle. They actually build it. Within hours, there's a working prototype.
+
+### 2. The Team Decides Together
+
+They share it with the rest of the team, and the team decides if it's worthwhile to pursue or not. Whether that is just something interesting to explore in the product or—ideally—it's something that a customer asked for that would have taken a long cycle to create, and now there's a working prototype of it within the day.
+
+The decision happens quickly because everyone can actually *see and interact with* what's being proposed, not just read about it in a spec document.
+
+### 3. Designer Takes a Pass
+
+The designer could get involved, taking over that branch, that prototype that's now still sandboxed. They take their pass at the design and build an experience that feels up to the design experience standards for the company.
+
+They're not starting from scratch—they're refining something that already works. They can focus on the polish, the interactions, the accessibility, the brand consistency. The tedious implementation work is already done.
+
+### 4. Engineer Reviews and Optimizes
+
+Once the entire experience is approved and feels great, they pass it over to an engineer just for code review, optimization, and tightening things up. The review process should include both making sure code is of good quality and also owning the entire technical experience that goes out.
+
+**This is where being an engineer adds value**—not in doing initial implementation that anybody can now be prototyping or building. Every engineer should own the craft of good quality code that has been optimized and is maintainable and readable by the rest of the team, so that the codebase remains clean and delightful moving forward.
+
+Engineers become quality gatekeepers and optimization experts, not ticket-takers.
+
+### 5. Release
+
+At this point, the experience can be put behind a feature flag, battle-tested on a preview/staging URL, or released directly to users.
+
+Because the entire process was collaborative and visible from day one, there are no surprises. Everyone has seen it, tried it, and approved it.
+
+## See the Difference
+
+Here's a side-by-side comparison of the old way versus the new way:
+
+<WorkflowVisualizer mode="comparison" />
+
+The difference is dramatic. What used to take 6-8 weeks now takes 3-5 days. What used to require 10+ handoffs now requires fluid collaboration. What used to be limited to a few people now empowers your entire team.
+
+## Why This Change Matters
+
+This change in process is hugely beneficial to your organization. It does three critical things:
+
+### 1. Preserves Context from Customer to Code
+
+It allows anyone to get context directly from customers and translate that context into code without playing a game of telephone across the entire team. When you go through multiple handoffs—customer → support → PM → designer → engineer—the original insight gets diluted. Details get lost. Nuance disappears.
+
+When the person who heard the customer feedback can actually build a prototype themselves, nothing is lost in translation. The solution stays true to the actual problem.
+
+### 2. Empowers Your Entire Team
+
+It empowers anyone on the team to build and be part of the product directly. Your customer success team can prototype solutions to problems they hear about every day. Your marketing team can build the landing page variations they want to test. Your operations team can create the internal tools they need.
+
+People stop feeling like they're sending requests into a black box and waiting weeks to see what comes out. They become active participants in building the product.
+
+### 3. Lets Experts Focus on Expertise
+
+It speeds up the creation of great software while allowing designers and engineers to do what they should be doing—using their expertise where it matters, not doing tedious implementation work.
+
+Designers spend their time on craft: perfecting interactions, ensuring accessibility, maintaining brand consistency. Engineers spend their time on quality: optimizing performance, ensuring security, keeping code maintainable.
+
+Nobody is wasting their specialized skills on work that AI can now help with.
+
+## The Bottom Line
+
+The traditional product development process was designed for a world where code was hard to write and dangerous to change. That world is gone.
+
+In 2026, the barriers to building software have collapsed. AI coding assistants let anyone create working prototypes. Modern deployment platforms make sandboxed experimentation safe and easy. The tools exist to completely rethink how you build products.
+
+The question is: will you?
+
+If you're still making your designers write specs instead of building prototypes, you're wasting their talent. If you're still making your engineers implement designs they had no input on, you're missing their insights. If you're still making your team wait weeks to see if their ideas are even possible, you're killing their momentum.
+
+The companies that win in 2026 will be the ones that let their entire team contribute, that shorten the distance between idea and implementation, and that use AI to augment everyone's capabilities rather than just a few specialized roles.
+
+## Get Started
+
+The hardest part is setting up that prerequisite: the sandboxed environments, the preview infrastructure, the Git permissions. But once you have it, everything else flows naturally.
+
+Start small. Pick one team or one project. Set up the infrastructure. Train people on AI tools. Try the new process on one feature.
+
+You'll be shocked at how much faster you can move.
+
+## Need Help?
+
+If you need help implementing this at your company, reach out to me:
+
+- **LinkedIn**: [/in/dMcCaffree](https://linkedin.com/in/dMcCaffree)
+- **X (Twitter)**: [@terribledustin](https://x.com/terribledustin)
+- **Email**: [d@dustin.site](mailto:d@dustin.site)
+
+I'd love to hear about your experience transforming your product development process.
+

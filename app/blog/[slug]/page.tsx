@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { DiceRoller } from "@/components/blog/DiceRoller";
 import { MadLibsPrompt } from "@/components/blog/MadLibsPrompt";
 import { PromptGenerator } from "@/components/blog/PromptGenerator";
+import { WorkflowVisualizer } from "@/components/blog/WorkflowVisualizer";
 
 // Force static generation at build time - no runtime functions
 export const dynamic = "force-static";
@@ -148,6 +149,7 @@ export default async function BlogPostPage({
 				DiceRoller,
 				MadLibsPrompt,
 				PromptGenerator,
+				WorkflowVisualizer,
 			}}
 		/>
 	);

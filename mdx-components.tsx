@@ -2,12 +2,14 @@ import type { MDXComponents } from "mdx/types";
 import { DiceRoller } from "@/components/blog/DiceRoller";
 import { MadLibsPrompt } from "@/components/blog/MadLibsPrompt";
 import { PromptGenerator } from "@/components/blog/PromptGenerator";
+import { WorkflowVisualizer } from "@/components/blog/WorkflowVisualizer";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
 		DiceRoller,
 		MadLibsPrompt,
 		PromptGenerator,
+		WorkflowVisualizer,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}
