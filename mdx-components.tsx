@@ -8,6 +8,7 @@ import { ColorPaletteComparison } from "@/components/blog/ColorPaletteComparison
 import { CopywritingComparison } from "@/components/blog/CopywritingComparison";
 import { FontPreview } from "@/components/blog/FontPreview";
 import { ColorSwatch } from "@/components/blog/ColorSwatch";
+import { LinkPreview } from "@/components/blog/LinkPreview";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -20,6 +21,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		CopywritingComparison,
 		FontPreview,
 		ColorSwatch,
+		LinkPreview,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}

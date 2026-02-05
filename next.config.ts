@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	images: {
-		remotePatterns: [{ hostname: "file.swell.so", protocol: "https" }],
+		remotePatterns: [{ hostname: "**", protocol: "https" }],
 	},
 	// Aggressive caching for static pages
 	async headers() {

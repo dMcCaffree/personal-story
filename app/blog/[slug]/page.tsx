@@ -13,6 +13,7 @@ import { ColorPaletteComparison } from "@/components/blog/ColorPaletteComparison
 import { CopywritingComparison } from "@/components/blog/CopywritingComparison";
 import { FontPreview } from "@/components/blog/FontPreview";
 import { ColorSwatch } from "@/components/blog/ColorSwatch";
+import { LinkPreview } from "@/components/blog/LinkPreview";
 
 // Force static generation at build time - no runtime functions
 export const dynamic = "force-static";
@@ -160,6 +161,7 @@ export default async function BlogPostPage({
 				CopywritingComparison,
 				FontPreview,
 				ColorSwatch,
+				LinkPreview,
 			}}
 		/>
 	);

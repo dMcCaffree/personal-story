@@ -1,0 +1,49 @@
+---
+description: Scrape metadata for external links in blog posts using firecrawl-mcp
+globs: content/blog/**/*.mdx
+alwaysApply: false
+---
+
+# External Link Metadata for Blog Posts
+
+When adding external links in blog posts, automatically scrape metadata using firecrawl-mcp to populate preview popover information.
+
+## Process
+
+1. **Identify External Links**: When adding a link to an external site in a blog post
+2. **Use firecrawl-mcp**: Call the firecrawl-mcp tool to scrape the target URL
+3. **Extract Metadata**: Get title, description, image, and other relevant metadata
+4. **Populate Preview Info**: Use the scraped metadata to fill in the preview popover component
+
+## Example
+
+When adding a link like:
+
+```markdown
+Check out [this article](https://example.com/article)
+```
+
+Use firecrawl-mcp to scrape `https://example.com/article` and enhance it with preview metadata:
+
+```markdown
+<LinkWithPreview 
+  href="https://example.com/article"
+  title="Article Title from Metadata"
+  description="Article description from meta tags"
+  image="https://example.com/article/og-image.jpg"
+>
+  this article
+</LinkWithPreview>
+```
+
+## What to Scrape
+
+- **title**: `<title>` or `og:title`
+- **description**: `<meta name="description">` or `og:description`
+- **image**: `og:image` or first prominent image
+- **siteName**: `og:site_name`
+- **author**: Article author if available
+
+## Implementation
+
+Always use firecrawl-mcp to fetch metadata rather than manual entry to ensure accuracy and save time.

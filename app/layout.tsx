@@ -6,7 +6,7 @@ import {
 	Roboto,
 	Poppins,
 	JetBrains_Mono,
-	IBM_Plex_Sans,
+	IBM_Plex_Mono,
 	Playfair_Display,
 	Source_Sans_3,
 	Space_Grotesk,
@@ -54,8 +54,8 @@ const jetbrainsMono = JetBrains_Mono({
 	display: "swap",
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-	variable: "--font-ibm-plex-sans",
+const ibmPlexMono = IBM_Plex_Mono({
+	variable: "--font-ibm-plex-mono",
 	weight: ["400", "500"],
 	subsets: ["latin"],
 	display: "swap",
@@ -138,7 +138,7 @@ export default function RootLayout({
 			/>
 			<link rel="manifest" href="/site.webmanifest" />
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${jetbrainsMono.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${outfit.variable} ${dmSans.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${jetbrainsMono.variable} ${ibmPlexMono.variable} ${playfairDisplay.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${outfit.variable} ${dmSans.variable} antialiased`}
 			>
 				<ThemeProvider>
 					<ThemeWrapper>{children}</ThemeWrapper>
