@@ -9,6 +9,7 @@ import { CopywritingComparison } from "@/components/blog/CopywritingComparison";
 import { FontPreview } from "@/components/blog/FontPreview";
 import { ColorSwatch } from "@/components/blog/ColorSwatch";
 import { LinkPreview } from "@/components/blog/LinkPreview";
+import { ScrollTimeline } from "@/components/blog/ScrollTimeline";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -22,6 +23,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		FontPreview,
 		ColorSwatch,
 		LinkPreview,
+		ScrollTimeline,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}

@@ -14,6 +14,8 @@ import { CopywritingComparison } from "@/components/blog/CopywritingComparison";
 import { FontPreview } from "@/components/blog/FontPreview";
 import { ColorSwatch } from "@/components/blog/ColorSwatch";
 import { LinkPreview } from "@/components/blog/LinkPreview";
+import { ScrollTimeline } from "@/components/blog/ScrollTimeline";
+import Link from "next/link";
 
 // Force static generation at build time - no runtime functions
 export const dynamic = "force-static";
@@ -124,12 +126,12 @@ export default async function BlogPostPage({
 			<div className="fixed inset-0 flex items-center justify-center bg-black text-white">
 				<div className="text-center">
 					<h1 className="mb-4 text-4xl font-bold">Post not found</h1>
-					<a
+					<Link
 						href="/blog"
 						className="rounded-xl border border-white/20 px-8 py-3 font-mono text-sm tracking-wider transition-colors hover:bg-white/10"
 					>
 						BACK TO BLOG
-					</a>
+					</Link>
 				</div>
 			</div>
 		);
@@ -162,6 +164,7 @@ export default async function BlogPostPage({
 				FontPreview,
 				ColorSwatch,
 				LinkPreview,
+				ScrollTimeline,
 			}}
 		/>
 	);

@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { MDXContent } from "./MDXContent";
+import { ScrollTimeline } from "@/components/blog/ScrollTimeline";
 import type { Post } from "@/lib/mdx";
+import { useRef } from "react";
 
 export function BlogPostContent({
 	post,
@@ -16,13 +18,17 @@ export function BlogPostContent({
 }) {
 	const router = useRouter();
 	const { theme } = useTheme();
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<div
+			ref={scrollContainerRef}
 			className={`fixed inset-0 overflow-y-auto transition-colors duration-300 ${
 				theme === "dark" ? "bg-black" : "bg-white"
 			}`}
 		>
+			{/* Render timeline if post has it */}
+			{post.hasTimeline && <ScrollTimeline scrollContainerRef={scrollContainerRef} />}
 			<article className="mx-auto min-h-full max-w-3xl px-6 py-16 sm:px-8 lg:px-12">
 				{/* Breadcrumbs */}
 				<Breadcrumbs

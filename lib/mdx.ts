@@ -10,6 +10,7 @@ export interface PostMetadata {
 	readTime: string;
 	coverImageDark: string;
 	coverImageLight: string;
+	hasTimeline?: boolean;
 }
 
 export interface Post extends PostMetadata {
