@@ -95,20 +95,38 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dustin.site";
 
 export const metadata: Metadata = {
 	metadataBase: new URL(baseUrl),
-	title: "Dustin McCaffree",
-	description: "Software engineer, builder, and storyteller",
+	title: "Dustin McCaffree | Software Engineer, Builder, and Storyteller",
+	description:
+		"Thoughts on software engineering, product development, and building things from scratch.",
 	openGraph: {
-		title: "Dustin McCaffree",
-		description: "Software engineer, builder, and storyteller",
+		title: "Dustin McCaffree | Software Engineer, Builder, and Storyteller",
+		description:
+			"Thoughts on software engineering, product development, and building things from scratch.",
 		url: baseUrl,
 		siteName: "Dustin McCaffree",
 		locale: "en_US",
 		type: "website",
+		images: [
+			{
+				url: "https://file.swell.so/story/meta-tags/og-image.png",
+				width: 1200,
+				height: 630,
+				alt: "Dustin McCaffree | Software Engineer, Builder, and Storyteller",
+			},
+		],
 	},
 	twitter: {
 		card: "summary",
 		site: "@dustinmccaffree",
 		creator: "@dustinmccaffree",
+		images: [
+			{
+				url: "https://file.swell.so/story/meta-tags/og-image.png",
+				width: 1200,
+				height: 630,
+				alt: "Dustin McCaffree | Software Engineer, Builder, and Storyteller",
+			},
+		],
 	},
 };
 
