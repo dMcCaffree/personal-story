@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { MDXContent } from "./MDXContent";
@@ -16,7 +15,6 @@ export function BlogPostContent({
 	post: Post;
 	children: React.ReactNode;
 }) {
-	const router = useRouter();
 	const { theme } = useTheme();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -28,7 +26,13 @@ export function BlogPostContent({
 			}`}
 		>
 			{/* Render timeline if post has it */}
-			{post.hasTimeline && <ScrollTimeline scrollContainerRef={scrollContainerRef} />}
+			{post.hasTimeline && (
+				<ScrollTimeline
+					scrollContainerRef={
+						scrollContainerRef as React.RefObject<HTMLDivElement>
+					}
+				/>
+			)}
 			<article className="mx-auto min-h-full max-w-3xl px-6 py-16 sm:px-8 lg:px-12">
 				{/* Breadcrumbs */}
 				<Breadcrumbs
