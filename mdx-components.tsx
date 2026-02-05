@@ -3,6 +3,11 @@ import { DiceRoller } from "@/components/blog/DiceRoller";
 import { MadLibsPrompt } from "@/components/blog/MadLibsPrompt";
 import { PromptGenerator } from "@/components/blog/PromptGenerator";
 import { WorkflowVisualizer } from "@/components/blog/WorkflowVisualizer";
+import { FontComparison } from "@/components/blog/FontComparison";
+import { ColorPaletteComparison } from "@/components/blog/ColorPaletteComparison";
+import { CopywritingComparison } from "@/components/blog/CopywritingComparison";
+import { FontPreview } from "@/components/blog/FontPreview";
+import { ColorSwatch } from "@/components/blog/ColorSwatch";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -10,6 +15,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		MadLibsPrompt,
 		PromptGenerator,
 		WorkflowVisualizer,
+		FontComparison,
+		ColorPaletteComparison,
+		CopywritingComparison,
+		FontPreview,
+		ColorSwatch,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}

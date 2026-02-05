@@ -1,5 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+	Geist,
+	Geist_Mono,
+	Inter,
+	Roboto,
+	Poppins,
+	JetBrains_Mono,
+	IBM_Plex_Sans,
+	Playfair_Display,
+	Source_Sans_3,
+	Space_Grotesk,
+	Outfit,
+	DM_Sans,
+} from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ThemeWrapper } from "@/components/ThemeWrapper";
@@ -12,6 +25,70 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+});
+
+// Blog component fonts
+const inter = Inter({
+	variable: "--font-inter",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const roboto = Roboto({
+	variable: "--font-roboto",
+	weight: ["400", "700"],
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const poppins = Poppins({
+	variable: "--font-poppins",
+	weight: ["400", "700"],
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+	variable: "--font-jetbrains-mono",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const ibmPlexSans = IBM_Plex_Sans({
+	variable: "--font-ibm-plex-sans",
+	weight: ["400", "500"],
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const playfairDisplay = Playfair_Display({
+	variable: "--font-playfair-display",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const sourceSans = Source_Sans_3({
+	variable: "--font-source-sans",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+	variable: "--font-space-grotesk",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const outfit = Outfit({
+	variable: "--font-outfit",
+	subsets: ["latin"],
+	display: "swap",
+});
+
+const dmSans = DM_Sans({
+	variable: "--font-dm-sans",
+	subsets: ["latin"],
+	display: "swap",
 });
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dustin.site";
@@ -61,7 +138,7 @@ export default function RootLayout({
 			/>
 			<link rel="manifest" href="/site.webmanifest" />
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${roboto.variable} ${poppins.variable} ${jetbrainsMono.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${outfit.variable} ${dmSans.variable} antialiased`}
 			>
 				<ThemeProvider>
 					<ThemeWrapper>{children}</ThemeWrapper>

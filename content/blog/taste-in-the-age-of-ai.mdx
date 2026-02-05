@@ -1,0 +1,211 @@
+export const metadata = {
+  title: "Taste in the Age of AI: Why Design Details Matter More Than Ever",
+  date: "2026-02-04",
+  excerpt: "Now that anyone can vibe code a website, the difference between good and great comes down to four things you can't automate: fonts, colors, inspiration, and copy.",
+  readTime: "8 min",
+  coverImageDark: "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2000&auto=format&fit=crop",
+  coverImageLight: "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2000&auto=format&fit=crop"
+}
+
+# Taste in the Age of AI: Why Design Details Matter More Than Ever
+
+We're living through a remarkable moment in software development. You can literally vibe with an AI, describe what you want, and get a working website. No CS degree required. No years of grinding through Stack Overflow. Just conversation and iteration.
+
+**And that's amazing.**
+
+But here's what I've noticed after reviewing hundreds of AI-generated products: they all look the same. Not just similar. I mean *literally the same*. Like they were stamped from the same template, because in many ways, they were.
+
+The barrier to building has collapsed. The barrier to building something *good* hasn't budged an inch. If anything, it's gotten higher, because now the differentiator isn't technical skill. It's taste.
+
+## The Four Pillars of Digital Taste
+
+After building dozens of sites (both with and without AI), I've found that great design comes down to four details that most people (and definitely most AIs) get wrong:
+
+1. **Fonts** (more than just Inter)
+2. **Colors** (please, not another purple)
+3. **Inspiration** (mood boards > AI autopilot)
+4. **Copywriting** (humans write differently than LLMs)
+
+Let's break each one down.
+
+---
+
+## 1. Fonts: The Typography Epidemic
+
+Here's a fun game: open 10 random AI-generated landing pages. I'll bet you at least 8 of them use <FontPreview fontName="Inter" fontFamily="var(--font-inter)">**Inter**</FontPreview>. Maybe one uses <FontPreview fontName="Roboto" fontFamily="var(--font-roboto)">**Roboto**</FontPreview>. If you're really lucky, you might find a rogue <FontPreview fontName="Poppins" fontFamily="var(--font-poppins)">**Poppins**</FontPreview>.
+
+Don't get me wrong, <FontPreview fontName="Inter" fontFamily="var(--font-inter)">Inter</FontPreview> is a *fantastic* font. It's clean, readable, and works everywhere. But when everyone uses it, nobody stands out.
+
+<FontComparison />
+
+### The Problem with Default Fonts
+
+AI models are trained on the web as it exists. And the web as it exists is dominated by a handful of fonts that became popular precisely because they're safe, accessible, and free. This creates a feedback loop:
+
+- Designers use safe fonts
+- AI learns from those designs
+- AI suggests safe fonts
+- New sites look like old sites
+
+### Breaking the Cycle
+
+You don't need to be a typography expert. You just need to make *one conscious choice*:
+
+**Pick a font pairing that expresses your brand's personality.**
+
+- Building something technical? Try <FontPreview fontName="JetBrains Mono" fontFamily="var(--font-jetbrains-mono)">**JetBrains Mono**</FontPreview> or <FontPreview fontName="IBM Plex Mono" fontFamily="var(--font-ibm-plex-sans)">**IBM Plex Mono**</FontPreview>
+- Going for elegance? <FontPreview fontName="Playfair Display" fontFamily="var(--font-playfair-display)">**Playfair Display**</FontPreview> with <FontPreview fontName="Source Sans" fontFamily="var(--font-source-sans)">**Source Sans**</FontPreview>
+- Want that startup energy? <FontPreview fontName="Space Grotesk" fontFamily="var(--font-space-grotesk)">**Space Grotesk**</FontPreview> with <FontPreview fontName="Inter" fontFamily="var(--font-inter)">**Inter**</FontPreview>
+- Making something playful? <FontPreview fontName="Outfit" fontFamily="var(--font-outfit)">**Outfit**</FontPreview> or <FontPreview fontName="DM Sans" fontFamily="var(--font-dm-sans)">**DM Sans**</FontPreview>
+
+The key is *intentionality*. When you choose a font because it *means something* to your product, people feel it.
+
+---
+
+## 2. Colors: The Purple Problem
+
+Let's talk about the elephant in the room. Or should I say, the purple in the room.
+
+If you've used **shadcn/ui** or any Tailwind-based UI library, you've seen it: that default purple (<ColorSwatch hex="#8B5CF6">`#8B5CF6`</ColorSwatch>). It's everywhere. Every button, every badge, every call-to-action looks *exactly the same*.
+
+<ColorPaletteComparison />
+
+### Why Everyone Defaults to Purple
+
+Purple became the "startup color" around 2018-2020. It was fresh, it wasn't corporate blue, and it signaled innovation. Companies like Twitch, Discord, and countless SaaS products adopted it.
+
+Then component libraries made it the default. And AI, being trained on these libraries, keeps suggesting it.
+
+The result? A sea of indistinguishable purple websites.
+
+### Building a Real Palette
+
+Here's my process for choosing colors:
+
+1. **Find inspiration first** (more on this next)
+2. **Extract 2-3 colors** from something you love
+3. **Use a tool like Coolors or Realtime Colors** to build a full palette
+4. **Test in both light and dark mode**
+5. **Replace your framework's defaults**
+
+Your brand color should come from *your vision*, not from Tailwind's default config.
+
+---
+
+## 3. Inspiration: Design Doesn't Happen in a Vacuum
+
+Here's the biggest mistake I see: people ask AI to design something with zero visual reference. They just describe it in words and hope for the best.
+
+**Design is a visual medium.** You need visual inspiration.
+
+### The Mood Board Mindset
+
+Before I build anything, I spend 30-60 minutes collecting inspiration:
+
+- **Dribbble** and **Behance** for polished concepts
+- **Awwwards** for cutting-edge web design
+- **Pinterest** for unexpected combinations
+- **Real-world products** I love using
+
+I don't copy these. I *synthesize* them. I look for:
+
+- Color combinations that feel right
+- Layout patterns that guide attention well
+- Animation styles that enhance (not distract)
+- Typography pairings that work
+
+Then I can give AI *specific references*: "Make this hero section, but with the color energy of Stripe's new brand and the typography weight of Linear."
+
+### What Happens Without Inspiration
+
+When you skip this step, you get generic-by-default:
+
+- Centered hero sections with generic taglines
+- Three feature cards in a row
+- A testimonial carousel
+- A purple CTA button
+
+It's not *bad*. It's just... expected. Forgettable.
+
+---
+
+## 4. Copywriting: The AI Tells
+
+I can spot AI-written copy from a mile away. So can your users. Here's why:
+
+### The LLM Writing Pattern
+
+AI tends to write in a very specific style:
+
+- **Over-explains everything** ("Discover the power of...")
+- **Uses superlatives constantly** ("revolutionary", "game-changing", "seamless")
+- **Follows predictable structures** (problem → solution → benefits)
+- **Lacks personality** (no jokes, no edge, no voice)
+
+<CopywritingComparison />
+
+### Writing Like a Human
+
+Good copy is:
+
+- **Specific** (not "increase productivity" but "save 2 hours a day")
+- **Conversational** (use contractions, ask questions)
+- **Opinionated** (have a point of view)
+- **Surprising** (break expectations occasionally)
+
+Compare these:
+
+**AI-generated:**
+> "Revolutionize your workflow with our cutting-edge platform that seamlessly integrates with your existing tools to boost productivity and drive results."
+
+**Human-written:**
+> "Your workflow is probably broken. We built this because we were tired of switching between 15 apps just to ship one feature."
+
+See the difference? The second one has *voice*. It makes a claim. It assumes you share the frustration. It's memorable.
+
+---
+
+## The Taste Stack
+
+So here's my framework for building something that doesn't look like everything else:
+
+1. **Collect inspiration** (30-60 min on mood boarding)
+2. **Choose fonts intentionally** (pick for personality, not popularity)
+3. **Build a custom color palette** (steal from your inspiration)
+4. **Write your copy first** (before you show it to AI)
+5. **Then let AI implement** (with your aesthetic locked in)
+
+AI is incredible at *implementing* your vision. It's terrible at *having* one.
+
+---
+
+## Why This Matters Now
+
+The proliferation of AI coding tools is creating a new divide in digital products:
+
+- **The bottom 80%** will all look the same (Inter, purple, generic copy)
+- **The top 20%** will stand out precisely because they *made choices*
+
+The irony is that having taste has never been more valuable *and* never been more accessible. You don't need to code anymore. You don't need design school. You just need three things:
+
+1. **Look at things**
+2. **Care about details**
+3. **Make intentional choices**
+
+That's it. That's the whole game.
+
+---
+
+## Your Turn
+
+Next time you're building something (whether you're writing code manually or vibing with an AI), ask yourself:
+
+- Does this font choice mean something?
+- Would someone recognize this color palette as mine?
+- Did I collect visual inspiration before starting?
+- Would a human actually talk like this?
+
+If you can't answer yes to all four, you're blending in.
+
+And in 2026, blending in is the real risk.
+

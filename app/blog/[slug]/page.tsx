@@ -8,6 +8,11 @@ import { DiceRoller } from "@/components/blog/DiceRoller";
 import { MadLibsPrompt } from "@/components/blog/MadLibsPrompt";
 import { PromptGenerator } from "@/components/blog/PromptGenerator";
 import { WorkflowVisualizer } from "@/components/blog/WorkflowVisualizer";
+import { FontComparison } from "@/components/blog/FontComparison";
+import { ColorPaletteComparison } from "@/components/blog/ColorPaletteComparison";
+import { CopywritingComparison } from "@/components/blog/CopywritingComparison";
+import { FontPreview } from "@/components/blog/FontPreview";
+import { ColorSwatch } from "@/components/blog/ColorSwatch";
 
 // Force static generation at build time - no runtime functions
 export const dynamic = "force-static";
@@ -150,6 +155,11 @@ export default async function BlogPostPage({
 				MadLibsPrompt,
 				PromptGenerator,
 				WorkflowVisualizer,
+				FontComparison,
+				ColorPaletteComparison,
+				CopywritingComparison,
+				FontPreview,
+				ColorSwatch,
 			}}
 		/>
 	);
