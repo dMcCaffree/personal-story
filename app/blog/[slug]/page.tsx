@@ -15,6 +15,10 @@ import { FontPreview } from "@/components/blog/FontPreview";
 import { ColorSwatch } from "@/components/blog/ColorSwatch";
 import { LinkPreview } from "@/components/blog/LinkPreview";
 import { ScrollTimeline } from "@/components/blog/ScrollTimeline";
+import { AgentVisionDemo } from "@/components/blog/AgentVisionDemo";
+import { SnapshotSimulator } from "@/components/blog/SnapshotSimulator";
+import { BrowserModes } from "@/components/blog/BrowserModes";
+import { WorkspaceExplorer } from "@/components/blog/WorkspaceExplorer";
 import Link from "next/link";
 
 // Force static generation at build time - no runtime functions
@@ -165,6 +169,10 @@ export default async function BlogPostPage({
 				ColorSwatch,
 				LinkPreview,
 				ScrollTimeline,
+				AgentVisionDemo,
+				SnapshotSimulator,
+				BrowserModes,
+				WorkspaceExplorer,
 			}}
 		/>
 	);

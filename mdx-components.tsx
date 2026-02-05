@@ -10,6 +10,10 @@ import { FontPreview } from "@/components/blog/FontPreview";
 import { ColorSwatch } from "@/components/blog/ColorSwatch";
 import { LinkPreview } from "@/components/blog/LinkPreview";
 import { ScrollTimeline } from "@/components/blog/ScrollTimeline";
+import { AgentVisionDemo } from "@/components/blog/AgentVisionDemo";
+import { SnapshotSimulator } from "@/components/blog/SnapshotSimulator";
+import { BrowserModes } from "@/components/blog/BrowserModes";
+import { WorkspaceExplorer } from "@/components/blog/WorkspaceExplorer";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -24,6 +28,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		ColorSwatch,
 		LinkPreview,
 		ScrollTimeline,
+		AgentVisionDemo,
+		SnapshotSimulator,
+		BrowserModes,
+		WorkspaceExplorer,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}
@@ -85,10 +93,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 				{children}
 			</a>
 		),
-		hr: () => (
-			<hr className="my-12 border-black/10 dark:border-white/10" />
-		),
+		hr: () => <hr className="my-12 border-black/10 dark:border-white/10" />,
 		...components,
 	};
 }
-
