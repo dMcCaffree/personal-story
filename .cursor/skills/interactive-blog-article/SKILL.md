@@ -134,6 +134,91 @@ Here's some text.
 More text continues...
 ```
 
+## Inline Preview Components
+
+### LinkPreview Component
+
+The `LinkPreview` component (`@/components/blog/LinkPreview.tsx`) provides rich preview tooltips for external links with Open Graph metadata.
+
+**Usage in MDX**:
+
+```markdown
+Check out <LinkPreview href="https://example.com" ogImage="https://example.com/og.png" ogTitle="Example Site" ogDescription="A great example site">Example Site</LinkPreview> for inspiration.
+```
+
+**Props**:
+- `href`: URL of the external link (required)
+- `ogImage`: Open Graph image URL
+- `ogTitle`: Page title
+- `ogDescription`: Page description
+- `children`: Link text content
+
+**Behavior**:
+- Shows a tooltip with OG metadata after 500ms hover delay
+- Gracefully degrades to regular link if no OG data provided
+- Handles image loading errors
+- Theme-aware styling (dark/light mode)
+- Displays site hostname
+
+**Fetching OG Metadata with firecrawl-mcp**:
+
+Use the `firecrawl-mcp` tools to scrape Open Graph metadata from websites:
+
+```typescript
+// Use the firecrawl_scrape tool with formats: ['markdown']
+user-firecrawl-mcp-firecrawl_scrape({
+  url: "https://example.com",
+  formats: ["markdown"]
+})
+```
+
+The tool returns metadata including `ogImage`, `ogTitle`, and `ogDescription` which can be directly used in the LinkPreview component.
+
+**Important Notes**:
+- Some sites (like Pinterest) may not be supported by Firecrawl
+- Always check if the scraped `ogImage` is relative and convert to absolute URL if needed
+- Test the link preview to ensure images load correctly
+
+**Example from Article**:
+
+```markdown
+- <LinkPreview href="https://dribbble.com" ogImage="https://cdn.dribbble.com/assets/dribbble-logo-facebook-aa0c755e3a5efa2374e0d19b4bb9a02238385c5ff0cb6c0817c6d78c0d8d1506.png" ogTitle="Dribbble - Discover the World's Top Designers & Creative Professionals" ogDescription="Find Top Designers & Creative Professionals on Dribbble. We are where designers gain inspiration, feedback, community, and jobs.">**Dribbble**</LinkPreview> for interface design patterns
+```
+
+### FontPreview Component
+
+The `FontPreview` component provides hover tooltips that display font samples.
+
+**Usage in MDX**:
+
+```markdown
+Instead of <FontPreview fontName="Inter" fontFamily="Inter, sans-serif">Inter</FontPreview>, try something with personality.
+```
+
+**Props**:
+- `fontName`: Display name of the font
+- `fontFamily`: CSS font-family value
+- `children`: Inline text to trigger tooltip
+
+**Behavior**:
+- Shows font sample after 500ms hover delay
+- Displays font name and "quick brown fox" sample
+- Theme-aware styling
+
+### ColorSwatch Component
+
+The `ColorSwatch` component displays inline color swatches next to hex codes.
+
+**Usage in MDX**:
+
+```markdown
+Use colors like <ColorSwatch color="#FF6B6B">#FF6B6B</ColorSwatch> instead of default Tailwind colors.
+```
+
+**Props**:
+- `color`: Hex color code
+- `children`: Inline text (typically the hex code)
+
 ## 3D Animations & Dice Pattern
 
 ### 3D CSS Transforms
