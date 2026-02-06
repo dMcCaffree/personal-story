@@ -19,6 +19,8 @@ import { AgentVisionDemo } from "@/components/blog/AgentVisionDemo";
 import { SnapshotSimulator } from "@/components/blog/SnapshotSimulator";
 import { BrowserModes } from "@/components/blog/BrowserModes";
 import { WorkspaceExplorer } from "@/components/blog/WorkspaceExplorer";
+import { ContextBudget } from "@/components/blog/ContextBudget";
+import { AgentRace } from "@/components/blog/AgentRace";
 import Link from "next/link";
 
 // Force static generation at build time - no runtime functions
@@ -173,6 +175,8 @@ export default async function BlogPostPage({
 				SnapshotSimulator,
 				BrowserModes,
 				WorkspaceExplorer,
+			ContextBudget,
+			AgentRace,
 			}}
 		/>
 	);

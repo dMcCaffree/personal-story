@@ -1,0 +1,122 @@
+export const metadata = {
+  title: "What is MCP and Does It Still Matter After SKILLS.md?",
+  date: "2026-02-07",
+  excerpt: "The internet declared MCP dead the moment agent skills dropped. Here's why that take is wrong, what each actually does, and when you should reach for one over the other.",
+  readTime: "8 min",
+  coverImageDark: "https://file.swell.so/story/blog/what-is-mcp-and-does-it-still-matter/the-nunchuck-skills-paradox.png",
+  coverImageLight: "https://file.swell.so/story/blog/what-is-mcp-and-does-it-still-matter/the-nunchuck-skills-paradox.png"
+}
+
+Every few months the AI developer ecosystem picks a new thing to declare dead. Last month it was fine-tuning. Before that, RAG. Right now, the hot take is that the <LinkPreview href="https://modelcontextprotocol.io/" ogImage="https://raw.githubusercontent.com/modelcontextprotocol/docs/2eb6171ddbfeefde349dc3b8d5e2b87414c26250/images/og-image.png" ogTitle="What is the Model Context Protocol (MCP)? - Model Context Protocol" ogDescription="MCP is an open-source standard for connecting AI applications to external systems.">Model Context Protocol</LinkPreview> is dead because SKILL.md files exist.
+
+If you're on AI Twitter (or whatever we're calling it now), you've seen the posts. "RIP MCP. Long live skills!" The discourse has been... something.
+
+Here's the thing though. MCP and skills are solving fundamentally different problems. Saying skills replace MCP is like saying a cookbook replaces your kitchen. Sure, the cookbook tells you what to do. But you still need the stove.
+
+## What Even Is MCP?
+
+MCP, or the <LinkPreview href="https://www.anthropic.com/news/model-context-protocol" ogImage="https://cdn.sanity.io/images/4zrzovbb/website/1aef864f9b246c740fe3cef6e1068f2220995d5e-2400x1260.png" ogTitle="Introducing the Model Context Protocol" ogDescription="The Model Context Protocol is an open standard for connecting AI assistants to the systems where data lives, including content repositories, business tools, and development environments.">Model Context Protocol</LinkPreview>, is an open standard Anthropic released in late 2024. The pitch is simple. AI assistants need to talk to external systems (databases, APIs, SaaS tools) and every integration was a custom snowflake. MCP standardizes that.
+
+Think of it like USB-C for AI. Before USB-C, every phone manufacturer had their own charging cable. MCP does the same thing for tool integrations. One protocol, many services.
+
+The architecture is client-server. Your AI assistant (Claude, Cursor, whatever) is the client. MCP servers expose tools and data sources. The protocol handles the communication layer, including authentication via OAuth.
+
+In practice, when your coding agent needs to query a database, file a Jira ticket, or check your Sentry errors, MCP is the standardized pipe that makes it happen at runtime. Live data, live actions, live connections.
+
+## What Are Agent Skills?
+
+Skills (typically a `SKILL.md` file) are a completely different animal. They're reusable instruction documents that get loaded into an agent's context window. No servers, no runtime connections, no protocol overhead.
+
+A skill is literally a markdown file that says "here's how to do X." When the agent encounters a task that matches the skill's description, it loads the file and follows the instructions. It might bundle scripts, reference documentation, or include templates. But at the core, it's just text that teaches the agent a procedure.
+
+Think of the skills I built on this very site. My <LinkPreview href="https://dustin.site/blog/simulate-creativity-ai-images" ogTitle="How To Simulate Human Creativity in AI Image Generation Models" ogDescription="Discover how to use simulated dice-rolling techniques to break free from generic AI-generated images and create truly unique, interesting visuals for your content." ogImage="https://file.swell.so/story/blog/simulate-creativity-ai-images/cover.png">cover image generator</LinkPreview> is a skill. It teaches the agent how to roll dice, call Replicate for a text prompt, send that to Fal.ai for image generation, and upload to Cloudflare R2. The skill doesn't *connect* to those services at the protocol level. It just tells the agent the steps, and the agent uses its existing tools to execute them.
+
+That distinction matters more than you'd think.
+
+## The Token Tax Nobody Talks About
+
+Before we get into when to use which, there's a cost to having tools that most people miss entirely: context window consumption.
+
+Every MCP server you connect dumps its full tool schema into the agent's context window. That's not free. Those tokens compete with your conversation history, your code context, and the model's reasoning space.
+
+<ContextBudget />
+
+Toggle a few MCP servers on and off. Then try the skills. Feel the difference? MCP servers are always-on passengers. They eat tokens just by existing, whether the agent needs them or not. Skills sit dormant at ~150 tokens of metadata until the agent actually needs one.
+
+This isn't a flaw of MCP. It's a fundamental architectural trade-off. MCP gives agents new capabilities they didn't have before. Without an MCP server for Sentry, your agent *can't* query error logs. The server *is* the capability, and that capability has a token cost.
+
+Skills teach agents how to use capabilities they already have. Shell access, file system access, HTTP calls. Skills encode the *right way* to combine those existing abilities for a specific workflow.
+
+<LinkPreview href="https://cra.mr/mcp-skills-and-agents/" ogImage="https://cra.mr/ai-content/mcp-skills-and-agents.png" ogTitle="MCP, Skills, and Agents" ogDescription="If you're not caught up on the current hypewave, coding agents like Claude Code and Cursor have latched onto skills recently. Like with all of these waves, everyone has immediately proclaimed they solve all problems.">David Cramer put it well</LinkPreview>: "If skills teach you to cook, MCP provides the instruments that let you do it."
+
+## Why People Think MCP Is Dead
+
+The "MCP is dead" narrative comes from a real place. A lot of MCP servers are genuinely bad.
+
+The typical MCP server wraps an API and exposes every single endpoint as a tool. Your agent now has 47 new tools to sift through, each one injecting its full JSON schema into the context window. The model gets confused about which tool to use. It wastes tokens on exploration. It calls the wrong endpoints. The experience is awful.
+
+And then someone writes a `SKILL.md` file that says "to do X, run this curl command" and it works perfectly on the first try. No server setup, no token bloat, no schema pollution.
+
+So the conclusion is obvious, right? Skills are better, MCP is dead.
+
+Except... that's not MCP's fault. That's bad MCP implementation. It's like saying "REST APIs are dead" because someone wrote a bad one.
+
+## When MCP Actually Matters
+
+MCP shines in specific scenarios that skills genuinely cannot replicate.
+
+**Live data access.** If your agent needs to query your production database, check real-time metrics, or look up current user information, no amount of markdown instructions will help. You need a live connection.
+
+**Authentication and governance.** MCP has OAuth baked into the spec. For enterprise teams that need audit logs, permission management, and centralized access control across multiple AI clients, this is non-negotiable. A SKILL.md can't enforce permissions.
+
+**Cross-client consistency.** The same MCP server works in Claude Desktop, Cursor, VS Code Copilot, or any other MCP-compatible client. Skills are often tied to a specific harness.
+
+**Dynamic tool discovery.** When the question is different every time and the agent needs to explore what's available, fixed procedures in a skill file actually lose flexibility.
+
+## When Skills Win
+
+Skills dominate for a different set of problems.
+
+**Repetitive workflows.** If you run the same procedure weekly, encoding it as a skill eliminates the exploration overhead entirely. The agent doesn't waste tokens figuring out *how* to do something, it just follows the recipe.
+
+**Local-first execution.** Skills work offline. No server dependencies, no network calls during the core workflow. If the skill bundles a shell script, it runs right there on your machine.
+
+**Team knowledge sharing.** Drop a `.cursor/skills/` directory into your repo and every developer on the team gets the same encoded procedures. No server infrastructure to maintain, no credentials to distribute.
+
+**Token efficiency.** Skills load on demand. The metadata is tiny (name + description), and the full content only gets injected when needed. Compare this to MCP servers that dump their entire tool schema into the context from the start.
+
+## Racing Side by Side
+
+Theory is great. But I learn better by watching things run. So let's put MCP and skills head-to-head on real tasks and see how each approach plays out, step by step.
+
+<AgentRace />
+
+The pattern that emerges is clear. MCP wins at live data retrieval and ad-hoc queries where typed tool schemas prevent errors. Skills win at multi-step workflows where a bundled script replaces entire chains of MCP round-trips. Cross-service tasks are a toss-up.
+
+## The Real Answer
+
+As <LinkPreview href="https://www.thoughtworks.com/en-us/insights/blog/generative-ai/model-context-protocol-mcp-impact-2025" ogImage="https://www.thoughtworks.com/content/dam/thoughtworks/images/illustration/brand/tw_illustration_52.jpg" ogTitle="The Model Context Protocol's impact on 2025" ogDescription="The Model Context Protocol (MCP) has been one of the key stories of 2025. We unpack its impact through the lens of the Thoughtworks Technology Radar.">Thoughtworks noted in their radar analysis</LinkPreview>, MCP has been one of the key technology stories of the past year.
+
+The answer is obviously both. Together.
+
+Skills for the knowledge layer. MCP for the capability layer. The skill tells the agent *what to do*. MCP gives it *the means to do it* when those means don't already exist.
+
+Here's a concrete example from my own setup. I have a skill for generating blog cover images. It knows the entire procedure (roll dice, call Claude, generate image, upload to R2, update MDX). But Replicate and Fal.ai are called via their npm packages, which the agent runs as scripts. If those services had MCP servers, the agent could call them directly as tools without needing a bundled script at all.
+
+Another example. You could have a Notion MCP server that gives the agent access to your workspace. Then a skill that teaches the agent your specific workflow for triaging meeting notes from Notion into your task manager. The MCP provides the connection. The skill provides the procedure.
+
+## What Comes Next
+
+The <LinkPreview href="https://www.cosmicjs.com/blog/mcp-vs-skills-ai-coding-assistant-integrations-guide" ogImage="https://imgix.cosmicjs.com/11d4c130-ffb3-11f0-a874-7b0437483129-ai-gemini-3-pro-image-preview-1769980501119.jpeg?w=1200&auto=compress" ogTitle="MCP vs Skills: Understanding AI Coding Assistant Integrations in 2026" ogDescription="MCP enables real-time AI connections to external services. Skills provide static documentation context. Learn when to use each approach.">conversation is evolving quickly</LinkPreview>. I think a few things are inevitable.
+
+**Skills will get more sophisticated.** Right now they're markdown files with optional scripts. Soon they'll likely support declaring MCP dependencies, bundling subagents, and specifying model requirements. Imagine a `SKILL.md` that says "this skill requires the Sentry MCP server and runs best on Opus."
+
+**MCP servers will get smarter.** The early days of "expose every API endpoint" are dying. The best MCP implementations are already moving toward curated tool sets, subagents, and intelligent context steering. Sentry's approach of letting you pick which capability groups to enable is the model everyone should follow.
+
+**The boundaries will blur.** We're already seeing it. Sentry calls their MCP tool groups "skills." Some harnesses expose skills as subagent tools. The taxonomy is messy and will likely converge into something simpler.
+
+The one thing I'm confident about is that neither approach wins alone. The "X is all you need" take is always wrong in developer tooling. Always. We said it about Docker, about GraphQL, about serverless. The answer is always "it depends" and the real skill is knowing when to reach for which tool.
+
+So no, MCP is not dead. It's just getting started. And skills are a powerful complement, not a replacement.
+
+Use both. Build the systems that make sense for your workflows. And maybe don't take your architectural advice from hot takes on Twitter.

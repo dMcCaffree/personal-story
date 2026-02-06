@@ -14,6 +14,8 @@ import { AgentVisionDemo } from "@/components/blog/AgentVisionDemo";
 import { SnapshotSimulator } from "@/components/blog/SnapshotSimulator";
 import { BrowserModes } from "@/components/blog/BrowserModes";
 import { WorkspaceExplorer } from "@/components/blog/WorkspaceExplorer";
+import { ContextBudget } from "@/components/blog/ContextBudget";
+import { AgentRace } from "@/components/blog/AgentRace";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -32,6 +34,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		SnapshotSimulator,
 		BrowserModes,
 		WorkspaceExplorer,
+		ContextBudget,
+		AgentRace,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}
