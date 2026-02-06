@@ -69,62 +69,64 @@ function Confetti({ theme }: { theme: string }) {
 
 function SuccessCheckmark({ theme }: { theme: string }) {
 	return (
-		<motion.div
-			initial={{ scale: 0, rotate: -45 }}
-			animate={{ scale: 1, rotate: 0 }}
-			transition={{
-				type: "spring",
-				stiffness: 300,
-				damping: 15,
-				delay: 0.1,
-			}}
-			className="relative mx-auto mb-4"
-		>
+		<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center">
 			<motion.div
-				initial={{ scale: 0 }}
-				animate={{ scale: [0, 1.3, 1] }}
-				transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
-				className={`flex h-14 w-14 items-center justify-center rounded-full ${
-					theme === "dark" ? "bg-emerald-500/20" : "bg-emerald-100"
-				}`}
+				initial={{ scale: 0, rotate: -45 }}
+				animate={{ scale: 1, rotate: 0 }}
+				transition={{
+					type: "spring",
+					stiffness: 300,
+					damping: 15,
+					delay: 0.1,
+				}}
+				className="relative flex h-14 w-14 items-center justify-center"
 			>
-				<motion.svg
-					width="28"
-					height="28"
-					viewBox="0 0 24 24"
-					fill="none"
-					role="img"
-					aria-label="Success checkmark"
-					initial={{ pathLength: 0, opacity: 0 }}
-					animate={{ pathLength: 1, opacity: 1 }}
-					transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
+				<motion.div
+					initial={{ scale: 0 }}
+					animate={{ scale: [0, 1.3, 1] }}
+					transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
+					className={`flex h-14 w-14 items-center justify-center rounded-full ${
+						theme === "dark" ? "bg-emerald-500/20" : "bg-emerald-100"
+					}`}
 				>
-					<title>Success checkmark</title>
-					<motion.path
-						d="M5 13l4 4L19 7"
-						stroke={theme === "dark" ? "#34D399" : "#059669"}
-						strokeWidth="2.5"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						initial={{ pathLength: 0 }}
-						animate={{ pathLength: 1 }}
+					<motion.svg
+						width="28"
+						height="28"
+						viewBox="0 0 24 24"
+						fill="none"
+						role="img"
+						aria-label="Success checkmark"
+						initial={{ pathLength: 0, opacity: 0 }}
+						animate={{ pathLength: 1, opacity: 1 }}
 						transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
-					/>
-				</motion.svg>
-			</motion.div>
+					>
+						<title>Success checkmark</title>
+						<motion.path
+							d="M5 13l4 4L19 7"
+							stroke={theme === "dark" ? "#34D399" : "#059669"}
+							strokeWidth="2.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							initial={{ pathLength: 0 }}
+							animate={{ pathLength: 1 }}
+							transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}
+						/>
+					</motion.svg>
+				</motion.div>
 
-			{/* Glow ring */}
-			<motion.div
-				initial={{ scale: 0.5, opacity: 0.8 }}
-				animate={{ scale: 2.5, opacity: 0 }}
-				transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-				className={`absolute inset-0 rounded-full ${
-					theme === "dark"
-						? "bg-emerald-400/20"
-						: "bg-emerald-400/15"
-				}`}
-			/>
-		</motion.div>
+				{/* Glow ring - sized explicitly to match the circle */}
+				<motion.div
+					initial={{ scale: 0.5, opacity: 0.8 }}
+					animate={{ scale: 2.5, opacity: 0 }}
+					transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+					className={`pointer-events-none absolute h-14 w-14 rounded-full ${
+						theme === "dark"
+							? "bg-emerald-400/20"
+							: "bg-emerald-400/15"
+					}`}
+				/>
+			</motion.div>
+		</div>
 	);
 }
 
