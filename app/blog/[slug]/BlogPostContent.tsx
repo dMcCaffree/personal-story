@@ -5,15 +5,29 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { MDXContent } from "./MDXContent";
 import { ScrollTimeline } from "@/components/blog/ScrollTimeline";
+import { EmailSignup } from "@/components/blog/EmailSignup";
+import { RelatedPosts } from "@/components/blog/RelatedPosts";
 import type { Post } from "@/lib/mdx";
 import { useRef } from "react";
+
+interface RelatedPostData {
+	slug: string;
+	title: string;
+	excerpt: string;
+	date: string;
+	readTime: string;
+	coverImageDark: string;
+	coverImageLight: string;
+}
 
 export function BlogPostContent({
 	post,
 	children,
+	relatedPosts = [],
 }: {
 	post: Post;
 	children: React.ReactNode;
+	relatedPosts?: RelatedPostData[];
 }) {
 	const { theme } = useTheme();
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -120,6 +134,22 @@ export function BlogPostContent({
 				>
 					<MDXContent>{children}</MDXContent>
 				</motion.div>
+
+				{/* Post footer */}
+				<motion.footer
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.6, delay: 0.4 }}
+					className={`mt-20 border-t pt-12 ${
+						theme === "dark" ? "border-white/10" : "border-black/10"
+					}`}
+				>
+					<EmailSignup variant="inline" />
+
+					{relatedPosts.length > 0 && (
+						<RelatedPosts posts={relatedPosts} />
+					)}
+				</motion.footer>
 			</article>
 		</div>
 	);

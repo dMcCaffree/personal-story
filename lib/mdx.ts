@@ -11,6 +11,7 @@ export interface PostMetadata {
 	coverImageDark: string;
 	coverImageLight: string;
 	hasTimeline?: boolean;
+	relatedPosts?: string[];
 }
 
 export interface Post extends PostMetadata {

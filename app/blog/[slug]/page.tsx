@@ -1,4 +1,4 @@
-import { getPost, getAllPosts } from "@/lib/mdx";
+import { getPost, getAllPosts, type Post } from "@/lib/mdx";
 import { BlogPostContent } from "./BlogPostContent";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
@@ -143,6 +143,24 @@ export default async function BlogPostPage({
 		);
 	}
 
+	// Resolve related posts
+	const relatedPosts = (post.relatedPosts ?? [])
+		.map((relSlug: string) => {
+			const all = getAllPosts();
+			const found = all.find((p: Post) => p.slug === relSlug);
+			if (!found) return null;
+			return {
+				slug: found.slug,
+				title: found.title,
+				excerpt: found.excerpt,
+				date: found.date,
+				readTime: found.readTime,
+				coverImageDark: found.coverImageDark,
+				coverImageLight: found.coverImageLight,
+			};
+		})
+		.filter((p): p is NonNullable<typeof p> => p !== null);
+
 	// Remove metadata export from content for rendering
 	const mdxContent = post.content.replace(
 		/export const metadata = {[\s\S]*?}\n\n/,
@@ -181,5 +199,9 @@ export default async function BlogPostPage({
 		/>
 	);
 
-	return <BlogPostContent post={post}>{content}</BlogPostContent>;
+	return (
+		<BlogPostContent post={post} relatedPosts={relatedPosts}>
+			{content}
+		</BlogPostContent>
+	);
 }

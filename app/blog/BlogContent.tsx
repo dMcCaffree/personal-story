@@ -1,13 +1,12 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { EmailSignup } from "@/components/blog/EmailSignup";
 import type { Post } from "@/lib/mdx";
 
 export function BlogContent({ posts }: { posts: Post[] }) {
-	const router = useRouter();
 	const { theme } = useTheme();
 
 	return (
@@ -46,6 +45,16 @@ export function BlogContent({ posts }: { posts: Post[] }) {
 					>
 						Thoughts on building, engineering, and creating
 					</p>
+				</motion.div>
+
+				{/* Email signup */}
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5, delay: 0.15 }}
+					className="mb-16"
+				>
+					<EmailSignup variant="hero" />
 				</motion.div>
 
 				{/* Posts list */}
