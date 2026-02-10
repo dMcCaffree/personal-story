@@ -19,6 +19,8 @@ import { AgentRace } from "@/components/blog/AgentRace";
 import { ApproachComparison } from "@/components/blog/ApproachComparison";
 import { DailyPlaybook } from "@/components/blog/DailyPlaybook";
 import { OutreachTracker } from "@/components/blog/OutreachTracker";
+import { AgencyEconomics } from "@/components/blog/AgencyEconomics";
+import { AgencyWorkflowDemo } from "@/components/blog/AgencyWorkflowDemo";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -42,6 +44,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		ApproachComparison,
 		DailyPlaybook,
 		OutreachTracker,
+		AgencyEconomics,
+		AgencyWorkflowDemo,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}

@@ -24,6 +24,8 @@ import { AgentRace } from "@/components/blog/AgentRace";
 import { ApproachComparison } from "@/components/blog/ApproachComparison";
 import { DailyPlaybook } from "@/components/blog/DailyPlaybook";
 import { OutreachTracker } from "@/components/blog/OutreachTracker";
+import { AgencyEconomics } from "@/components/blog/AgencyEconomics";
+import { AgencyWorkflowDemo } from "@/components/blog/AgencyWorkflowDemo";
 import Link from "next/link";
 
 // Force static generation at build time - no runtime functions
@@ -201,6 +203,8 @@ export default async function BlogPostPage({
 		ApproachComparison,
 		DailyPlaybook,
 		OutreachTracker,
+		AgencyEconomics,
+		AgencyWorkflowDemo,
 		}}
 	/>
 	);

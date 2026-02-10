@@ -1,0 +1,123 @@
+export const metadata = {
+  title: "Why YC Wants AI-Native Agencies (And How to Actually Build One)",
+  date: "2026-02-11",
+  excerpt: "Y Combinator just put AI-native agencies on their Spring 2026 RFS. The playbook for building one is already here. Skills, MCP, and OpenClaw turn service businesses into software companies.",
+  readTime: "10 min",
+  coverImageDark: "https://file.swell.so/story/blog/yc-ai-native-agencies/the-transformation-threshold.png",
+  coverImageLight: "https://file.swell.so/story/blog/yc-ai-native-agencies/the-transformation-threshold.png",
+  relatedPosts: ["what-is-mcp-and-does-it-still-matter", "how-openclaw-sees-the-web"]
+}
+
+Y Combinator just dropped their <LinkPreview href="https://www.ycombinator.com/rfs" ogImage="https://bookface-static.ycombinator.com/assets/ycdc/rfs/yc-rfs-preview-image-bec1c2a78786b42d93e51344ad4e81a35936ac59ad6f54179fabfaffb1dde75f.jpg" ogTitle="Requests for Startups | Y Combinator" ogDescription="Y Combinator is looking for startups working on these ideas. If you're working on something we're interested in, we'd love to hear from you.">Spring 2026 Requests for Startups</LinkPreview>, and one section jumped off the page. Aaron Epstein wrote that agencies of the future will look more like software companies, with software margins. And they'll scale far bigger than any agencies that exist today.
+
+He's right. And the tech to make it happen already exists. Most people just haven't connected the dots yet.
+
+## The Agency Trap
+
+If you've ever worked at or run a service business, you know the math is brutal. You sell hours. Your costs are people. The only way to make more money is to hire more people, which means more management overhead, more coordination, more slow. Margins stay thin because your biggest expense (humans) scales linearly with your revenue.
+
+A design agency with 10 designers can handle maybe 25 clients. Want 250 clients? You need roughly 100 designers. Your margin stays at 20-30% because salaries eat everything else.
+
+Software companies have it different. Build the product once, sell it a million times. The marginal cost of the next customer approaches zero. That's why software margins sit at 70-85% while agency margins struggle to break 30%.
+
+Epstein nailed the insight: "Now instead of selling software to customers to help them do the work, you can charge way more by using the software yourself and selling them the finished product at 100x the price."
+
+That's the whole thesis. Don't sell tools. Sell the output of the tools.
+
+## The Numbers Don't Lie
+
+The economics shift across every vertical. Pick an agency type and look at what happens when AI handles the production work while humans handle the strategy and quality control.
+
+<AgencyEconomics />
+
+The revenue-per-employee jump is the headline number, but the delivery time compression might matter more. When you can turn around a design project in a day instead of three weeks, you don't just save money. You fundamentally change the client relationship. You can do spec work. You can offer unlimited revisions. You can say yes to projects that traditional agencies would turn down because the timeline is too tight.
+
+## This Isn't Theoretical
+
+Think about what's already happening in the wild.
+
+A design firm that uses AI to produce custom mockups for prospective clients before the contract is even signed. The prospect gets three polished concepts in their inbox within 24 hours of the initial call. The old way? That same output would take a week of designer time and you'd never risk it on an unsigned deal.
+
+An ad agency that generates stunning video concepts without physical production. No location scouts, no camera crews, no two-week post-production timeline. An agent orchestrates the whole thing from brief to final cut in hours.
+
+A law firm that drafts contracts, reviews compliance documents, and generates regulatory filings in minutes instead of billing junior associates for weeks of manual work.
+
+These aren't hypotheticals. Every one of these is buildable right now with tools that already exist. The question isn't whether it's possible. The question is who builds the workflows first.
+
+## The Stack That Makes It Real
+
+Here's where it gets concrete. If you've been following along with this blog, you've already seen all the pieces. They just haven't been assembled for this purpose yet.
+
+The AI-native agency stack has four layers. They map perfectly to tools we've already explored.
+
+### OpenClaw: The Hands
+
+Your agents need to actually *do things* in the world. <LinkPreview href="https://openclaw.ai" ogImage="https://openclaw.ai/og-image.png" ogTitle="OpenClaw — Personal AI Assistant" ogDescription="OpenClaw — The AI that actually does things. Your personal assistant on any platform.">OpenClaw</LinkPreview> gives them a browser, a file system, and a communication layer. As I covered in <LinkPreview href="https://dustin.site/blog/how-openclaw-sees-the-web" ogImage="https://file.swell.so/story/blog/how-openclaw-sees-the-web/the-structured-navigator.png" ogTitle="How OpenClaw Sees the Web" ogDescription="AI agents don't browse the internet like you do. They see numbered elements, accessibility trees, and zero pixels.">my previous article</LinkPreview>, agents navigate the web through accessibility snapshots. They don't need pixel-perfect vision. They just need semantic understanding of what's on the page and the ability to interact with it.
+
+For an agency, this means your agents can navigate client platforms, log into dashboards, download assets, upload deliverables, send messages, and handle the thousands of small browser tasks that eat up an agency employee's day.
+
+### MCP: The Connections
+
+The <LinkPreview href="https://modelcontextprotocol.io/" ogImage="https://raw.githubusercontent.com/modelcontextprotocol/docs/2eb6171ddbfeefde349dc3b8d5e2b87414c26250/images/og-image.png" ogTitle="What is the Model Context Protocol (MCP)? - Model Context Protocol" ogDescription="MCP is an open-source standard for connecting AI applications to external systems.">Model Context Protocol</LinkPreview> is the plumbing that connects agents to external services. As I wrote in <LinkPreview href="https://dustin.site/blog/what-is-mcp-and-does-it-still-matter" ogImage="https://file.swell.so/story/blog/what-is-mcp-and-does-it-still-matter/the-nunchuck-skills-paradox.png" ogTitle="What is MCP and Does It Still Matter After SKILL.md?" ogDescription="The internet declared MCP dead the moment agent skills dropped. Here's why that take is wrong.">my MCP article</LinkPreview>, it's like USB-C for AI. One protocol, many services.
+
+For an agency, MCP servers connect your agents to the tools of the trade. Figma for design. Google Ads and Meta Ads for marketing. Stripe and QuickBooks for billing. CRMs, project management tools, analytics platforms. Each MCP server gives the agent typed, structured access to these services. No screen scraping, no brittle API wrappers. Just clean tool interfaces that the agent calls like functions.
+
+### Skills: The Playbooks
+
+Skills are the secret weapon. They're the reusable procedures that encode *how your agency does its best work*. A skill might be "how we onboard a new design client" or "the process for generating a social media content calendar" or "steps for auditing a client's ad spend."
+
+Each skill is a markdown file that teaches the agent a complete workflow. When a client request matches a skill's description, the agent loads it and executes the procedure. No exploration, no wasted tokens figuring out what to do. Just crisp execution of a proven process.
+
+This is where the agency's competitive advantage lives. Your skills *are* your intellectual property. Every time you refine a workflow, you're improving every future execution of that workflow. The compound effect is enormous.
+
+### Workflows: The Orchestration
+
+The final layer is the orchestration. This is where everything comes together. A workflow chains Skills, MCP connections, and OpenClaw actions into an end-to-end pipeline that turns a client request into a delivered product.
+
+<AgencyWorkflowDemo />
+
+Notice what's happening in that workflow. The agent receives a brief, activates the right skill, connects to external services through MCP, executes browser actions through OpenClaw, and delivers a finished product. Everything between the initial request and the quality review happens without a human touching anything.
+
+That's the software margin Epstein is talking about. Your cost to fulfill that request is tokens and API calls, not a designer's weekly salary.
+
+## The Compound Advantage
+
+The compounding advantage of an AI-native agency is hard to overstate.
+
+Traditional agencies get better by hiring better people. But good people are expensive, scarce, and they leave. Your institutional knowledge walks out the door every time someone quits.
+
+An AI-native agency gets better by improving its skills. Every client engagement teaches you something. You refine the skill, and that improvement applies to every future execution instantly. Your institutional knowledge lives in code, not in people's heads.
+
+You can also run experiments at near-zero marginal cost. Want to test a new approach to client onboarding? Fork the skill, try the variation, measure the results. In a traditional agency, that experiment costs real money in employee time and carries real risk of client dissatisfaction.
+
+And scaling doesn't require proportional headcount growth. Adding MCP connections to new services, writing skills for new workflows, and spinning up more agent instances is fundamentally cheaper than recruiting, training, and managing more employees.
+
+## Building Your First AI-Native Workflow
+
+If you're reading this and thinking about building an AI-native agency, here's how I'd approach it.
+
+**Start with one vertical.** Don't try to build a general-purpose agency. Pick the service you know best. Design, copywriting, legal review, ad management, whatever. You need deep domain expertise to write good skills.
+
+**Map the manual workflow first.** Before you automate anything, document exactly how you do the work today. Every step, every tool, every decision point. This becomes your first skill.
+
+**Build the MCP connections.** Identify every external service your workflow touches and find or build MCP servers for them. This is your infrastructure investment. It pays dividends across every workflow you build afterward.
+
+**Write the skills.** Take your documented workflow and encode it as a skill. Be specific. Include error handling. Specify what the agent should do when it encounters edge cases. The more detailed the skill, the more reliable the execution.
+
+**Let OpenClaw handle the last mile.** There will always be browser actions that don't have MCP servers. A client's custom CMS. A niche industry tool. OpenClaw's browser capabilities cover the gap. The agent navigates it like a human would, just faster and without complaining.
+
+**Build the quality gate.** This is critical. The human doesn't disappear from the workflow. They move from *doing* the work to *reviewing* the work. Set up a review step where a senior person validates the output before it goes to the client. Over time, as the workflows prove reliable, this review becomes lighter and lighter.
+
+## What Comes Next
+
+YC putting AI-native agencies on their RFS is a signal. The investors who funded every major software wave of the past two decades are now saying "agency businesses are about to have software economics." When YC says they want to fund something, it tends to happen.
+
+The tools are ready. MCP standardizes external connections. Skills encode expertise. OpenClaw gives agents hands. The workflow layer ties them together.
+
+The question isn't whether AI-native agencies will exist. It's who builds the definitive ones first. In design, in legal, in marketing, in accounting, in every fragmented service market where humans currently do repetitive knowledge work.
+
+If you've been building with these tools, you're closer than you think. The hard part was never the AI. It was always the domain expertise. Knowing *exactly* how to do great design work, write bulletproof contracts, or run effective ad campaigns. If you have that knowledge and you can encode it into skills that agents execute reliably, you're not building an agency.
+
+You're building a software company with an agency's client relationships.
+
+And that's what YC wants to fund.
