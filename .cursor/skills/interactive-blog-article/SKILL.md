@@ -44,44 +44,104 @@ Never use em dashes (`---`) in the metadata. Also, avoid AI writing tropes like 
 
 ## Creating Interactive Components
 
-### Component Guidelines
+### Core Principles
+
+These are non-negotiable rules for every interactive component:
 
 1. **Always use "use client"** - All interactive components must be client-side
-2. **Theme-aware styling** - Use `useTheme()` from `@/contexts/ThemeContext`
-3. **Glass morphism aesthetic** - Match site style with backdrop blur and transparency
-4. **Motion animations** - Use `motion.dev` (already installed) for smooth transitions
+2. **Theme-aware styling** - Use `useTheme()` from `@/contexts/ThemeContext` for every color decision
+3. **Glass morphism aesthetic** - Backdrop blur, transparency, and subtle borders everywhere
+4. **Blur crossfade transitions** - State changes blur out the old content and blur in the new. This is our signature animation.
 5. **Responsive design** - Components work on mobile and desktop
+6. **Data-driven architecture** - Define content as typed arrays/objects at the top of the file, render below
 
-### Example Component Template
+### Component Architecture Pattern
+
+Every interactive component follows this exact structure:
 
 ```typescript
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useTheme } from "@/contexts/ThemeContext";
 
+// 1. DATA FIRST: Define all content as typed arrays at the top
+const items = [
+  { name: "Option A", description: "...", /* fields */ },
+  { name: "Option B", description: "...", /* fields */ },
+];
+
+// 2. COMPONENT: Stateful with blur crossfade
 export function MyComponent() {
   const { theme } = useTheme();
-  const [state, setState] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selected = items[selectedIndex];
 
   return (
     <div className="my-12">
+      {/* 3. SELECTOR: Tab-style buttons */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {items.map((item, i) => (
+          <button
+            key={item.name}
+            type="button"
+            onClick={() => setSelectedIndex(i)}
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+              selectedIndex === i
+                ? theme === "dark"
+                  ? "border-white/40 bg-white/10 text-white"
+                  : "border-black/40 bg-black/10 text-black"
+                : theme === "dark"
+                  ? "border-white/20 bg-white/5 text-white/70 hover:bg-white/10"
+                  : "border-black/20 bg-black/5 text-black/70 hover:bg-black/10"
+            }`}
+          >
+            {item.name}
+          </button>
+        ))}
+      </div>
+
+      {/* 4. CONTENT: Blur crossfade between states */}
+      <div className="relative">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={selectedIndex}
+            initial={{ opacity: 0, filter: "blur(10px)", position: "absolute", inset: 0 }}
+            animate={{ opacity: 1, filter: "blur(0px)", position: "relative" }}
+            exit={{ opacity: 0, filter: "blur(10px)", position: "absolute", inset: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className={`rounded-xl border backdrop-blur-xl p-8 ${
+              theme === "dark"
+                ? "border-white/20 bg-white/5"
+                : "border-black/20 bg-black/5"
+            }`}
+          >
+            {/* Render selected content */}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* 5. INSIGHT NOTE: Always end with a takeaway */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`rounded-xl border backdrop-blur-xl p-6 ${
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className={`mt-4 rounded-lg border p-4 text-sm ${
           theme === "dark"
-            ? "border-white/20 bg-white/5"
-            : "border-black/20 bg-black/5"
+            ? "border-white/10 bg-white/5 text-white/60"
+            : "border-black/10 bg-black/5 text-black/60"
         }`}
       >
-        {/* Component content */}
+        <span className="font-bold">Key insight:</span> Explain what the reader
+        should notice or take away from interacting with this component.
       </motion.div>
     </div>
   );
 }
 ```
+
+**This pattern is not optional.** Every interactive component must follow this 5-part structure: data at top, selector buttons, blur crossfade content, and an insight note at the bottom.
 
 ## Integrating Components with MDX
 
@@ -348,56 +408,197 @@ else if (faceIndex === 5) finalX = baseSpinsX + 90;
 
 ## Styling Patterns
 
-### Glass Morphism Card
+### The Design Language (2026 Aesthetic)
+
+Our components follow a sleek, modern design language. This is NOT generic Tailwind. Every component should feel like it belongs in a polished, high-end product demo.
+
+**Key characteristics:**
+- Glass morphism with `backdrop-blur-xl` on every container
+- Subtle transparency (`bg-white/5`, `bg-black/5`) instead of solid backgrounds
+- Thin borders with low opacity (`border-white/20`, `border-black/20`)
+- Generous padding and spacing (`p-8`, `my-12`)
+- `rounded-xl` on primary containers, `rounded-lg` on secondary elements
+- No hard shadows. Only subtle `shadow-lg` on colored elements.
+
+### Glass Morphism Card (Primary Container)
 
 ```typescript
-className={`rounded-xl border backdrop-blur-xl p-6 ${
+className={`rounded-xl border backdrop-blur-xl p-8 ${
   theme === "dark"
     ? "border-white/20 bg-white/5"
     : "border-black/20 bg-black/5"
 }`}
 ```
 
-### Chip/Badge Style
+### Insight Note (Secondary Container)
+
+Every component ends with one of these. The bold lead-in text varies: "Pro tip:", "Notice the difference?", "The test:", "Watch the loop:", etc.
 
 ```typescript
-className="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 font-bold text-white shadow-sm mx-0.5"
+className={`mt-4 rounded-lg border p-4 text-sm ${
+  theme === "dark"
+    ? "border-white/10 bg-white/5 text-white/60"
+    : "border-black/10 bg-black/5 text-black/60"
+}`}
 ```
 
-### Button Style
+### Tab Selector Buttons
+
+Used in EVERY component that switches between views. Active state has higher opacity borders/backgrounds.
 
 ```typescript
-className={`rounded-xl border px-8 py-3 font-mono text-sm tracking-wider backdrop-blur-xl transition-all ${
+// Active state
+theme === "dark"
+  ? "border-white/40 bg-white/10 text-white"
+  : "border-black/40 bg-black/10 text-black"
+
+// Inactive state
+theme === "dark"
+  ? "border-white/20 bg-white/5 text-white/70 hover:bg-white/10"
+  : "border-black/20 bg-black/5 text-black/70 hover:bg-black/10"
+```
+
+### Badge/Chip Style
+
+For labels, verdicts, status indicators. Use semantic colors on solid backgrounds.
+
+```typescript
+className="rounded-full bg-blue-600 px-3 py-1 text-xs font-bold text-white"
+```
+
+### Semantic Color Coding
+
+When showing comparisons or status:
+- **Red/negative**: `border-red-500/30 bg-red-500/5` (dark) / `border-red-500/30 bg-red-50/50` (light)
+- **Green/positive**: `border-green-500/30 bg-green-500/5` (dark) / `border-green-500/30 bg-green-50/50` (light)
+- **Blue/interactive**: `border-blue-500/40 bg-blue-500/10` (dark) / `border-blue-600/40 bg-blue-50` (light)
+- **Purple/input**: `border-violet-500/40 bg-violet-500/8` (dark) / `border-violet-600/40 bg-violet-50` (light)
+- **Emerald/action**: `border-emerald-500/40 bg-emerald-500/8` (dark) / `border-emerald-600/40 bg-emerald-50` (light)
+
+### Section Labels
+
+Use uppercase tracking-wider labels to title sections within components:
+
+```typescript
+className={`text-xs font-bold uppercase tracking-wider ${
+  theme === "dark" ? "text-white/40" : "text-black/40"
+}`}
+```
+
+### Mini Browser Chrome
+
+When simulating a browser window inside a component, always include the traffic light dots:
+
+```typescript
+<div className={`flex items-center gap-1.5 border-b px-3 py-1.5 ${
+  theme === "dark" ? "border-white/10 bg-white/5" : "border-black/10 bg-black/5"
+}`}>
+  <div className="h-1.5 w-1.5 rounded-full bg-red-500/60" />
+  <div className="h-1.5 w-1.5 rounded-full bg-yellow-500/60" />
+  <div className="h-1.5 w-1.5 rounded-full bg-green-500/60" />
+  <div className={`ml-2 rounded px-2 py-0.5 text-[8px] ${
+    theme === "dark" ? "bg-white/10 text-white/30" : "bg-black/5 text-black/30"
+  }`}>
+    example.com
+  </div>
+</div>
+```
+
+### Action/Control Button
+
+For "Run", "Roll", "Play" type buttons within components:
+
+```typescript
+className={`rounded-lg border px-4 py-2 text-xs font-medium transition-all ${
   theme === "dark"
     ? "border-white/20 bg-white/5 text-white hover:bg-white/10"
     : "border-black/20 bg-black/5 text-black hover:bg-black/10"
-} disabled:opacity-50 disabled:cursor-not-allowed`}
+} disabled:cursor-not-allowed disabled:opacity-40`}
 ```
+
+### Text Opacity Scale
+
+Use these consistently for text hierarchy:
+- **Primary text**: `text-white` / `text-black` (full opacity)
+- **Secondary text**: `text-white/80` / `text-black/80`
+- **Tertiary text**: `text-white/60` / `text-black/60`
+- **Muted/labels**: `text-white/40` / `text-black/40`
+- **Barely visible**: `text-white/30` / `text-black/30`
 
 ## Animation Patterns
 
-### Staggered Grid Animation
+### The Blur Crossfade (Signature Transition)
+
+This is the most important animation pattern. It is used for **every** state transition where content changes. Old content blurs out while new content blurs in. This creates a sleek, modern feel that avoids jarring cuts.
 
 ```typescript
-{items.map((item, index) => (
+<div className="relative">
+  <AnimatePresence initial={false}>
+    <motion.div
+      key={selectedIndex}  // MUST change to trigger animation
+      initial={{ opacity: 0, filter: "blur(10px)", position: "absolute", inset: 0 }}
+      animate={{ opacity: 1, filter: "blur(0px)", position: "relative" }}
+      exit={{ opacity: 0, filter: "blur(10px)", position: "absolute", inset: 0 }}
+      transition={{ duration: 0.5, ease: "easeInOut" }}
+    >
+      {/* content */}
+    </motion.div>
+  </AnimatePresence>
+</div>
+```
+
+**Critical details:**
+- `initial={false}` on AnimatePresence prevents the blur animation on first render
+- The wrapping `<div className="relative">` is required for absolute positioning during crossfade
+- `position: "absolute"` in initial/exit keeps both states overlapping during transition
+- `position: "relative"` in animate ensures normal flow after transition completes
+- Use `filter: "blur(10px)"` for standard content, `filter: "blur(12px)"` for larger content blocks, `filter: "blur(8px)"` for smaller elements
+- Always 0.5s duration with easeInOut. This is the sweet spot.
+
+### Staggered List Entry
+
+For items that appear one after another (snapshot elements, checklist items):
+
+```typescript
+{items.map((item, i) => (
   <motion.div
-    key={index}
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ delay: index * 0.1 }}
+    key={item.id}
+    initial={{ opacity: 0, x: -8 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay: i * 0.04, duration: 0.3 }}
   >
     {/* content */}
   </motion.div>
 ))}
 ```
 
-### Cascading Roll Effect
+Use `delay: i * 0.04` for fast cascades (many items), `delay: i * 0.05` for medium cascades, `delay: i * 0.1` for slow/dramatic cascades.
+
+### Delayed Fade In
+
+For secondary content that appears after the main content:
 
 ```typescript
-for (let i = 0; i < items.length; i++) {
-  await new Promise(resolve => setTimeout(resolve, 150)); // Stagger
-  // Trigger animation for item i
-}
+<motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+>
+```
+
+### Pulsing Highlight (Attention Indicator)
+
+For elements that need to draw attention (like a targeted element in a simulation):
+
+```typescript
+animate={{
+  boxShadow: [
+    "0 0 0px 0px rgba(59,130,246,0)",
+    "0 0 12px 4px rgba(59,130,246,0.5)",
+    "0 0 0px 0px rgba(59,130,246,0)",
+  ],
+}}
+transition={{ duration: 1.2, repeat: Number.POSITIVE_INFINITY }}
 ```
 
 ### Pop-in with Bounce
@@ -411,6 +612,15 @@ for (let i = 0; i < items.length; i++) {
     ease: [0.34, 1.56, 0.64, 1] // Bouncy easing
   }}
 >
+```
+
+### Cascading Roll Effect
+
+```typescript
+for (let i = 0; i < items.length; i++) {
+  await new Promise(resolve => setTimeout(resolve, 150)); // Stagger
+  // Trigger animation for item i
+}
 ```
 
 ## Data Management
@@ -442,14 +652,89 @@ export function rollDie(category: keyof typeof categories): string {
 
 ## Best Practices
 
-- Keep components focused on one purpose
-- Extract reusable logic to lib files
-- Use TypeScript for type safety
-- Add loading states for async operations
-- Include helpful explanatory text
-- Make interactions obvious (clear buttons/affordances)
-- Test with multiple rapid interactions
-- Consider accessibility (keyboard navigation where applicable)
+### Component Design Rules
+
+1. **One concept per component** - Each component illustrates a single idea. If it does two things, split it.
+2. **Data-driven, not hardcoded** - All content lives in typed arrays/objects at the top of the file. The render logic is generic.
+3. **Every state change uses blur crossfade** - No exceptions. No hard cuts. No slide-in/slide-out. Blur in, blur out.
+4. **Every component has an insight note** - The bottom callout with bold lead text that tells the reader what to notice.
+5. **Tab selectors for multi-view components** - Use the exact button pattern (active/inactive styles) shown above. Don't invent new selector patterns.
+6. **Always `type="button"` on buttons** - Prevents form submission in MDX context.
+7. **No `index` as `key`** - Use a meaningful identifier from the data (name, id, category).
+8. **Extract reusable logic to `lib/` files** - Data configs, utility functions, etc.
+
+### Theme Handling Rules
+
+1. **Always use ternary with `theme === "dark"`** - Never use Tailwind's `dark:` prefix in interactive components. Always use the ThemeContext.
+2. **Every color must have a dark AND light variant** - No color should look good in only one mode.
+3. **Use opacity-based colors, not solid colors** - `bg-white/5` not `bg-gray-900`. `border-white/20` not `border-gray-700`. This is what gives the glass morphism effect.
+4. **The only solid colors allowed** are semantic badges/chips (e.g., `bg-blue-600`, `bg-red-600`, `bg-green-600` for status indicators).
+
+### What NOT To Do
+
+- **Don't use Tailwind `dark:` classes** in interactive components (use ThemeContext ternaries instead)
+- **Don't use solid backgrounds** on containers (`bg-gray-800` is wrong, `bg-white/5` is right)
+- **Don't use `opacity-60`** for text (use `text-white/60` instead - it's the same effect but more explicit)
+- **Don't use slide/transform animations** for state transitions (blur crossfade only)
+- **Don't skip the insight note** at the bottom of the component
+- **Don't use generic Tailwind card patterns** (no `shadow-md rounded-lg bg-white p-4`)
+- **Don't use `indexOf` in event handlers** - capture the index from `map` directly
+- **Don't forget `initial={false}` on AnimatePresence** - without it, the first render will blur in annoyingly
+
+## Component Categories
+
+When building interactive components, they generally fall into one of these categories. Use the right pattern for the right job.
+
+### 1. Comparison/Switcher Components
+
+**Use when**: The reader needs to see the same concept rendered differently (fonts, colors, code styles, before/after).
+
+**Pattern**: Tab selector buttons + blur crossfade between states. See `FontComparison.tsx`, `ColorPaletteComparison.tsx`, `CopywritingComparison.tsx`, `AgentVisionDemo.tsx`.
+
+**Structure**:
+- Data array of options at top
+- `selectedIndex` state to track which option is active
+- Tab buttons to switch
+- `AnimatePresence` with blur crossfade for content
+- Insight note at bottom
+
+### 2. Simulation/Stepper Components
+
+**Use when**: Demonstrating a multi-step process (agent workflow, build pipeline, animation sequence).
+
+**Pattern**: Play/step controls + blur crossfade between steps + visual representation. See `SnapshotSimulator.tsx`.
+
+**Structure**:
+- Steps array with `thought`, `action`, `highlight` fields
+- `step` state + `isPlaying` state
+- Auto-play function with `setTimeout` delays between steps
+- Split layout (visual on left, data on right)
+- Step counter (`Step 2/5`) in controls area
+
+### 3. Inline Preview Components
+
+**Use when**: Enriching inline text with hover tooltips (links, fonts, colors).
+
+**Pattern**: `TooltipProvider` + `Tooltip` from `@/components/ui/tooltip` with glass morphism content. See `FontPreview.tsx`, `LinkPreview.tsx`, `ColorSwatch.tsx`.
+
+**Structure**:
+- Wraps inline `<span>` or `<a>` elements
+- `TooltipContent` with `backdrop-blur-xl` and theme-aware borders
+- `delayDuration={500}` on TooltipProvider
+- `showArrow={false}` on TooltipContent (our style doesn't use arrows)
+- `sideOffset={8}` for spacing
+
+### 4. Complex Interactive Components
+
+**Use when**: More elaborate interactions like 3D dice, drag-and-drop, multi-panel simulators.
+
+**Pattern**: Custom state management + motion animations. See `DiceRoller.tsx`, `BrowserModes.tsx`.
+
+**Structure**:
+- Complex state (`isRolling`, `rotateX`, `rotateY`, etc.)
+- Multiple animation phases
+- Still wrapped in glass morphism container
+- Still ends with insight note
 
 ## Example: Complete Interactive Component Flow
 
@@ -460,10 +745,32 @@ export function rollDie(category: keyof typeof categories): string {
 5. Use `<MyDemo />` in MDX article
 6. Test thoroughly
 
+## Quick Reference Checklist
+
+Before submitting any interactive component, verify all of the following:
+
+- [ ] `"use client"` at the top
+- [ ] `useTheme()` from `@/contexts/ThemeContext` for all colors
+- [ ] Data defined as typed arrays/objects at the top of the file
+- [ ] Tab selector buttons with exact active/inactive styling pattern
+- [ ] `AnimatePresence initial={false}` wrapping blur crossfade
+- [ ] Blur crossfade uses `filter: "blur(10px)"`, 0.5s duration, easeInOut
+- [ ] `position: "absolute"/"relative"` pattern in crossfade initial/animate/exit
+- [ ] Wrapping `<div className="relative">` around the AnimatePresence
+- [ ] Glass morphism container: `rounded-xl border backdrop-blur-xl p-8` + theme ternary
+- [ ] Insight note at the bottom with bold lead text
+- [ ] `my-12` spacing on the outermost wrapper
+- [ ] `type="button"` on all button elements
+- [ ] Both dark and light mode look good
+- [ ] No use of Tailwind `dark:` prefix (use ThemeContext ternaries)
+- [ ] No solid backgrounds on containers (use transparency)
+- [ ] No hard cuts between states (blur crossfade everywhere)
+
 ## Resources
 
 - Motion.dev docs: https://motion.dev
 - Tailwind CSS: Already configured
 - Theme context: `@/contexts/ThemeContext`
 - Existing components: Reference `components/blog/` for examples
+- Best reference components: `FontComparison.tsx`, `ColorPaletteComparison.tsx`, `AgentVisionDemo.tsx`
 
