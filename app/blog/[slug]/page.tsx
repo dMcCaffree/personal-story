@@ -21,6 +21,9 @@ import { BrowserModes } from "@/components/blog/BrowserModes";
 import { WorkspaceExplorer } from "@/components/blog/WorkspaceExplorer";
 import { ContextBudget } from "@/components/blog/ContextBudget";
 import { AgentRace } from "@/components/blog/AgentRace";
+import { ApproachComparison } from "@/components/blog/ApproachComparison";
+import { DailyPlaybook } from "@/components/blog/DailyPlaybook";
+import { OutreachTracker } from "@/components/blog/OutreachTracker";
 import Link from "next/link";
 
 // Force static generation at build time - no runtime functions
@@ -193,10 +196,13 @@ export default async function BlogPostPage({
 				SnapshotSimulator,
 				BrowserModes,
 				WorkspaceExplorer,
-			ContextBudget,
-			AgentRace,
-			}}
-		/>
+		ContextBudget,
+		AgentRace,
+		ApproachComparison,
+		DailyPlaybook,
+		OutreachTracker,
+		}}
+	/>
 	);
 
 	return (

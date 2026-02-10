@@ -16,6 +16,9 @@ import { BrowserModes } from "@/components/blog/BrowserModes";
 import { WorkspaceExplorer } from "@/components/blog/WorkspaceExplorer";
 import { ContextBudget } from "@/components/blog/ContextBudget";
 import { AgentRace } from "@/components/blog/AgentRace";
+import { ApproachComparison } from "@/components/blog/ApproachComparison";
+import { DailyPlaybook } from "@/components/blog/DailyPlaybook";
+import { OutreachTracker } from "@/components/blog/OutreachTracker";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -36,6 +39,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		WorkspaceExplorer,
 		ContextBudget,
 		AgentRace,
+		ApproachComparison,
+		DailyPlaybook,
+		OutreachTracker,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}
