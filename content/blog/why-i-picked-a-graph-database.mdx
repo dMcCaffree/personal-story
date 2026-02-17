@@ -1,0 +1,138 @@
+export const metadata = {
+  title: "Why I Picked a Graph Database (And When You Should Too)",
+  date: "2026-02-17",
+  excerpt: "I hit a wall building a memory layer for an AI SMS product. Postgres choked. MongoDB faked it. Then I discovered that graph databases solve an entire class of problems nothing else can.",
+  readTime: "9 min",
+  coverImageDark: "https://file.swell.so/story/blog/why-i-picked-a-graph-database/dawn-of-connected-understanding.png",
+  coverImageLight: "https://file.swell.so/story/blog/why-i-picked-a-graph-database/dawn-of-connected-understanding.png",
+  relatedPosts: ["what-is-mcp-and-does-it-still-matter", "building-products-2026"]
+}
+
+Your AI texting assistant needs to remember that your sister Sarah lives in Paris, that you hate window seats, and that three weeks ago you were stressed about a deadline at work. When you text "booking a flight to Europe next month," the AI should surface all of that. Sarah. The aisle seat preference. Maybe even the work stress, in case the trip is a much-needed break.
+
+How do you store that?
+
+This was the exact problem I ran into building <LinkPreview href="https://aichatsms.com" ogImage="https://www.aichatsms.com/assets/images/open-graph.jpg" ogTitle="AI right in your text messages | AI Chat" ogDescription="No apps to download, passwords to remember, or API tokens to manage">aichatsms.com</LinkPreview>, an AI-powered SMS product that keeps long-term memory of everything you've talked about and surfaces relevant context when it matters. Not keyword matching. Not search. Actual understanding of how your life connects together.
+
+I tried the obvious databases first. Both of them failed me in ways I didn't expect.
+
+## What a graph database actually is
+
+Before I get into the war story, here's the quick version for anyone who hasn't encountered graph databases before.
+
+A graph database stores data as **nodes** (things) and **edges** (relationships between things). That's it. Every node can have properties. Every edge can have properties. And crucially, the relationships are stored as actual data, not computed at query time through JOINs.
+
+Think of it like this. In a traditional database, you store records in tables and figure out how they connect when you run a query. In a graph database, the connections are the data. They exist as first-class citizens right alongside the entities.
+
+The query language for most graph databases (Neo4j uses Cypher) reads almost like English:
+
+```
+MATCH (user:User)-[:SENT]->(msg:Message)-[:ABOUT]->(topic:Topic)
+WHERE user.name = "Dustin"
+RETURN topic.name
+```
+
+That says "find all topics that Dustin's messages are about." No JOINs. No subqueries. Just follow the arrows.
+
+## Why Postgres fell apart
+
+Like every developer, I started with Postgres. It's the default for good reason. Solid, reliable, well-understood. For the basic stuff, it worked great. Users table. Conversations table. Messages table. Foreign keys everywhere. Clean schema. Textbook stuff.
+
+The problem showed up when I needed to build the memory layer.
+
+An AI SMS product isn't just storing messages. It's extracting meaning from them. Every message gets parsed for topics ("travel," "family," "work"), entities ("Paris," "Sarah," "Delta Airlines"), preferences ("hates window seats"), and emotional context ("stressed about deadline"). All of these extracted pieces need to connect to each other because that's where the value lives.
+
+When I started writing the queries to surface relevant context, things got ugly fast. "Find all memories related to topics this user has discussed, including memories connected to those memories up to 2 hops away" turned into a recursive CTE with 4+ JOINs that I had to squint at to understand.
+
+The real killer was performance. At 1 hop (direct connections), Postgres was fine. At 2 hops, it was tolerable. At 3 hops, query times started climbing into hundreds of milliseconds. At 5 hops, I was looking at multi-second queries. For a product that needs to respond to an SMS in real time, that's a non-starter.
+
+The fundamental issue is that relational databases compute relationships at query time. Every JOIN is a lookup. Every hop multiplies the work. The more connected your data is, the worse it gets.
+
+<QueryComparison />
+
+## Why MongoDB didn't fix it
+
+After Postgres started showing cracks, I thought about MongoDB. Maybe the problem was rigid schemas. Maybe I needed flexible documents that could nest related data naturally.
+
+MongoDB has this operator called `$graphLookup` that does recursive traversal across collections. It sounds perfect on paper. In practice, it's bolted onto a document-oriented storage engine that was never designed for graph traversal. The performance characteristics are similar to SQL recursive CTEs because under the hood, it's doing the same kind of work. Scanning documents, matching IDs, building result sets.
+
+The other problem with MongoDB for this use case is data duplication. If Sarah is mentioned in 15 different conversations, do you embed her in each one? Then when you learn something new about Sarah (she moved to Lyon), you have 15 documents to update. Or do you reference her by ID and do lookups? Then you're back to the JOIN problem, just with a different syntax.
+
+Document databases are great when your data is naturally hierarchical. Blog posts with comments. Product catalogs with variants. User profiles with nested settings. But when your data is a web of connections where any node can relate to any other node through multiple paths, you're fighting the data model instead of working with it.
+
+## The graph DB "aha" moment
+
+I modeled the aichatsms.com data as a knowledge graph, and everything clicked immediately.
+
+- **User** nodes connect to **Message** nodes through `SENT` edges
+- **Message** nodes connect to **Topic** nodes through `ABOUT` edges
+- **Message** nodes connect to **Entity** nodes through `MENTIONS` edges
+- **Entity** nodes connect to other **Entity** nodes through relationship edges like `LIVES_IN`, `WORKS_AT`, `RELATED_TO`
+- **User** nodes connect to **Preference** nodes through `PREFERS` edges
+
+The data model *is* the query. When I need to find everything relevant to a new message about travel, I start at the user node and walk outward through the graph. Every edge I follow adds context. The traversal stops when the connections get too distant or too weak to matter.
+
+And the performance? Nearly constant regardless of how many hops I need to traverse.
+
+<RelationshipDepthDemo />
+
+That's not a rounding error. Graph databases use something called index-free adjacency, which means each node physically stores pointers to its neighbors. Traversing an edge is an O(1) pointer lookup, not a table scan. Whether your graph has a thousand nodes or a billion, following one connection takes the same amount of time.
+
+## How the memory graph actually works
+
+Here's the real payoff. Watch what happens as a conversation builds up a knowledge graph message by message, and then see what the AI can surface when a new topic comes up.
+
+<MemoryGraphDemo />
+
+This is the part that Postgres and MongoDB simply cannot do elegantly. When a user texts about flying to Europe, the AI needs to traverse:
+
+1. **User** -> previous messages about **Travel** (topic match)
+2. **Travel** -> **Paris** (entity connected to the topic)
+3. **Paris** -> **Sarah** lives there (entity-to-entity relationship)
+4. **User** -> **Preference**: no window seats (user preference linked to travel context)
+
+In Neo4j, that's a single Cypher query that executes in single-digit milliseconds. In Postgres, it's a recursive CTE that grows linearly with data volume. In MongoDB, it's an aggregation pipeline that pretends to be a graph query.
+
+The graph doesn't just store what the user said. It stores how everything the user said connects together. And that's what makes the AI actually feel like it remembers you, not just your keywords.
+
+## When NOT to use a graph DB
+
+I want to be honest about this because graph databases are not the answer to everything. If someone tells you to use a graph DB for a basic CRUD app, they're overcomplicating things.
+
+**Don't use a graph DB when:**
+
+- **Your relationships are simple and shallow.** Users have orders. Orders have items. That's two JOINs. Postgres handles this better, faster, and with more mature tooling than any graph database.
+- **You mostly do single-entity lookups.** If 90% of your queries are "get user by ID" or "find products under $50," a graph DB adds operational complexity for zero benefit.
+- **You need heavy analytics and aggregations.** Counting totals, computing averages, building reports. That's what Postgres and data warehouses are built for. Graph DBs are terrible at this.
+- **Your team only knows SQL.** The learning curve for Cypher is real. If you don't have a genuine graph-shaped problem, the ramp-up time isn't worth it.
+- **Your data is naturally hierarchical.** A file system, an org chart, a category tree. These are technically graphs, but they're so simple that Postgres with a recursive CTE or MongoDB with nested documents handles them fine.
+
+**Use a graph DB when:**
+
+- Relationships are as important as the entities themselves
+- You need multi-hop traversals (3+ levels deep) in real time
+- Your data model has many-to-many relationships that evolve over time
+- Pattern discovery matters (fraud detection, recommendation engines, knowledge graphs)
+- You're building something where the connections between data points *are* the product
+
+For aichatsms.com, the product literally *is* the connections. The value isn't in any individual message or entity. It's in the web of relationships that the AI builds over time and traverses to surface the right context at the right moment.
+
+## The options if you go this route
+
+If you've decided you have a genuine graph-shaped problem, here are the main options:
+
+**Neo4j** is the market leader and what I use. Cypher is the most readable graph query language, and it recently became an ISO standard. The community is large, the documentation is solid, and the performance is proven. They have a free community edition and a managed cloud offering (Aura).
+
+**Amazon Neptune** is the go-to if you're already deep in AWS. It supports both property graphs (Gremlin) and RDF triple stores (SPARQL). Less opinionated than Neo4j, which is both a feature and a drawback.
+
+**ArangoDB** is interesting if you want a multi-model database that handles documents, key-value, and graph queries in one system. Less specialized than Neo4j for pure graph work, but reduces operational complexity if you need multiple data models.
+
+**TigerGraph** is built for real-time analytics on large graphs. If your graph has billions of edges and you need sub-second queries, TigerGraph is purpose-built for that scale.
+
+## Closing thought
+
+Every database is a tool for a specific shape of problem. Postgres is brilliant for structured, relational data with predictable query patterns. MongoDB is great for flexible, document-shaped data that doesn't fit rigid schemas. Graph databases are the answer when your data's value lives in its connections, not its records.
+
+For aichatsms.com, switching to a graph database wasn't an optimization. It was a fundamental shift in how the product thinks about memory. The AI doesn't search for relevant information. It traverses a web of connections that grows richer with every conversation.
+
+If you're building something where the relationships between things matter more than the things themselves, stop fighting your relational database and look at a graph. You'll know it's the right call when your query starts reading like a sentence instead of a legal document.

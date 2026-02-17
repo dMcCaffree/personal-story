@@ -21,6 +21,9 @@ import { DailyPlaybook } from "@/components/blog/DailyPlaybook";
 import { OutreachTracker } from "@/components/blog/OutreachTracker";
 import { AgencyEconomics } from "@/components/blog/AgencyEconomics";
 import { AgencyWorkflowDemo } from "@/components/blog/AgencyWorkflowDemo";
+import { QueryComparison } from "@/components/blog/QueryComparison";
+import { RelationshipDepthDemo } from "@/components/blog/RelationshipDepthDemo";
+import { MemoryGraphDemo } from "@/components/blog/MemoryGraphDemo";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
 	return {
@@ -46,6 +49,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 		OutreachTracker,
 		AgencyEconomics,
 		AgencyWorkflowDemo,
+		QueryComparison,
+		RelationshipDepthDemo,
+		MemoryGraphDemo,
 		h1: ({ children }) => (
 			<h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight">
 				{children}
